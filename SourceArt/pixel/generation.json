@@ -1,0 +1,10 @@
+{
+  "art_source": "host_image",
+  "route": "image_gen",
+  "model": "tool-managed",
+  "estimateUsd": null,
+  "reference": "existing main-menu heroine key art",
+  "prompt_set": {
+    "ui": "Matching pixel-art 4 x 4 transparent atlas: portrait, life, posture, energy, attack, parry, jump, dodge, counter, home, pause, left, right, settings, manual, moon."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "package": "contentpack_20261104",
+  "project": "LingyueEchoes",
+  "scope": "Retained music pack. Superseded prologue background plates removed; active replacement is prologue_route.",
+  "tests_run": false,
+  "images": [],
+  "music": [
+    {
+      "file": "assets/resources/contentpack_20261104/music/menu_stage_select.ogg",
+      "usage_suggestion": "主界面 / 选关",
+      "source_filename": "Juhani Junkala [Chiptune Adventures] 4. Stage Select.ogg",
+      "title": "4. Stage Select",
+      "author": "Juhani Junkala (SubspaceAudio)",
+      "source": "https://opengameart.org/content/4-chiptunes-adventure",
+      "license": "CC0-1.0",
+      "loop": "seamlessly looping according to author",
+      "seconds": 21.333,
+      "sample_rate": 44100,
+      "channels": 2,
+      "sha256": "8d5c0456107049b0d846b72eba722bea5f897e3b2c96a68512edb8f898170e7c"
+    },
+    {
+      "file": "assets/resources/contentpack_20261104/music/prologue_stage_1.ogg",
+      "usage_suggestion": "序章探索 / 训练",
+      "source_filename": "Juhani Junkala [Chiptune Adventures] 1. Stage 1.ogg",
+      "title": "1. Stage 1",
+      "author": "Juhani Junkala (SubspaceAudio)",
+      "source": "https://opengameart.org/content/4-chiptunes-adventure",
+      "license": "CC0-1.0",
+      "loop": "seamlessly looping according to author",
+      "seconds": 41.143,
+      "sample_rate": 44100,
+      "channels": 2,
+      "sha256": "cd35b9cf8929352d60b79fdedbe43f7fab3e6e0c228b22970851c542a89f0531"
+    },
+    {
+      "file": "assets/resources/contentpack_20261104/music/pilgrim_stage_2.ogg",
+      "usage_suggestion": "旧日参道 / 推进",
+      "source_filename": "Juhani Junkala [Chiptune Adventures] 2. Stage 2.ogg",
+      "title": "2. Stage 2",
+      "author": "Juhani Junkala (SubspaceAudio)",
+      "source": "https://opengameart.org/content/4-chiptunes-adventure",
+      "license": "CC0-1.0",
+      "loop": "seamlessly looping according to author",
+      "seconds": 56.104,
+      "sample_rate": 44100,
+      "channels": 2,
+      "sha256": "68ec252839e1f227275fe46fca5e38ffab5086b39a6ab2650a752e4f2ef2a5a7"
+    },
+    {
+      "file": "assets/resources/contentpack_20261104/music/moon_gate_boss.ogg",
+      "usage_suggestion": "月门试炼 / Boss",
+      "source_filename": "Juhani Junkala [Chiptune Adventures] 3. Boss Fight.ogg",
+      "title": "3. Boss Fight",
+      "author": "Juhani Junkala (SubspaceAudio)",
+      "source": "https://opengameart.org/content/4-chiptunes-adventure",
+      "license": "CC0-1.0",
+      "loop": "seamlessly looping according to author",
+      "seconds": 71.724,
+      "sample_rate": 44100,
+      "channels": 2,
+      "sha256": "1c5521a07cf503b79cc0ff8f6c031d5a9c213e9c31f27bcc614883b092ee0b7a"
+    }
+  ],
+  "music_license": "MUSIC_LICENSE.txt"
+}

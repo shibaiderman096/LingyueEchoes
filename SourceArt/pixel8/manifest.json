@@ -1,0 +1,322 @@
+{
+  "schema": "lingyue.pixel-art.v2",
+  "art_source": "host_image",
+  "route": "image_gen",
+  "logical_frame": [
+    192,
+    128
+  ],
+  "anchor": [
+    96,
+    112
+  ],
+  "fx_frame": [
+    128,
+    128
+  ],
+  "logic_hz": 60,
+  "parry_logic_frames": 8,
+  "hitstop_logic_frames": 3,
+  "sampling": "nearest",
+  "frames_per_action": 8,
+  "native_animation": true,
+  "clips": {
+    "idle": {
+      "key_ticks": [
+        0,
+        12,
+        24,
+        36,
+        48,
+        60,
+        72,
+        84
+      ],
+      "duration_ticks": 96,
+      "uuid": "d599f11b-ff58-5ddb-acbd-ff957618a422",
+      "path": "pixel8/animations/idle"
+    },
+    "run": {
+      "key_ticks": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35
+      ],
+      "duration_ticks": 40,
+      "uuid": "a2be9152-0f16-5177-9a8e-ea129cbab65c",
+      "path": "pixel8/animations/run"
+    },
+    "jump": {
+      "key_ticks": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35
+      ],
+      "duration_ticks": 40,
+      "uuid": "fcb1ca50-2604-5def-904d-fa81e1a1afb6",
+      "path": "pixel8/animations/jump"
+    },
+    "attack1": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "54a321dd-c882-5e24-929f-a7a33b293663",
+      "path": "pixel8/animations/attack1",
+      "sample_fps": 8,
+      "contact_cell": 3,
+      "runtime_timing": "actor.move phases; 8 FPS pose holds; immediate contact; resolved age = age - 1"
+    },
+    "attack2": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "28dd486b-433c-5c81-9dd8-aab8d352a563",
+      "path": "pixel8/animations/attack2",
+      "sample_fps": 8,
+      "contact_cell": 3,
+      "runtime_timing": "actor.move phases; 8 FPS pose holds; immediate contact; resolved age = age - 1"
+    },
+    "attack3": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "dc13f261-74b4-5a94-8aab-7e77e4bf7add",
+      "path": "pixel8/animations/attack3",
+      "sample_fps": 8,
+      "contact_cell": 3,
+      "runtime_timing": "actor.move phases; 8 FPS pose holds; immediate contact; resolved age = age - 1"
+    },
+    "parry": {
+      "key_ticks": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        15,
+        22,
+        27
+      ],
+      "duration_ticks": 30,
+      "uuid": "d4d642ed-c170-5d90-bf50-58792c375c39",
+      "path": "pixel8/animations/parry"
+    },
+    "dodge": {
+      "key_ticks": [
+        0,
+        3,
+        7,
+        10,
+        14,
+        18,
+        23,
+        26
+      ],
+      "duration_ticks": 28,
+      "uuid": "c847b304-a86f-52c8-b68d-bb27bbd01e96",
+      "path": "pixel8/animations/dodge"
+    },
+    "counter": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "e05a3f9b-c7fd-5814-8e20-f6cd000a656a",
+      "path": "pixel8/animations/counter",
+      "sample_fps": 8,
+      "contact_cell": 4,
+      "runtime_timing": "actor.move phases; 8 FPS pose holds; immediate contact; resolved age = age - 1",
+      "retired": true
+    },
+    "hurt": {
+      "key_ticks": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        16,
+        21,
+        25
+      ],
+      "duration_ticks": 28,
+      "uuid": "a1b0ba74-f626-576d-8fe6-2319ece1760e",
+      "path": "pixel8/animations/hurt"
+    },
+    "dead": {
+      "key_ticks": [
+        0,
+        8,
+        16,
+        24,
+        32,
+        40,
+        48,
+        56
+      ],
+      "duration_ticks": 64,
+      "uuid": "6b1221c1-f429-5915-b89d-6232a6832f97",
+      "path": "pixel8/animations/dead"
+    },
+    "victory": {
+      "key_ticks": [
+        0,
+        9,
+        18,
+        27,
+        36,
+        45,
+        54,
+        63
+      ],
+      "duration_ticks": 72,
+      "uuid": "4cc9649b-81a3-537b-b2ca-e6a39ec545c8",
+      "path": "pixel8/animations/victory"
+    },
+    "slash": {
+      "key_ticks": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        11,
+        14,
+        18
+      ],
+      "duration_ticks": 22,
+      "uuid": "cedb2d59-e1e0-573b-bd50-0ae9b738a263",
+      "path": "pixel8/animations/slash"
+    },
+    "impact": {
+      "key_ticks": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21
+      ],
+      "duration_ticks": 24,
+      "uuid": "24d9234c-191f-5cef-ab21-4e53e60b2ac7",
+      "path": "pixel8/animations/impact"
+    },
+    "perfect_dodge": {
+      "key_ticks": [
+        0,
+        2,
+        4,
+        7,
+        10,
+        14,
+        18,
+        23
+      ],
+      "duration_ticks": 28,
+      "uuid": "84367bce-e600-5cdd-8d2f-06fe1cf61d80",
+      "path": "pixel8/animations/perfect_dodge"
+    },
+    "parry_success": {
+      "key_ticks": [
+        0,
+        2,
+        4,
+        7,
+        10,
+        14,
+        18,
+        23
+      ],
+      "duration_ticks": 28,
+      "uuid": "467e5c2d-891d-5244-adcb-c93bb0e60e4d",
+      "path": "pixel8/animations/parry_success"
+    },
+    "execute": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "f6b46750-9685-5b72-ac76-f4e60e59c58b",
+      "path": "pixel8/animations/execute",
+      "source": "../combat8/hero_execute.png",
+      "pose_fps": 8,
+      "contact_cell": 3
+    },
+    "finisher": {
+      "key_ticks": [
+        0.0,
+        7.5,
+        15.0,
+        22.5,
+        30.0,
+        37.5,
+        45.0,
+        52.5
+      ],
+      "duration_ticks": 60,
+      "uuid": "bdb78577-31e4-5c4a-9ad3-98123d747a0e",
+      "path": "pixel8/animations/finisher",
+      "source": "../combat8/hero_finisher.png",
+      "pose_fps": 8,
+      "contact_cell": 4
+    }
+  },
+  "success_slow": {
+    "rate": 0.25,
+    "real_ticks": 24,
+    "after_hitstop": true
+  },
+  "attack_pose_fps": 8,
+  "attack_pose_policy": "Phase sampling reads live combat move timing. Contact overrides cadence; short attacks skip source poses. Native clips retain all eight editable drawings.",
+  "runtime_visual_scale": 1.5
+}

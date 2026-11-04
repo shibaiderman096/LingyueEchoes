@@ -1,0 +1,215 @@
+{
+  "schema": "generate2dmap.map_bundle.v2",
+  "id": "moonlit-prologue",
+  "name": "月下参道",
+  "world": {
+    "width": 2172,
+    "height": 724,
+    "unit": "px"
+  },
+  "art_source": "host_image",
+  "placeholder": false,
+  "layers": [
+    {
+      "name": "canopy-1",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/canopy-1.png",
+      "offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "canopy-2",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/canopy-2.png",
+      "offset": [
+        724,
+        0
+      ]
+    },
+    {
+      "name": "canopy-3",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/canopy-3.png",
+      "offset": [
+        1448,
+        0
+      ]
+    },
+    {
+      "name": "landmarks-1",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/landmarks-1.png",
+      "offset": [
+        0,
+        300
+      ]
+    },
+    {
+      "name": "landmarks-2",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/landmarks-2.png",
+      "offset": [
+        724,
+        300
+      ]
+    },
+    {
+      "name": "landmarks-3",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/landmarks-3.png",
+      "offset": [
+        1448,
+        300
+      ]
+    },
+    {
+      "name": "foundation-1",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/foundation-1.png",
+      "offset": [
+        0,
+        548
+      ]
+    },
+    {
+      "name": "foundation-2",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/foundation-2.png",
+      "offset": [
+        724,
+        548
+      ]
+    },
+    {
+      "name": "foundation-3",
+      "kind": "image",
+      "image": "../../assets/resources/prologue_route/parts/foundation-3.png",
+      "offset": [
+        1448,
+        548
+      ]
+    },
+    {
+      "name": "playable-props",
+      "kind": "objects"
+    }
+  ],
+  "objects": [
+    {
+      "id": "broken_stone",
+      "prop": "broken_stone",
+      "image": "../../assets/resources/prologue_route/broken_stone.png",
+      "x": 1182.5333333333333,
+      "y": 548,
+      "anchor_px": [
+        352.0,
+        201
+      ],
+      "scale": 0.13807628524046436,
+      "solid": false,
+      "layer": "playable-props",
+      "occupant_policy": "static_back"
+    },
+    {
+      "id": "practice_dummy",
+      "prop": "practice_dummy",
+      "image": "../../assets/resources/prologue_route/practice_dummy.png",
+      "x": 1466.1,
+      "y": 548,
+      "anchor_px": [
+        218.0,
+        625
+      ],
+      "scale": 0.11584,
+      "solid": false,
+      "layer": "playable-props",
+      "occupant_policy": "static_back"
+    },
+    {
+      "id": "moon_lantern",
+      "prop": "moon_lantern",
+      "image": "../../assets/resources/prologue_route/moon_lantern.png",
+      "x": 1773.8,
+      "y": 548,
+      "anchor_px": [
+        150.5,
+        601
+      ],
+      "scale": 0.11845812534664447,
+      "solid": false,
+      "layer": "playable-props",
+      "occupant_policy": "static_back"
+    }
+  ],
+  "collision": {
+    "actorRadius": 10.86,
+    "rects": [
+      [
+        1134.2666666666667,
+        520.2466666666667,
+        96.53333333333333,
+        27.753333333333334
+      ]
+    ]
+  },
+  "spawns": [
+    {
+      "id": "awakening",
+      "x": 144.8,
+      "y": 548,
+      "facing": "right"
+    }
+  ],
+  "anchors": {
+    "dummy": {
+      "point": [
+        1466.1,
+        548
+      ]
+    },
+    "trial-entry": {
+      "point": [
+        1797.9333333333334,
+        548
+      ]
+    },
+    "guardian": {
+      "point": [
+        1978.9333333333334,
+        548
+      ]
+    }
+  },
+  "camera": {
+    "pixelToWorld": 1.6574585635359116
+  },
+  "provenance": {
+    "tool": "image_gen",
+    "version": "host-managed",
+    "params": {
+      "art_source": "host_image",
+      "finish": "pixel",
+      "source_ground_y": 548,
+      "cocos": {
+        "origin_x": -1640,
+        "ground_y": -95,
+        "source_ground_y": 548,
+        "viewport": [
+          1280,
+          720
+        ],
+        "collision_y_up": {
+          "x": 240,
+          "y": 0,
+          "w": 160,
+          "h": 46
+        },
+        "border_overdraw": "mirrored panorama beyond both image edges, covering the opening close-up and arena camera",
+        "reachability": "platformer jump/contact proof in tests/prologue.cjs; generic top-down nav is not a platformer reachability solver"
+      }
+    },
+    "inputs": []
+  }
+}

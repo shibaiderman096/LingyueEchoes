@@ -1,0 +1,9 @@
+Chiptune Adventures — Juhani Junkala (SubspaceAudio)
+Source: https://opengameart.org/content/4-chiptunes-adventure
+License: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The source page and the archive INFO.txt release these tracks under CC0.
+Original OGG audio is included unchanged; local filenames describe suggested usage.
+No attribution is required by CC0; author credit is retained here for provenance.
+No playback wiring, code, scenes, settings, or existing assets were changed.

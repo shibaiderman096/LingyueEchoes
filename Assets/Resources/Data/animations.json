@@ -1,0 +1,900 @@
+{
+  "clips": [
+    {
+      "name": "broken",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/broken",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/broken/broken-01",
+        "guardian8/frames/broken/broken-02",
+        "guardian8/frames/broken/broken-03",
+        "guardian8/frames/broken/broken-04",
+        "guardian8/frames/broken/broken-05",
+        "guardian8/frames/broken/broken-06",
+        "guardian8/frames/broken/broken-07",
+        "guardian8/frames/broken/broken-08"
+      ]
+    },
+    {
+      "name": "dead",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/dead",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/dead/dead-01",
+        "guardian8/frames/dead/dead-02",
+        "guardian8/frames/dead/dead-03",
+        "guardian8/frames/dead/dead-04",
+        "guardian8/frames/dead/dead-05",
+        "guardian8/frames/dead/dead-06",
+        "guardian8/frames/dead/dead-07",
+        "guardian8/frames/dead/dead-08"
+      ]
+    },
+    {
+      "name": "double",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/double",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/double/double-01",
+        "guardian8/frames/double/double-02",
+        "guardian8/frames/double/double-03",
+        "guardian8/frames/double/double-04",
+        "guardian8/frames/double/double-05",
+        "guardian8/frames/double/double-06",
+        "guardian8/frames/double/double-07",
+        "guardian8/frames/double/double-08"
+      ]
+    },
+    {
+      "name": "guard",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/guard",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/guard/guard-01",
+        "guardian8/frames/guard/guard-02",
+        "guardian8/frames/guard/guard-03",
+        "guardian8/frames/guard/guard-04",
+        "guardian8/frames/guard/guard-05",
+        "guardian8/frames/guard/guard-06",
+        "guardian8/frames/guard/guard-07",
+        "guardian8/frames/guard/guard-08"
+      ]
+    },
+    {
+      "name": "idle",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/idle",
+      "duration": 1,
+      "sample": 8,
+      "loop": true,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/idle/idle-01",
+        "guardian8/frames/idle/idle-02",
+        "guardian8/frames/idle/idle-03",
+        "guardian8/frames/idle/idle-04",
+        "guardian8/frames/idle/idle-05",
+        "guardian8/frames/idle/idle-06",
+        "guardian8/frames/idle/idle-07",
+        "guardian8/frames/idle/idle-08"
+      ]
+    },
+    {
+      "name": "jump",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/jump",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/jump/jump-01",
+        "guardian8/frames/jump/jump-02",
+        "guardian8/frames/jump/jump-03",
+        "guardian8/frames/jump/jump-04",
+        "guardian8/frames/jump/jump-05",
+        "guardian8/frames/jump/jump-06",
+        "guardian8/frames/jump/jump-07",
+        "guardian8/frames/jump/jump-08"
+      ]
+    },
+    {
+      "name": "leap",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/leap",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/leap/leap-01",
+        "guardian8/frames/leap/leap-02",
+        "guardian8/frames/leap/leap-03",
+        "guardian8/frames/leap/leap-04",
+        "guardian8/frames/leap/leap-05",
+        "guardian8/frames/leap/leap-06",
+        "guardian8/frames/leap/leap-07",
+        "guardian8/frames/leap/leap-08"
+      ]
+    },
+    {
+      "name": "phase",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/phase",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/phase/phase-01",
+        "guardian8/frames/phase/phase-02",
+        "guardian8/frames/phase/phase-03",
+        "guardian8/frames/phase/phase-04",
+        "guardian8/frames/phase/phase-05",
+        "guardian8/frames/phase/phase-06",
+        "guardian8/frames/phase/phase-07",
+        "guardian8/frames/phase/phase-08"
+      ]
+    },
+    {
+      "name": "run",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/run",
+      "duration": 1,
+      "sample": 8,
+      "loop": true,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/run/run-01",
+        "guardian8/frames/run/run-02",
+        "guardian8/frames/run/run-03",
+        "guardian8/frames/run/run-04",
+        "guardian8/frames/run/run-05",
+        "guardian8/frames/run/run-06",
+        "guardian8/frames/run/run-07",
+        "guardian8/frames/run/run-08"
+      ]
+    },
+    {
+      "name": "slam",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/slam",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/slam/slam-01",
+        "guardian8/frames/slam/slam-02",
+        "guardian8/frames/slam/slam-03",
+        "guardian8/frames/slam/slam-04",
+        "guardian8/frames/slam/slam-05",
+        "guardian8/frames/slam/slam-06",
+        "guardian8/frames/slam/slam-07",
+        "guardian8/frames/slam/slam-08"
+      ]
+    },
+    {
+      "name": "slash",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/slash",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/slash/slash-01",
+        "guardian8/frames/slash/slash-02",
+        "guardian8/frames/slash/slash-03",
+        "guardian8/frames/slash/slash-04",
+        "guardian8/frames/slash/slash-05",
+        "guardian8/frames/slash/slash-06",
+        "guardian8/frames/slash/slash-07",
+        "guardian8/frames/slash/slash-08"
+      ]
+    },
+    {
+      "name": "spin",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/spin",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/spin/spin-01",
+        "guardian8/frames/spin/spin-02",
+        "guardian8/frames/spin/spin-03",
+        "guardian8/frames/spin/spin-04",
+        "guardian8/frames/spin/spin-05",
+        "guardian8/frames/spin/spin-06",
+        "guardian8/frames/spin/spin-07",
+        "guardian8/frames/spin/spin-08"
+      ]
+    },
+    {
+      "name": "stagger",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/stagger",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/stagger/stagger-01",
+        "guardian8/frames/stagger/stagger-02",
+        "guardian8/frames/stagger/stagger-03",
+        "guardian8/frames/stagger/stagger-04",
+        "guardian8/frames/stagger/stagger-05",
+        "guardian8/frames/stagger/stagger-06",
+        "guardian8/frames/stagger/stagger-07",
+        "guardian8/frames/stagger/stagger-08"
+      ]
+    },
+    {
+      "name": "thrust",
+      "folder": "guardian8",
+      "path": "Animations/guardian8/thrust",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "guardian8/frames/thrust/thrust-01",
+        "guardian8/frames/thrust/thrust-02",
+        "guardian8/frames/thrust/thrust-03",
+        "guardian8/frames/thrust/thrust-04",
+        "guardian8/frames/thrust/thrust-05",
+        "guardian8/frames/thrust/thrust-06",
+        "guardian8/frames/thrust/thrust-07",
+        "guardian8/frames/thrust/thrust-08"
+      ]
+    },
+    {
+      "name": "attack1",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/attack1",
+      "duration": 1.0,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/attack1/attack1-01",
+        "pixel8/frames/attack1/attack1-02",
+        "pixel8/frames/attack1/attack1-03",
+        "pixel8/frames/attack1/attack1-04",
+        "pixel8/frames/attack1/attack1-05",
+        "pixel8/frames/attack1/attack1-06",
+        "pixel8/frames/attack1/attack1-07",
+        "pixel8/frames/attack1/attack1-08"
+      ]
+    },
+    {
+      "name": "attack2",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/attack2",
+      "duration": 1.0,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/attack2/attack2-01",
+        "pixel8/frames/attack2/attack2-02",
+        "pixel8/frames/attack2/attack2-03",
+        "pixel8/frames/attack2/attack2-04",
+        "pixel8/frames/attack2/attack2-05",
+        "pixel8/frames/attack2/attack2-06",
+        "pixel8/frames/attack2/attack2-07",
+        "pixel8/frames/attack2/attack2-08"
+      ]
+    },
+    {
+      "name": "attack3",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/attack3",
+      "duration": 1.0,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/attack3/attack3-01",
+        "pixel8/frames/attack3/attack3-02",
+        "pixel8/frames/attack3/attack3-03",
+        "pixel8/frames/attack3/attack3-04",
+        "pixel8/frames/attack3/attack3-05",
+        "pixel8/frames/attack3/attack3-06",
+        "pixel8/frames/attack3/attack3-07",
+        "pixel8/frames/attack3/attack3-08"
+      ]
+    },
+    {
+      "name": "counter",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/counter",
+      "duration": 1.0,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/counter/counter-01",
+        "pixel8/frames/counter/counter-02",
+        "pixel8/frames/counter/counter-03",
+        "pixel8/frames/counter/counter-04",
+        "pixel8/frames/counter/counter-05",
+        "pixel8/frames/counter/counter-06",
+        "pixel8/frames/counter/counter-07",
+        "pixel8/frames/counter/counter-08"
+      ]
+    },
+    {
+      "name": "dead",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/dead",
+      "duration": 1.0666666666666667,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.13333333333333333,
+        0.26666666666666666,
+        0.4,
+        0.5333333333333333,
+        0.6666666666666666,
+        0.8,
+        0.9333333333333333
+      ],
+      "frames": [
+        "pixel8/frames/dead/dead-01",
+        "pixel8/frames/dead/dead-02",
+        "pixel8/frames/dead/dead-03",
+        "pixel8/frames/dead/dead-04",
+        "pixel8/frames/dead/dead-05",
+        "pixel8/frames/dead/dead-06",
+        "pixel8/frames/dead/dead-07",
+        "pixel8/frames/dead/dead-08"
+      ]
+    },
+    {
+      "name": "dodge",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/dodge",
+      "duration": 0.4666666666666667,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.11666666666666667,
+        0.16666666666666666,
+        0.23333333333333334,
+        0.3,
+        0.38333333333333336,
+        0.43333333333333335
+      ],
+      "frames": [
+        "pixel8/frames/dodge/dodge-01",
+        "pixel8/frames/dodge/dodge-02",
+        "pixel8/frames/dodge/dodge-03",
+        "pixel8/frames/dodge/dodge-04",
+        "pixel8/frames/dodge/dodge-05",
+        "pixel8/frames/dodge/dodge-06",
+        "pixel8/frames/dodge/dodge-07",
+        "pixel8/frames/dodge/dodge-08"
+      ]
+    },
+    {
+      "name": "execute",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/execute",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/execute/execute-01",
+        "pixel8/frames/execute/execute-02",
+        "pixel8/frames/execute/execute-03",
+        "pixel8/frames/execute/execute-04",
+        "pixel8/frames/execute/execute-05",
+        "pixel8/frames/execute/execute-06",
+        "pixel8/frames/execute/execute-07",
+        "pixel8/frames/execute/execute-08"
+      ]
+    },
+    {
+      "name": "finisher",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/finisher",
+      "duration": 1,
+      "sample": 8,
+      "loop": false,
+      "times": [
+        0.0,
+        0.125,
+        0.25,
+        0.375,
+        0.5,
+        0.625,
+        0.75,
+        0.875
+      ],
+      "frames": [
+        "pixel8/frames/finisher/finisher-01",
+        "pixel8/frames/finisher/finisher-02",
+        "pixel8/frames/finisher/finisher-03",
+        "pixel8/frames/finisher/finisher-04",
+        "pixel8/frames/finisher/finisher-05",
+        "pixel8/frames/finisher/finisher-06",
+        "pixel8/frames/finisher/finisher-07",
+        "pixel8/frames/finisher/finisher-08"
+      ]
+    },
+    {
+      "name": "hurt",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/hurt",
+      "duration": 0.4666666666666667,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.26666666666666666,
+        0.35,
+        0.4166666666666667
+      ],
+      "frames": [
+        "pixel8/frames/hurt/hurt-01",
+        "pixel8/frames/hurt/hurt-02",
+        "pixel8/frames/hurt/hurt-03",
+        "pixel8/frames/hurt/hurt-04",
+        "pixel8/frames/hurt/hurt-05",
+        "pixel8/frames/hurt/hurt-06",
+        "pixel8/frames/hurt/hurt-07",
+        "pixel8/frames/hurt/hurt-08"
+      ]
+    },
+    {
+      "name": "idle",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/idle",
+      "duration": 1.6,
+      "sample": 60,
+      "loop": true,
+      "times": [
+        0.0,
+        0.2,
+        0.4,
+        0.6,
+        0.8,
+        1.0,
+        1.2,
+        1.4
+      ],
+      "frames": [
+        "pixel8/frames/idle/idle-01",
+        "pixel8/frames/idle/idle-02",
+        "pixel8/frames/idle/idle-03",
+        "pixel8/frames/idle/idle-04",
+        "pixel8/frames/idle/idle-05",
+        "pixel8/frames/idle/idle-06",
+        "pixel8/frames/idle/idle-07",
+        "pixel8/frames/idle/idle-08"
+      ]
+    },
+    {
+      "name": "impact",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/impact",
+      "duration": 0.4,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35
+      ],
+      "frames": [
+        "pixel8/frames/impact/impact-01",
+        "pixel8/frames/impact/impact-02",
+        "pixel8/frames/impact/impact-03",
+        "pixel8/frames/impact/impact-04",
+        "pixel8/frames/impact/impact-05",
+        "pixel8/frames/impact/impact-06",
+        "pixel8/frames/impact/impact-07",
+        "pixel8/frames/impact/impact-08"
+      ]
+    },
+    {
+      "name": "jump",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/jump",
+      "duration": 0.6666666666666666,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.08333333333333333,
+        0.16666666666666666,
+        0.25,
+        0.3333333333333333,
+        0.4166666666666667,
+        0.5,
+        0.5833333333333334
+      ],
+      "frames": [
+        "pixel8/frames/jump/jump-01",
+        "pixel8/frames/jump/jump-02",
+        "pixel8/frames/jump/jump-03",
+        "pixel8/frames/jump/jump-04",
+        "pixel8/frames/jump/jump-05",
+        "pixel8/frames/jump/jump-06",
+        "pixel8/frames/jump/jump-07",
+        "pixel8/frames/jump/jump-08"
+      ]
+    },
+    {
+      "name": "parry",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/parry",
+      "duration": 0.5,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667,
+        0.1,
+        0.13333333333333333,
+        0.25,
+        0.36666666666666664,
+        0.45
+      ],
+      "frames": [
+        "pixel8/frames/parry/parry-01",
+        "pixel8/frames/parry/parry-02",
+        "pixel8/frames/parry/parry-03",
+        "pixel8/frames/parry/parry-04",
+        "pixel8/frames/parry/parry-05",
+        "pixel8/frames/parry/parry-06",
+        "pixel8/frames/parry/parry-07",
+        "pixel8/frames/parry/parry-08"
+      ]
+    },
+    {
+      "name": "parry_success",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/parry_success",
+      "duration": 0.4666666666666667,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667,
+        0.11666666666666667,
+        0.16666666666666666,
+        0.23333333333333334,
+        0.3,
+        0.38333333333333336
+      ],
+      "frames": [
+        "pixel8/frames/parry_success/parry_success-01",
+        "pixel8/frames/parry_success/parry_success-02",
+        "pixel8/frames/parry_success/parry_success-03",
+        "pixel8/frames/parry_success/parry_success-04",
+        "pixel8/frames/parry_success/parry_success-05",
+        "pixel8/frames/parry_success/parry_success-06",
+        "pixel8/frames/parry_success/parry_success-07",
+        "pixel8/frames/parry_success/parry_success-08"
+      ]
+    },
+    {
+      "name": "perfect_dodge",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/perfect_dodge",
+      "duration": 0.4666666666666667,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667,
+        0.11666666666666667,
+        0.16666666666666666,
+        0.23333333333333334,
+        0.3,
+        0.38333333333333336
+      ],
+      "frames": [
+        "pixel8/frames/perfect_dodge/perfect_dodge-01",
+        "pixel8/frames/perfect_dodge/perfect_dodge-02",
+        "pixel8/frames/perfect_dodge/perfect_dodge-03",
+        "pixel8/frames/perfect_dodge/perfect_dodge-04",
+        "pixel8/frames/perfect_dodge/perfect_dodge-05",
+        "pixel8/frames/perfect_dodge/perfect_dodge-06",
+        "pixel8/frames/perfect_dodge/perfect_dodge-07",
+        "pixel8/frames/perfect_dodge/perfect_dodge-08"
+      ]
+    },
+    {
+      "name": "run",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/run",
+      "duration": 0.6666666666666666,
+      "sample": 60,
+      "loop": true,
+      "times": [
+        0.0,
+        0.08333333333333333,
+        0.16666666666666666,
+        0.25,
+        0.3333333333333333,
+        0.4166666666666667,
+        0.5,
+        0.5833333333333334
+      ],
+      "frames": [
+        "pixel8/frames/run/run-01",
+        "pixel8/frames/run/run-02",
+        "pixel8/frames/run/run-03",
+        "pixel8/frames/run/run-04",
+        "pixel8/frames/run/run-05",
+        "pixel8/frames/run/run-06",
+        "pixel8/frames/run/run-07",
+        "pixel8/frames/run/run-08"
+      ]
+    },
+    {
+      "name": "slash",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/slash",
+      "duration": 0.36666666666666664,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667,
+        0.1,
+        0.13333333333333333,
+        0.18333333333333332,
+        0.23333333333333334,
+        0.3
+      ],
+      "frames": [
+        "pixel8/frames/slash/slash-01",
+        "pixel8/frames/slash/slash-02",
+        "pixel8/frames/slash/slash-03",
+        "pixel8/frames/slash/slash-04",
+        "pixel8/frames/slash/slash-05",
+        "pixel8/frames/slash/slash-06",
+        "pixel8/frames/slash/slash-07",
+        "pixel8/frames/slash/slash-08"
+      ]
+    },
+    {
+      "name": "victory",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/victory",
+      "duration": 1.2,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.15,
+        0.3,
+        0.45,
+        0.6,
+        0.75,
+        0.9,
+        1.05
+      ],
+      "frames": [
+        "pixel8/frames/victory/victory-01",
+        "pixel8/frames/victory/victory-02",
+        "pixel8/frames/victory/victory-03",
+        "pixel8/frames/victory/victory-04",
+        "pixel8/frames/victory/victory-05",
+        "pixel8/frames/victory/victory-06",
+        "pixel8/frames/victory/victory-07",
+        "pixel8/frames/victory/victory-08"
+      ]
+    }
+  ]
+}

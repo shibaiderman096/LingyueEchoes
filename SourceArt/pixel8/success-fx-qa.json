@@ -1,0 +1,20 @@
+{
+  "perfect_dodge": {
+    "frames": 8,
+    "size": [
+      128,
+      128
+    ],
+    "binary_alpha": true,
+    "palette_colors": 16
+  },
+  "parry_success": {
+    "frames": 8,
+    "size": [
+      128,
+      128
+    ],
+    "binary_alpha": true,
+    "palette_colors": 17
+  }
+}

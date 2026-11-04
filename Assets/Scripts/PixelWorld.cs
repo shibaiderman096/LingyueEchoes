@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace LingyueEchoes
+{
+    [Serializable] public class ClipDefinition {public string name,folder,path;public float duration,sample;public bool loop;public float[] times;public string[] frames;}
+    [Serializable] public class ClipManifest {public ClipDefinition[] clips;}
+    public static class PixelWorld
+    {
+        static readonly Dictionary<string,ClipDefinition> definitions=new Dictionary<string,ClipDefinition>();
+        static readonly Dictionary<string,AnimationClip> clips=new Dictionary<string,AnimationClip>();
+        static readonly Dictionary<string,RuntimeAnimatorController> controllers=new Dictionary<string,RuntimeAnimatorController>();
+        public static void Load(){if(definitions.Count>0)return;var data=Resources.Load<TextAsset>("Data/animations");foreach(var c in JsonUtility.FromJson<ClipManifest>(data.text).clips)definitions[c.folder+"/"+c.name]=c;}
+        public static ClipDefinition Definition(string folder,string clip){Load();definitions.TryGetValue(folder+"/"+clip,out var d);return d;}
+        public static void Sample(GameObject target,string folder,string name,double seconds,int cell=-1){var d=Definition(folder,name);if(d==null)return;string key=folder+"/"+name;
+            if(!clips.TryGetValue(key,out var clip)){clip=Resources.Load<AnimationClip>(d.path);clips[key]=clip;}if(!clip)return;
+            double time=cell>=0?d.times[Mathf.Clamp(cell,0,d.times.Length-1)]+1e-6:d.loop?seconds%d.duration:Math.Min(seconds,d.duration-1e-6);
+            if(!controllers.TryGetValue(folder,out var controller)){controller=Resources.Load<RuntimeAnimatorController>("Animations/"+folder+"/Controller");controllers[folder]=controller;}
+            var animator=target.GetComponent<Animator>();if(!animator)animator=target.AddComponent<Animator>();if(animator.runtimeAnimatorController!=controller){animator.runtimeAnimatorController=controller;animator.cullingMode=AnimatorCullingMode.AlwaysAnimate;animator.speed=0;animator.Rebind();}
+            animator.Play(name,0,(float)(Math.Max(0,time)/clip.length));animator.Update(0);}
+        public static SpriteRenderer Sprite(Transform parent,string name,string resource,float x,float y,float width,float height,int order,Vector2 anchor){
+            var go=new GameObject(name);go.transform.SetParent(parent,false);var sp=go.AddComponent<SpriteRenderer>();sp.sprite=Resources.Load<Sprite>(resource);sp.sortingOrder=order;
+            if(!sp.sprite)throw new InvalidOperationException("Missing sprite "+resource);
+            go.transform.localPosition=new Vector3((x+width*(.5f-anchor.x))/100,(y+height*(.5f-anchor.y))/100,0);
+            go.transform.localScale=new Vector3(width/sp.sprite.rect.width,height/sp.sprite.rect.height,1);return sp;}
+        public static Transform Create(Transform parent){var world=new GameObject("World").transform;world.SetParent(parent,false);
+            float scale=3600f/2172,top=-95+548*scale;
+            string[] rows={"canopy","landmarks","foundation"};int[] edges={0,300,548,724};
+            for(int row=0;row<3;row++){float y=top-edges[row]*scale,h=(edges[row+1]-edges[row])*scale;
+                for(int col=0;col<3;col++)Sprite(world,rows[row]+"-"+(col+1),"prologue_route/parts/"+rows[row]+"-"+(col+1),-1640+col*1200,y,1200,h,row, new Vector2(0,1));
+                var left=Sprite(world,rows[row]+"-left","prologue_route/parts/"+rows[row]+"-1",-2840,y,1200,h,row,new Vector2(0,1));left.flipX=true;
+                var right=Sprite(world,rows[row]+"-right","prologue_route/parts/"+rows[row]+"-3",1960,y,1200,h,row,new Vector2(0,1));right.flipX=true;}
+            Sprite(world,"CollapsedStone","prologue_route/broken_stone",320,-95,160,46,5,new Vector2(.5f,0));
+            Sprite(world,"PracticeDummy","prologue_route/practice_dummy",790,-95,84,120,5,new Vector2(.5f,0));
+            foreach(int x in new[]{1300,1800})Sprite(world,"MoonLantern"+x,"prologue_route/moon_lantern",x,-95,59,118,5,new Vector2(.5f,0));
+            var boss=new GameObject("Guardian");boss.transform.SetParent(world,false);boss.AddComponent<SpriteRenderer>().sortingOrder=10;boss.transform.localPosition=new Vector3(-12.35f,-.95f,0);boss.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("guardian8/frames/idle/idle-01");
+            var hero=new GameObject("Hero");hero.transform.SetParent(world,false);hero.AddComponent<SpriteRenderer>().sortingOrder=12;hero.transform.localPosition=new Vector3(-14,-.95f,0);hero.transform.localScale=Vector3.one*1.5f;hero.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("pixel8/frames/idle/idle-01");
+            return world;
+        }
+    }
+    public class PixelActor
+    {
+        readonly GameObject go;readonly SpriteRenderer renderer;readonly bool hero;string previous="";int started,previousFrame=-1,attackId=-1;Fighter actor;
+        public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
+        public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1){
+            string clip=hero?(a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
+            if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";if(PixelWorld.Definition(folder,clip)==null)clip="idle";
+            if(clip!=previous||frame<previousFrame||actor!=a||(!hero&&attackId!=a.attackId)){started=frame;previous=clip;actor=a;attackId=a.attackId;}previousFrame=frame;
+            int cell=-1;
+            if(pose!=null)cell=poseCell;
+            else if(hero&&a.move!=null&&(clip.StartsWith("attack")||clip=="execute"||clip=="finisher"))cell=AttackCell(clip,a.move,a.age);
+            else if(!hero&&a.move!=null){var m=a.move;int age=Math.Max(0,a.age-1),contact=clip=="double"||clip=="spin"?3:4;
+                if(age<m.wind){int slots=Math.Max(1,(int)Math.Ceiling(m.wind*8d/60));cell=1+(int)Math.Floor(Math.Floor(age*8d/60)*(contact-2)/Math.Max(1,slots-1));}
+                else if(m.pulses!=null&&age>=m.wind+m.pulses[1])cell=Math.Min(7,5+(int)Math.Floor((age-m.wind-m.pulses[1])*8d/60));
+                else cell=Math.Min(m.pulses!=null?4:7,contact+(int)Math.Floor((age-m.wind)*8d/60));}
+            else if(clip=="jump")cell=hero?(a.y==0?7:a.vy>10?0:a.vy>6?1:a.vy>2?2:a.vy>-1?3:a.vy>-5?4:a.y<25?6:5):(a.y==0?7:a.vy>6?1:a.vy>1?2:a.vy>-2?3:a.vy>-6?4:5);
+            else if(!hero&&clip=="stagger")cell=new[]{1,2,4,6,7}[Math.Min(4,(int)Math.Floor(a.age*8d/60))];
+            else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
+            double seconds=(clip=="idle"||clip=="run"||clip=="dead"||clip=="victory"?frame-started:a.age)/60d+1e-7;
+            PixelWorld.Sample(go,folder,clip,seconds,cell);
+            go.transform.localPosition=new Vector3((float)Math.Floor(a.x+.5)/100,((float)Math.Floor(a.y+.5)-95+lift)/100,0);
+            float scale=hero?1.5f:1;go.transform.localScale=new Vector3(a.face*scale,scale,1);go.transform.localRotation=Quaternion.Euler(0,0,angle*a.face);
+            renderer.color=hero&&pose==null&&a.invuln>0&&(frame/3)%2==0?new Color(1,.86f,.86f,.65f):new Color(1,1,1,alpha);go.SetActive(alpha>0);
+        }
+        static string GuardianClip(Fighter a){if(a.move!=null){switch(a.move.name){case "双连斩":return "double";case "突刺":return "thrust";case "震地":return "slam";case "跃击":return "leap";case "赤月回旋":return "spin";default:return "slash";}}return a.state=="air"?"jump":a.state=="hurt"?"stagger":a.state;}
+        public static int AttackCell(string clip,Move move,int age){int contact=clip=="finisher"?4:3,resolved=Math.Max(0,age-1);if(resolved<move.wind){int slots=Math.Max(1,(int)Math.Ceiling(move.wind*8d/60)),slot=(int)Math.Floor(resolved*8d/60);return 1+(int)Math.Floor(slot*(contact-2d)/Math.Max(1,slots-1));}
+            int after=(int)Math.Floor((resolved-move.wind)*8d/60),count=Math.Max(1,(int)Math.Ceiling((move.active+move.recovery)*8d/60));return Math.Min(7,contact+(int)Math.Ceiling(after*(7d-contact)/Math.Max(1,count-1)));}
+    }
+    public class PixelEffects
+    {
+        class Effect {public GameObject go;public SpriteRenderer renderer;public VisualCue cue;}
+        readonly Effect[] pool=new Effect[12];int cursor,next;Combat model;
+        public PixelEffects(Transform parent){for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
+        public void Clear(){foreach(var e in pool){e.cue=null;e.go.SetActive(false);}cursor=next=0;model=null;}
+        public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
+            foreach(var e in pool){var cue=e.cue;if(cue==null)continue;string clip=cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
+                var d=PixelWorld.Definition("pixel8",clip);int source=(int)Math.Round(d.duration*60),life=cue.kind=="charge"?Math.Min(12,source):source,age=sim.frame-cue.frame;
+                e.go.SetActive(age>=0&&age<life);if(age>=life){e.cue=null;continue;}float size=cue.kind=="charge"?.22f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:1.8f;
+                e.go.transform.localPosition=new Vector3((float)Math.Floor(cue.x+.5)/100,((float)Math.Floor(cue.y+.5)-95)/100,0);e.go.transform.localScale=new Vector3(cue.face*size,size,1);
+                e.go.transform.localRotation=Quaternion.Euler(0,0,cue.kind=="slash"?cue.combo==1?-40:cue.combo==2?45:0:0);
+                e.renderer.color=cue.owner==2&&(cue.kind=="charge"||cue.kind=="slash")?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):Color.white;
+                PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1));}
+        }
+    }
+}

@@ -1,0 +1,117 @@
+{
+  "art_source": "host_image",
+  "route": "image_gen",
+  "model": "tool-managed",
+  "source_files": [
+    "exec-6671b9a9-037f-44a1-8ff8-ee6d240fe068.png",
+    "exec-6390b590-9f9b-4a49-9fd0-eb38df92a9b0.png"
+  ],
+  "processing": "copy panorama; alpha-bounds crop isolated sheet objects without repainting or resampling",
+  "props": [
+    {
+      "file": "broken_stone.png",
+      "size": [
+        704,
+        201
+      ],
+      "source_rect": [
+        75,
+        469,
+        779,
+        670
+      ],
+      "anchor_px": [
+        352.0,
+        201
+      ]
+    },
+    {
+      "file": "practice_dummy.png",
+      "size": [
+        436,
+        625
+      ],
+      "source_rect": [
+        868,
+        45,
+        1304,
+        670
+      ],
+      "anchor_px": [
+        218.0,
+        625
+      ]
+    },
+    {
+      "file": "moon_lantern.png",
+      "size": [
+        301,
+        601
+      ],
+      "source_rect": [
+        1459,
+        67,
+        1760,
+        668
+      ],
+      "anchor_px": [
+        150.5,
+        601
+      ]
+    }
+  ],
+  "files": {
+    "broken_stone.png": "f0764f454b652f9d961017a39ae4add631e43d8521071302b8fced2be989a32b",
+    "moonlit_route.png": "33b9695b5f24e470de69b50f74df5ec0984453c2d9f25750955925f30483f0e1",
+    "moon_lantern.png": "e52399255f04c8788ce4281f856f8f7c40faaef38ecee43cdaf70473a800e390",
+    "practice_dummy.png": "06ca879144072f259d5726a6ad228d205984011cbc25f22c85b5b4a4693dede9",
+    "guardian.png": "b7946bb38e923014495abd5f1fa47df63bc818ab8845c3800c0faecfb01eee29"
+  },
+  "reference": "https://deepnight.net/tutorial/the-level-design-of-dead-cells-a-hybrid-approach/",
+  "design": "Continuous authored route, quiet traversal before optional practice and combat peak. No completion checklist or dialogue pause.",
+  "guardian": {
+    "source_file": "exec-a042f5b3-a8a4-4bfd-92f0-fd9e9c7d8f6d.png",
+    "source_size": [
+      1168,
+      1346
+    ],
+    "crop": [
+      240,
+      77,
+      931,
+      1291
+    ],
+    "size": [
+      691,
+      1214
+    ],
+    "anchor_px": [
+      201.0,
+      1214
+    ],
+    "display_height": 146,
+    "actions": "14 native eight-frame clips in guardian8/animations; original still retained as design reference",
+    "art_source": "host_image",
+    "route": "image_gen",
+    "prompt": "Original side-view silver-blue braided female moon shrine guardian, teal/lavender robes, crescent pin, belt lantern and sheathed katana. Cute pixel art, facing left, native transparency; single full-body still.",
+    "animation_manifest": "../combat8/manifest.json"
+  },
+  "background": {
+    "file": "moonlit_route-master.png",
+    "source_size": [
+      2172,
+      724
+    ],
+    "source_ground_y": 548,
+    "display_scale": 1.6574585635359116,
+    "world_left": -1640,
+    "world_ground_y": -95,
+    "camera": "1280x720, continuous horizontal follow, ease into arena",
+    "art_source": "host_image",
+    "route": "image_gen",
+    "prompt": "One continuous ultra-wide 3:1 moonlit pixel art shrine route: luminous awakening grove and peach blossoms at left, mossy bamboo pilgrimage ruins, warm lantern training courtyard, crescent moon gate and wisteria at right. No text, UI, characters. Straight horizontal stone path at 75 percent image height, no stairs or pits; quiet foreground; midnight teal, lavender, dusty pink, warm gold.",
+    "parts_manifest": "background-parts.json",
+    "runtime_parts": 9
+  },
+  "prop_prompt": "Isolated low mossy broken stone beam, wooden straw sword practice dummy with pink ribbon, pair of crescent shrine lanterns, side-view original cute fantasy pixel art on native transparent background, no text, no scenery."
+}

@@ -1,0 +1,148 @@
+{
+  "art_source": "host_image",
+  "master": "moonlit_route-master.png",
+  "source_size": [
+    2172,
+    724
+  ],
+  "ground_y": 548,
+  "world_scale": 1.6574585635359116,
+  "world_left": -1640,
+  "parts": [
+    {
+      "name": "canopy-1",
+      "source_rect": [
+        0,
+        0,
+        724,
+        300
+      ],
+      "image": "../../assets/resources/prologue_route/parts/canopy-1.png",
+      "offset": [
+        0,
+        0
+      ],
+      "layer": 0
+    },
+    {
+      "name": "canopy-2",
+      "source_rect": [
+        724,
+        0,
+        1448,
+        300
+      ],
+      "image": "../../assets/resources/prologue_route/parts/canopy-2.png",
+      "offset": [
+        724,
+        0
+      ],
+      "layer": 0
+    },
+    {
+      "name": "canopy-3",
+      "source_rect": [
+        1448,
+        0,
+        2172,
+        300
+      ],
+      "image": "../../assets/resources/prologue_route/parts/canopy-3.png",
+      "offset": [
+        1448,
+        0
+      ],
+      "layer": 0
+    },
+    {
+      "name": "landmarks-1",
+      "source_rect": [
+        0,
+        300,
+        724,
+        548
+      ],
+      "image": "../../assets/resources/prologue_route/parts/landmarks-1.png",
+      "offset": [
+        0,
+        300
+      ],
+      "layer": 1
+    },
+    {
+      "name": "landmarks-2",
+      "source_rect": [
+        724,
+        300,
+        1448,
+        548
+      ],
+      "image": "../../assets/resources/prologue_route/parts/landmarks-2.png",
+      "offset": [
+        724,
+        300
+      ],
+      "layer": 1
+    },
+    {
+      "name": "landmarks-3",
+      "source_rect": [
+        1448,
+        300,
+        2172,
+        548
+      ],
+      "image": "../../assets/resources/prologue_route/parts/landmarks-3.png",
+      "offset": [
+        1448,
+        300
+      ],
+      "layer": 1
+    },
+    {
+      "name": "foundation-1",
+      "source_rect": [
+        0,
+        548,
+        724,
+        724
+      ],
+      "image": "../../assets/resources/prologue_route/parts/foundation-1.png",
+      "offset": [
+        0,
+        548
+      ],
+      "layer": 2
+    },
+    {
+      "name": "foundation-2",
+      "source_rect": [
+        724,
+        548,
+        1448,
+        724
+      ],
+      "image": "../../assets/resources/prologue_route/parts/foundation-2.png",
+      "offset": [
+        724,
+        548
+      ],
+      "layer": 2
+    },
+    {
+      "name": "foundation-3",
+      "source_rect": [
+        1448,
+        548,
+        2172,
+        724
+      ],
+      "image": "../../assets/resources/prologue_route/parts/foundation-3.png",
+      "offset": [
+        1448,
+        548
+      ],
+      "layer": 2
+    }
+  ]
+}

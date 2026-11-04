@@ -1,0 +1,31 @@
+{
+  "art_source": "host_image",
+  "route": "image_gen",
+  "alpha_threshold": 160,
+  "palette_colors": 48,
+  "warnings": [],
+  "sheets": [
+    {
+      "source": "ui-icons-source.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "visible_groups": 16,
+      "removed_sub4px_noise": 3
+    }
+  ],
+  "runtime_assets": [
+    {
+      "name": "ui-icons.png",
+      "size": [
+        256,
+        256
+      ],
+      "colors": 48,
+      "partial_alpha_pixels": 0,
+      "bytes": 46532,
+      "sha256": "af129becf88c73b6ae6bdc4adcbdab338adcf58fb5dd57840f7a76a471fa8e25"
+    }
+  ]
+}

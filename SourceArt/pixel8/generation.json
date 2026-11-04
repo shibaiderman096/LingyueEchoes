@@ -1,0 +1,19 @@
+{
+  "art_source": "host_image",
+  "route": "image_gen",
+  "master_reference": "hero-master.png",
+  "model": "tool-managed",
+  "frames_per_action": 8,
+  "prompt_set": {
+    "character_common": "Create a hand-drawn 2D action-game character sprite sheet, using the attached image only as identity/style reference. SAME cute chibi white fox-eared girl, silver-pink hair, amber eyes, crimson bow and gold bells, white/red shrine outfit, fluffy white tail, katana, facing RIGHT. Clean crisp pixel-art-style clusters, dark plum outline, red/ivory/pink/gold palette. Transparent background. EXACTLY 4 columns x 4 rows, 16 separate fully visible character poses, uniform scale and orthographic side view, no camera movement, no labels/grid/shadows/scenery or VFX. Each cell equal sized, centered root and generous margin including whole sword. Two actions, each eight frames read left-to-right first two rows then last two rows. Animation changes actual pose, not global translation; grounded feet remain at each cell's same baseline.",
+    "motion_contracts": [
+      "idle: eight phase breathing cycle, planted shoes, seamless phase 315 to 0; run: eight alternating contacts",
+      "jump: crouch, launch, ascent, apex, descent, landing; attacks: windup/contact/followthrough/recovery",
+      "parry: raise sword, guard, brace, release, ready; dodge: crouch, tuck, full roll, slide, rise",
+      "counter: gather, overhead, decisive cut, followthrough, ready; hurt: startle, recoil, hunch, steady, recover",
+      "defeat: stagger, kneel, collapse, final prone hold; victory: relax, smile, bell flourish"
+    ],
+    "fx": "4 by 4 transparent sheet. First eight frames: ivory-pink sword crescent with crimson edge growing, sweeping and dissipating into petals. Last eight: ivory spark, golden starburst, expanding pink-gold ring, fragments and fading glints. Crisp limited-palette pixel style; fixed local origin; no backdrop.",
+    "corrections": "Preserve same sixteen poses and pose order, reduce subjects within four by four cells; leave large transparent gutters; fully redraw clipped sword tip and separate neighboring swords and rolling poses."
+  }
+}
