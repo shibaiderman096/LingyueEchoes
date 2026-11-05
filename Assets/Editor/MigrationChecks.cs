@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEditor;
@@ -28,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckDeathAftermath();
+        CheckDefenseAndTutorial();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -47,7 +48,7 @@ public static class MigrationChecks
                     if(clip.secondContactPose>0)Assert(PixelActor.DrawnAttackCell(clip,move,move.wind+move.pulses[1]+1)==clip.secondContactPose,"Drawn second contact: "+clip.path);
                 }}}finally{UnityEngine.Object.DestroyImmediate(go);}
         if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
-        else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; manual dialogue; waiting guide and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
+        else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; V2 content, reading hold, broken steps and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
     static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=c.player,boss=c.boss,visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return JsonUtility.FromJson<Snapshot>(JsonUtility.ToJson(snapshot));}
     static Combat Contact(string state,int age,int energy=0,double echo=0){var c=new Combat{ai=false};c.player.x=0;c.player.state=state;c.player.age=age;c.player.energy=energy;c.player.echo=echo;c.boss.x=90;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;return c;}
     static void CheckDefenseAndTutorial(){
@@ -69,6 +70,49 @@ public static class MigrationChecks
         for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==790,"Guide walks to and waits at the next teaching point");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
         Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
+    }
+    static void CheckPrologueContent(){
+        var asset=Resources.Load<TextAsset>("Data/prologue-content");
+        Assert(asset,"Prologue JSON asset loads");
+        var data=JsonUtility.FromJson<PrologueContent>(asset.text);
+        string[] required={"routeWake","routeSteps","routeStepsClear","routeDummy","routeSpar","routeHit","routeDodge","routeParry",
+            "bossPre","bossRetry","bossPhase2","tail","tailAfter","rematchWin"};
+        Assert(data.scripts.Length==required.Length&&required.All(id=>data.scripts.Count(s=>s.id==id)==1),"Prologue IDs are unique and preserved");
+        Assert(data.story.Length==4&&data.lessons.Length==7&&data.scripts.All(s=>s.lines.Length>0),"V2 opening, dialogue and lesson content");
+        foreach(var line in data.scripts.SelectMany(s=>s.lines))
+            Assert(!string.IsNullOrWhiteSpace(line.text)&&line.text.Length<=36&&line.text.IndexOfAny(new[]{'{','}','%','％'})<0,
+                "Role text fits the bubble and contains no bindings or percentages: "+line.text);
+        var full=data.scripts.Single(s=>s.id=="routeSpar").lines.Last().text;
+        var dialogue=new DialogueDirector();int closed=0;dialogue.onClose=id=>closed++;
+        dialogue.Play(new DialogueScript{id="long",lines=new[]{new DialogueLine{speaker="guardian",text=full}}});
+        dialogue.Update(full.Length/34d+.01);
+        dialogue.Update(DialogueDirector.ReadingHold(full.Length)-.1);
+        Assert(dialogue.Active&&dialogue.VisibleText==full&&closed==0,"Long automatic dialogue remains fully visible for its reading hold");
+        dialogue.Update(.11);Assert(closed==1&&!dialogue.Active,"Automatic dialogue advances after the reading hold");
+    }
+    static void CheckBrokenSteps(){
+        var sim=new Combat{ai=false,enemyActive=false,boundsMin=-1560,boundsMax=PrologueLayout.ArenaMax};
+        var steps=PrologueLayout.BrokenSteps();var guide=new TutorialDirector();
+        sim.player.x=steps.x-100;sim.boss.x=-1235;
+        guide.Begin(sim,steps);sim.beforeStep=guide.Pump;sim.axis=1;
+        for(int i=0;i<50;i++)sim.Step();
+        double wall=steps.x-Combat.BodyWidth(sim.player)/2;
+        Assert(sim.player.x==wall&&!guide.StepsCleared&&guide.Lesson(sim)=="steps","Walking is blocked; a hint alone does not complete the jump");
+        sim.axis=0;sim.Press("jump");for(int i=0;i<60;i++)sim.Step();
+        Assert(sim.player.x==wall&&!guide.StepsCleared,"Jumping in place cannot complete the obstacle");
+        sim.axis=1;sim.Press("jump");
+        bool pastInAir=false;
+        for(int i=0;i<85&&!guide.StepsCleared;i++){
+            sim.Step();
+            if(sim.player.x-Combat.BodyWidth(sim.player)/2>=steps.x+steps.w&&sim.player.vy!=0){
+                pastInAir=true;Assert(!guide.StepsCleared,"Airborne beyond the obstacle is not yet a successful landing");
+            }
+        }
+        Assert(pastInAir&&guide.StepsCleared&&sim.player.y==0&&guide.Lesson(sim)=="stepsClear","Approach, jump across and land to complete the obstacle");
+        for(int i=0;i<780;i++)sim.Step();
+        sim.player.x=PrologueLayout.GuardianWaitX-120;sim.axis=0;sim.Step();
+        Assert(guide.GateBound&&!sim.enemyActive&&sim.dummyHits==0&&sim.deflectSerial==0&&guide.Interact(sim)=="bossPre",
+            "Skipping the wood dummy and sparring still reaches the required boss dialogue");
     }
     static void CheckDeathAftermath(){var c=new Combat{continueAfterDeath=true};c.player.x=0;c.player.y=65;c.player.vy=3;c.player.hp=0;c.player.state="dead";c.boss.x=100;c.DebugBoss(2);
         c.axis=1;c.Press("attack");c.Press("jump");for(int i=0;i<180;i++)c.Step();

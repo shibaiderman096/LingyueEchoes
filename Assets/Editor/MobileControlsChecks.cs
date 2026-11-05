@@ -20,19 +20,17 @@ namespace LingyueEchoes.EditorTools
             Require(ControlPrompts.Key("attack","pad")=="X"&&ControlPrompts.Key("interact","pad")=="RB","Xbox bindings");
             Require(ControlPrompts.Key("attack","touch")=="屏幕 X"&&ControlPrompts.Key("move","touch")=="左侧摇杆","touch bindings");
             var content=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/prologue-content").text);
-            foreach(var script in content.scripts)foreach(var line in script.lines)foreach(string device in new[]{"keyboard","pad","touch"}){
-                string rendered=ControlPrompts.Format(line.text,device);Require(!rendered.Contains("{")&&!rendered.Contains("}"),"all dialogue tokens resolve");
-                if(line.text.Contains("{interact}"))Require(rendered.Contains(ControlPrompts.Key("interact",device)),"dialogue uses the current interaction binding");
+            foreach(var lesson in content.lessons)foreach(string device in new[]{"keyboard","pad","touch"}){
+                string rendered=ControlPrompts.Format(lesson.controls,device);
+                Require(!rendered.Contains("{")&&!rendered.Contains("}"),"all lesson bindings resolve");
             }
-            var dialogue=new DialogueDirector();int closed=0;dialogue.onClose=id=>closed++;dialogue.resolveText=text=>ControlPrompts.Format(text,tracker.Device);
-            dialogue.Play(new DialogueScript{id="prompt",lines=new[]{new DialogueLine{speaker="guardian",text="按{interact}继续，{attack}攻击。"}}},false);
-            dialogue.Update(.06);Require(!dialogue.VisibleText.Contains("{"),"typing never reveals raw tokens");dialogue.Confirm();
-            Require(dialogue.VisibleText=="按E继续，J攻击。","keyboard dialogue renders");
-            tracker.Observe(false,true,false,0,0);Require(dialogue.VisibleText=="按RB继续，X攻击。"&&dialogue.Active&&closed==0,"open dialogue updates without restarting or advancing");
-            tracker.Observe(false,false,true,0,0);Require(dialogue.VisibleText=="按屏幕 RB继续，屏幕 X攻击。","open dialogue switches to touch");
-            for(int i=0;i<600;i++)dialogue.Update(1d/60);Require(dialogue.Active&&closed==0,"device changes preserve manual dialogue waiting");
-            dialogue.Confirm();Require(!dialogue.Active&&closed==1,"normal dialogue confirmation still closes once");
-            Debug.Log("TUTORIAL_DEVICE_PROMPTS_PASSED: keyboard/Xbox/touch bindings, last-used device and stick drift, all dialogue tokens, live dialogue switching without reset");
+            var steps=Array.Find(content.lessons,l=>l.id=="steps").controls;
+            Require(ControlPrompts.Format(steps,tracker.Device).Contains("空格 跳跃"),"keyboard jump card");
+            tracker.Observe(false,true,false,0,0);
+            Require(ControlPrompts.Format(steps,tracker.Device).Contains("A 跳跃"),"live Xbox jump card");
+            tracker.Observe(false,false,true,0,0);
+            Require(ControlPrompts.Format(steps,tracker.Device).Contains("屏幕 A 跳跃"),"live touch jump card");
+            Debug.Log("TUTORIAL_DEVICE_PROMPTS_PASSED: keyboard/Xbox/touch lesson bindings, last-used device, and stick drift");
         }
         [MenuItem("Lingyue/Check mobile controls")]
         public static void Run(){var controls=new MobileControls();Vector2 origin=MobileControls.StickCenter;

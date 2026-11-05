@@ -5,19 +5,49 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "醒了？别急着站起来。想不起从前的事，也没关系。"
+          "text": "醒了？别勉强，先站稳。"
         },
         {
           "speaker": "hero",
-          "text": "你……认识我？"
+          "text": "这里是……？"
         },
         {
           "speaker": "guardian",
-          "text": "叫你铃月，好吗？我会在这里等你。靠近后按{interact}，就能与我交谈。"
+          "text": "残月神社。一个早已被遗忘的地方。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你认识我？"
         },
         {
           "speaker": "guardian",
-          "text": "先用{move}走两步。不舒服就停下。我会在前面的灯下等你。"
+          "text": "……铃月。从前，你是这样称呼自己的。"
+        },
+        {
+          "speaker": "hero",
+          "text": "铃月……为什么我什么都想不起来？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "不必急着想起一切。前面的灯还亮着，先走过去吧。"
+        }
+      ]
+    },
+    {
+      "id": "routeSteps",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "小心脚下。这里许久没人修缮了。"
+        }
+      ]
+    },
+    {
+      "id": "routeStepsClear",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "看来，你的身手还没有完全忘记。"
         }
       ]
     },
@@ -26,28 +56,23 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "别握得太紧，手会疼。按{attack}出刀，慢一点，先听清刀铃的声音。"
+          "text": "这根木桩，居然还在。"
+        },
+        {
+          "speaker": "hero",
+          "text": "上面的刀痕……是你留下的？"
         },
         {
           "speaker": "guardian",
-          "text": "成功闪避、格挡回复 34% 回响，完美时回复 100%。别把气力空耗在风里。"
-        }
-      ]
-    },
-    {
-      "id": "routeSpar",
-      "lines": [
+          "text": "不是。试着挥一刀吧。"
+        },
         {
-          "speaker": "guardian",
-          "text": "怕也没关系。看我的手，按{parry}格挡，按{dodge}闪避。看准了再动。"
+          "speaker": "hero",
+          "text": "可我不记得自己会用刀。"
         },
         {
           "speaker": "guardian",
-          "text": "完美格挡或极限闪避，会回满气力与一格回响。再按{attack}，接上小处决。"
-        },
-        {
-          "speaker": "guardian",
-          "text": "这里只是练习，我会收着力。挡住我一刀，我们就去月门。"
+          "text": "没关系。手或许还记得。"
         }
       ]
     },
@@ -56,7 +81,40 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "对，就是这样。手腕放松些，你已经做得很好了。"
+          "text": "……还是那个起手式。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你刚才说什么？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "没什么。刀握稳些，别伤着自己。"
+        }
+      ]
+    },
+    {
+      "id": "routeSpar",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "木桩终究不会还手。要不要换我来？"
+        },
+        {
+          "speaker": "hero",
+          "text": "你要和我打？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "只是切磋。我会收着力。"
+        },
+        {
+          "speaker": "hero",
+          "text": "……好吧。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "看清我的动作。刀来时，躲开也好，迎上也好，别犹豫。"
         }
       ]
     },
@@ -65,7 +123,11 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "躲开了。别急着庆幸，先站稳。极闪后按{attack}，还能接上小处决。"
+          "text": "不错，脚步轻了不少。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "不过，光躲可赢不了我。"
         }
       ]
     },
@@ -74,7 +136,15 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "听见那声清响了吗？这就对了。走吧，我在月门等你。"
+          "text": "……这声音，倒是许久没听见了。"
+        },
+        {
+          "speaker": "hero",
+          "text": "我的身体……好像知道该怎么做。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "那便相信它。走吧，月门就在前面。"
         }
       ]
     },
@@ -82,25 +152,41 @@
       "id": "bossPre",
       "lines": [
         {
+          "speaker": "hero",
+          "text": "那盏灯里，究竟有什么？"
+        },
+        {
           "speaker": "guardian",
-          "text": "门外的灯会记住你的脚步。想歇一会儿的话，现在还来得及。"
+          "text": "你失去的一条尾巴。"
         },
         {
           "speaker": "hero",
-          "text": "我准备好了。请你教我最后一课。"
+          "text": "我的尾巴？为什么会在这里？"
         },
         {
           "speaker": "guardian",
-          "text": "好。到了场上，我就不会收刀。抬头，铃月，看着我。"
-        }
-      ]
-    },
-    {
-      "id": "bossRetry",
-      "lines": [
+          "text": "因为有人将它托付给了我。"
+        },
+        {
+          "speaker": "hero",
+          "text": "那就把它还给我。"
+        },
         {
           "speaker": "guardian",
-          "text": "还想再试一次？好。站稳了，这次我也不会让你。"
+          "text": "接过它，便也要接过它记得的一切。"
+        },
+        {
+          "speaker": "hero",
+          "text": "……即使如此，我也想知道。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "好。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "那么，最后这一课，我可不会再留手。",
+          "cue": "drawBlade"
         }
       ]
     },
@@ -109,7 +195,16 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "别等我停手。把刀举起来！"
+          "text": "很好！再让我看看，你还能做到什么程度！"
+        }
+      ]
+    },
+    {
+      "id": "bossRetry",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "还想继续？那就站稳。我们再来。"
         }
       ]
     },
@@ -118,15 +213,52 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "这一刀……很好。狐尾，该还给你了。"
+          "text": "……这一刀，像极了当年。"
         },
         {
           "speaker": "hero",
-          "text": "你还站得起来吗？来，抓着我的手。"
+          "text": "你受伤了！"
         },
         {
           "speaker": "guardian",
-          "text": "我只是累了。把它收好，铃月。这回换你循着灯走了。"
+          "text": "别担心。老毛病罢了。"
+        },
+        {
+          "speaker": "hero",
+          "text": "现在能告诉我了吗？你究竟在等谁？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "一个把故乡忘得干干净净的笨狐狸。"
+        },
+        {
+          "speaker": "hero",
+          "text": "……"
+        },
+        {
+          "speaker": "guardian",
+          "text": "这条尾巴，我替你守了很久。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "拿去吧。还有七道罪影，挡在你的归途上。",
+          "cue": "formTail"
+        },
+        {
+          "speaker": "hero",
+          "text": "那你呢？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "灯还亮着，我就还在。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "去吧，铃月。只是这一次……"
+        },
+        {
+          "speaker": "guardian",
+          "text": "别再忘记我们了。"
         }
       ]
     },
@@ -135,11 +267,23 @@
       "lines": [
         {
           "speaker": "narration",
-          "text": "铃月握住他的手。苏醒以来，第一个愿意扶她起来的人，刚刚被她亲手击倒。"
+          "text": "第一条狐尾在狐火中舒展。"
         },
         {
           "speaker": "narration",
-          "text": "守灯人坐回月门灯下。铃月收起第一尾，终于知道自己要找回什么。"
+          "text": "久违的温度涌入身体，随之而来的，还有一段尚未清晰的记忆。"
+        },
+        {
+          "speaker": "narration",
+          "text": "她回过头。"
+        },
+        {
+          "speaker": "narration",
+          "text": "守灯人已坐回月门的灯下，仿佛只是结束了一场寻常的练习。"
+        },
+        {
+          "speaker": "narration",
+          "text": "而那盏灯，依旧为她亮着。"
         }
       ]
     },
@@ -148,9 +292,57 @@
       "lines": [
         {
           "speaker": "guardian",
-          "text": "这局你赢了。等你准备好，我们再来。"
+          "text": "不错。这回比上次更稳了。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "路还长着呢，别太得意。"
         }
       ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "meet",
+      "title": "初遇",
+      "text": "靠近灯下的人，与他交谈。",
+      "controls": "{interact} 交谈"
+    },
+    {
+      "id": "move",
+      "title": "旧日参道",
+      "text": "沿着参道，走向前面的灯。",
+      "controls": "{move} 移动"
+    },
+    {
+      "id": "steps",
+      "title": "前方石阶已断",
+      "text": "走到断阶前，向前跳过去。",
+      "controls": "{move} 向前  ·  {jump} 跳跃"
+    },
+    {
+      "id": "stepsClear",
+      "title": "已越过断阶",
+      "text": "沿参道继续前行。",
+      "controls": ""
+    },
+    {
+      "id": "dummy",
+      "title": "练武之庭",
+      "text": "可以对木桩练习出刀，也可以直接前行。",
+      "controls": "{attack} 攻击"
+    },
+    {
+      "id": "sparOffer",
+      "title": "自愿切磋",
+      "text": "和守灯人交谈可开始切磋，也可以直接前往月门。",
+      "controls": "{interact} 交谈"
+    },
+    {
+      "id": "spar",
+      "title": "刀锋相授",
+      "text": "看准来刀，成功格挡一次即可结束练习。\n闪避或格挡成功回复 34% 回响；完美成功回复 100% 并回满气力。",
+      "controls": "{parry} 格挡  ·  {dodge} 闪避"
     }
   ],
   "zones": [
@@ -180,9 +372,9 @@
     }
   ],
   "story": [
-    "昔日，灵月高悬，照彻人妖两界。",
-    "直至七种欲念侵蚀月光，灾厄降临。",
+    "昔日，明月照彻人妖两界。",
+    "直到七种执念染上月光，长夜降临。",
     "一位九尾天狐斩断九尾，换来短暂的安宁。",
-    "数百年后，残月之下，一只白狐重新睁开了双眼。"
+    "数百年后，残灯未熄。"
   ]
 }

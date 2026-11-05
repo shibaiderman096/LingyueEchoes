@@ -8,8 +8,8 @@ namespace LingyueEchoes
     public class MigrationSmoke:MonoBehaviour
     {
         float elapsed,beatTime,parryFarewellTime;
-        int phase,firstVictoryFrame;
-        bool editorRun,restored,sawTail,sawEpilogue,sawOpeningPose;
+        int phase,firstVictoryFrame,stepsBlockedFrame=-1;
+        bool editorRun,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued;
         readonly string[] saveKeys={"lingyue.prologue","lingyue.tails",PrologueLayout.CheckpointKey};
         readonly int?[] saved=new int?[3];
         double originalHp;
@@ -29,11 +29,14 @@ namespace LingyueEchoes
             var game=FindAnyObjectByType<LingyueGame>();if(!game)return;
             elapsed+=Time.unscaledDeltaTime;beatTime+=Time.unscaledDeltaTime;
             try{
-                Require(elapsed<100,$"Timed out in phase {phase} ({game.stage}).");
+                Require(elapsed<150,$"Timed out in phase {phase} ({game.stage}).");
                 if(phase==0&&game.stage=="MENU"){Next();game.StartTrial(true);return;}
                 if(phase==1&&game.stage=="TUTORIAL"){
                     var world=game.transform.Find("World");
-                    Require(game.sim.terrain.Count==0&&!world.Find("CollapsedStone")&&world.Find("SceneryModules").childCount==6,"Expected the continuous modular route without a jump obstacle.");
+                    Require(game.sim.terrain.Count==1&&world.Find("SceneryModules").childCount==6,"Expected one broken-step obstacle on the modular route.");
+                    var steps=world.Find("Props/BrokenSteps").GetComponent<SpriteRenderer>();
+                    Require(steps.sprite&&Math.Abs(steps.bounds.min.x-PrologueLayout.StepsLeft/100)<.01&&
+                        Math.Abs(steps.bounds.max.y-(-.95+PrologueLayout.StepsHeight/100))<.01,"The visible broken steps align with the ground and collision.");
                     Require(!Seal(game,true).enabled&&Seal(game,false).enabled,"Only the outer arena boundary is sealed during exploration.");
                     originalPlayer=game.sim.player;originalHp=originalPlayer.hp;game.sim.god=true;Next();
                 }
@@ -43,6 +46,19 @@ namespace LingyueEchoes
                     case 2: // Complete each lesson by interacting while the guardian is stationary.
                         game.Interact();if(b.x>-1235)Next();break;
                     case 3:
+                        if(!game.BrokenStepsCleared){
+                            game.scriptedAxis=1;
+                            double wall=PrologueLayout.StepsLeft-Combat.BodyWidth(p)/2;
+                            // The crossing is recorded on the first fixed step after landing.
+                            if(!stepsJumpIssued&&p.x>=wall&&p.y==0&&p.vy==0){
+                                if(stepsBlockedFrame<0)stepsBlockedFrame=c.frame;
+                                Require(p.x==wall,"Walking must stop at the broken steps.");
+                                if(c.frame-stepsBlockedFrame>=18){game.Act("jump");stepsJumpIssued=true;}
+                            }
+                            return;
+                        }
+                        Require(stepsJumpIssued&&p.x-Combat.BodyWidth(p)/2>=PrologueLayout.StepsLeft+PrologueLayout.StepsWidth,
+                            "Tutorial completes only after crossing and landing beyond the steps.");
                         game.scriptedAxis=p.x<770?1:0;
                         if(p.x>=770)game.Interact();
                         if(b.x>790)Next();
@@ -102,7 +118,7 @@ namespace LingyueEchoes
                         }
                         else{
                             Require(game.stage=="GATE_READY"&&PlayerPrefs.GetInt("lingyue.tails",0)==1,"Rematch ends in the arena without another tail.");
-                            Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: stationary farewell, checkpoint, arena seals, first-victory story and tail, nonlethal rematch.");
+                            Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: broken steps physically block walking and clear on landing, stationary farewell, checkpoint, V2 first-victory story and tail, nonlethal rematch.");
                             Finish(0);
                         }
                         break;

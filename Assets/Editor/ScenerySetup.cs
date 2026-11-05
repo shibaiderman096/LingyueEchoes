@@ -31,7 +31,7 @@ public static class ScenerySetup
             world.gameObject.SetActive(scene.name!="MainMenu");EditorSceneManager.SaveScene(scene);
         }
         AssetDatabase.SaveAssets();if(!string.IsNullOrEmpty(returnPath))EditorSceneManager.OpenScene(returnPath);
-        Debug.Log("SCENERY_REBUILD_PASSED: 3 reusable background modules at 75% scale, 2 prop prefabs, continuous ground, no jump obstacle, arena 1200..2280.");
+        Debug.Log("SCENERY_REBUILD_PASSED: 3 reusable background modules at 75% scale, 2 prop prefabs, broken-step obstacle, arena 1200..2280.");
     }
     static void SaveProp(string name,string resource,float width,float height)
     {

@@ -14,7 +14,7 @@ namespace LingyueEchoes
         static bool replayRequested;static string lastInputDevice;
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
-        float stageTime,cameraX=-960,nextPadCheck,checkpointToast;string modal="";
+        float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime,tailFormTime;string modal="";
         bool debug,boxes,focused=true,motion,muted,hadTouch,showKeyHints,gameSettings;
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
@@ -37,6 +37,7 @@ namespace LingyueEchoes
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
         Texture2D keyart,hudPortrait,hudRing,firstTail;Font font;GUIStyle textStyle,buttonStyle;
+        readonly GUIContent measureContent=new GUIContent();
         Color[] hudRingPixels;float[] hudRingCoverage,hudRingPosition;int hudEcho=-1;
         AudioSource[] voices;AudioSource uiVoice,music;readonly Dictionary<string,AudioClip> soundClips=new Dictionary<string,AudioClip>();
         Combat soundModel;string musicKey="";
@@ -45,12 +46,15 @@ namespace LingyueEchoes
         bool TouchControlsVisible=>previewTouchControls||device=="touch";
         public bool BattleOn=>stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GUARDIAN_FIGHT";
         bool TailStory=>stage=="TAIL_DIALOGUE"||stage=="FIRST_TAIL"||stage=="TAIL_EPILOGUE";
+        bool WakeDialogue=>stage=="TUTORIAL"&&speech.Id=="routeWake";
+        internal bool BrokenStepsCleared=>tutorial.StepsCleared;
         void Awake(){Application.targetFrameRate=60;QualitySettings.vSyncCount=0;Input.simulateMouseWithTouches=true;
             content=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/prologue-content").text);PixelWorld.Load();
             view=Camera.main;if(!view){var camera=new GameObject("Main Camera");camera.tag="MainCamera";view=camera.AddComponent<Camera>();}
             view.orthographic=true;view.orthographicSize=3.6f;view.transform.position=new Vector3(0,0,-10);view.clearFlags=CameraClearFlags.SolidColor;view.backgroundColor=new Color(.043f,.075f,.106f);
             if(!FindAnyObjectByType<AudioListener>())view.gameObject.AddComponent<AudioListener>();
             world=transform.Find("World");if(!world)world=PixelWorld.Create(transform);
+            PixelWorld.PlaceBrokenSteps(world.Find("Props"));
             checkpointLamp=PixelWorld.PlaceCheckpoint(world.Find("Props"));
             leftSeal=PixelWorld.PlaceArenaSeal(world.Find("Props"),true);
             rightSeal=PixelWorld.PlaceArenaSeal(world.Find("Props"),false);
@@ -62,7 +66,6 @@ namespace LingyueEchoes
             motion=PlayerPrefs.GetString("lingyue.menuMotion","on")!="off";muted=PlayerPrefs.GetString("lingyue.sfxMuted","off")=="on";previewTouchControls=PlayerPrefs.GetInt("lingyue.touchControls",0)==1;
             showKeyHints=PlayerPrefs.GetInt("lingyue.keyHints",1)==1;
             inputDevice.Select(lastInputDevice??(Application.isMobilePlatform||previewTouchControls?"touch":Input.GetJoystickNames().Any(n=>!string.IsNullOrWhiteSpace(n))?"pad":"keyboard"));
-            speech.resolveText=text=>ControlPrompts.Format(text,device);
             voices=new AudioSource[12];for(int i=0;i<12;i++)voices[i]=gameObject.AddComponent<AudioSource>();uiVoice=gameObject.AddComponent<AudioSource>();music=gameObject.AddComponent<AudioSource>();music.loop=true;music.volume=.22f;
             foreach(string name in new[]{"step","jump","land","slash1","slash2","slash3","guard","dodge","counter","hit_player","hit_boss","parry","perfect_dodge","boss_swing","break","phase","death","victory","ui_confirm","ui_back"})soundClips[name]=Resources.Load<AudioClip>("audio/sfx/"+name);
             speech.onClose=id=>{
@@ -88,7 +91,8 @@ namespace LingyueEchoes
             checkpointReached=fromCheckpoint;checkpointToast=0;tutorial=new TutorialDirector();
             sim.player.x=fromCheckpoint?PrologueLayout.CheckpointX:-1400;
             sim.boss.x=fromCheckpoint?PrologueLayout.GuardianWaitX:-1235;
-            if(!fromCheckpoint){tutorial.Begin(sim);sim.beforeStep=tutorial.Pump;}
+            if(!fromCheckpoint){tutorial.Begin(sim,PrologueLayout.BrokenSteps());sim.beforeStep=tutorial.Pump;}
+            else sim.terrain.Add(PrologueLayout.BrokenSteps());
             speech.Reset();tutorialDialogue=false;effects.Clear();cameraX=-960;ClearInput();
             world.gameObject.SetActive(true);SetArenaSeals(false);UpdateCheckpointLamp();gameSettings=false;
         }
@@ -110,7 +114,7 @@ namespace LingyueEchoes
             if(PlayerPrefs.GetInt("lingyue.prologue",0)==1&&PlayerPrefs.GetInt("lingyue.tails",0)>0){
                 SetStage("GATE_READY");Say("rematchWin");return;
             }
-            ClearInput();effects.Clear();speech.Reset();
+            ClearInput();effects.Clear();speech.Reset();tailFormTime=0;
             var p=sim.player;var b=sim.boss;
             p.state="idle";p.move=null;p.age=0;p.y=p.vy=0;b.y=b.vy=0;
             p.face=b.x>=p.x?1:-1;b.face=-p.face;
@@ -147,8 +151,9 @@ namespace LingyueEchoes
                 case "FADE_IN":if(stageTime>=.8f)SetStage("CAMERA_REVEAL");break;
                 case "CAMERA_REVEAL":if(stageTime>=3.5f)SetStage("WAKE_UP");break;
                 case "WAKE_UP":if(stageTime>=.95f){SetStage(checkpointReached?"GATE_READY":"TUTORIAL");SetMusic("prologue_stage_1");}break;
-                case "GATE_DIALOGUE":break;
-                case "TAIL_DIALOGUE":case "TAIL_EPILOGUE":break;
+                case "GATE_DIALOGUE":if(speech.Cue=="drawBlade")bladeDrawTime+=dt;break;
+                case "TAIL_DIALOGUE":if(speech.Cue=="formTail"||tailFormTime>0)tailFormTime+=dt;break;
+                case "TAIL_EPILOGUE":break;
                 case "FIRST_TAIL":
                     if(stageTime>=2.75f){SetStage("TAIL_EPILOGUE");Say("tailAfter");}
                     break;
@@ -158,7 +163,7 @@ namespace LingyueEchoes
                     break;
                 case "DYING":case "DEATH":UpdateDeath(dt);break;
                 default:
-                    if(BattleOn){sim.axis=ReadAxis();clock.Advance(dt);SyncSounds();
+                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();clock.Advance(dt);SyncSounds();
                         if(sim.player.hp<=0&&sim.player.state=="dead"){EnterDeath();}
                         else if(stage=="TUTORIAL"){var id=tutorial.Speech(sim,!speech.Active);if(id!=null)Say(id);
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
@@ -168,7 +173,7 @@ namespace LingyueEchoes
             if(speech.Active)speech.Update(dt);if(stage!="MENU")DrawWorld(dt);
             checkpointToast=Math.Max(0,checkpointToast-dt);
         }
-        void UpdateStory(float dt){if(stageTime<.4f)return;storyTime+=dt;float span=storyPhase=="hold"?2.5f:.4f;if(storyTime>=span){storyTime=0;if(storyPhase=="in")storyPhase="hold";else if(storyPhase=="hold")storyPhase="out";else AdvanceStory();}}
+        void UpdateStory(float dt){if(stageTime<.4f)return;storyTime+=dt;float span=storyPhase=="hold"?(float)DialogueDirector.ReadingHold(content.story[storyIndex].Length):.4f;if(storyTime>=span){storyTime=0;if(storyPhase=="in")storyPhase="hold";else if(storyPhase=="hold")storyPhase="out";else AdvanceStory();}}
         void AdvanceStory(){if(stage!="STORY"||stageTime<.4f)return;storyIndex++;storyPhase="in";storyTime=0;if(storyIndex>=content.story.Length){SetStage("FADE_IN");SetMusic("prologue_stage_1");}}
         void DrawWorld(float dt){var p=sim.player;var b=sim.boss;float zoom=1,focusY=0;
             if(stage=="DYING"||stage=="DEATH"){float t=Ease(Mathf.Clamp01(deathZoomTime/DeathZoomDuration));
@@ -187,7 +192,8 @@ namespace LingyueEchoes
             if(stage=="GUARDIAN_INTRO"){
                 int slashCell=stageTime<TrialSlashTime?Mathf.Clamp((int)((stageTime-.22f)*6),0,3):Mathf.Clamp(4+(int)((stageTime-TrialSlashTime)*8),4,7);
                 guardian.Draw(b,sim.frame,pose:stageTime>=.22f&&stageTime<1.62f?"slash":"idle",poseCell:stageTime>=1.62f?0:slashCell);
-            }else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseCell:7);
+            }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
+            else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseCell:7);
             else guardian.Draw(b,sim.frame);
             effects.Draw(sim);
         }
@@ -210,9 +216,9 @@ namespace LingyueEchoes
                 ClearInput();
                 sim.player.state="idle";sim.player.move=null;sim.player.age=0;
                 sim.player.y=sim.player.vy=0;sim.player.face=sim.boss.x>=sim.player.x?1:-1;
-                sim.boss.face=-sim.player.face;SetStage("GATE_DIALOGUE");
+                sim.boss.face=-sim.player.face;bladeDrawTime=0;SetStage("GATE_DIALOGUE");SetArenaSeals(true);
                 if(interaction=="再次挑战")script=Array.Find(content.scripts,s=>s.id=="bossRetry");
-            }else{tutorialDialogue=true;tutorial.BeginDialogue(id);}
+            }else{tutorialDialogue=true;tutorial.BeginDialogue(id);if(id=="routeWake")ClearInput();}
             speech.Play(script,false);
         }
         void SetArenaSeals(bool active){
@@ -336,7 +342,7 @@ namespace LingyueEchoes
         void MobileAction(string action){if(action==null||clock.paused&&action!="pause")return;if(action=="interact")Interact();else Act(action);}
         double ReadAxis(){if(scriptedAxis.HasValue)return scriptedAxis.Value;float pad=Input.GetAxisRaw("PadX"),dpad=Input.GetAxisRaw("PadDpad");if(Math.Abs(pad)>.2f)return pad;if(Math.Abs(dpad)>.2f)return dpad;
             bool left=Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow),right=Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow);int keys=(right?1:0)-(left?1:0);return keys!=0?keys:mobileControls.Axis;}
-        public void Act(string action){if(!BattleOn)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun"){sim.boss.state="broken";sim.boss.age=0;sim.boss.move=null;sim.boss.posture=100;}else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
+        public void Act(string action){if(!BattleOn||WakeDialogue)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun"){sim.boss.state="broken";sim.boss.age=0;sim.boss.move=null;sim.boss.posture=100;}else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
         void OnApplicationPause(bool pause){if(pause)ClearInput();}
@@ -355,6 +361,7 @@ namespace LingyueEchoes
         static Color Ivory=>new Color(.98f,.93f,.85f);static Color Gold=>new Color(.85f,.74f,.53f);static Color Ink=>new Color(.075f,.11f,.18f,.95f);
         void Fill(Rect rect,Color color){color.a*=guiOpacity;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=Color.white;}
         void Text(Rect rect,string value,int size=20,Color? color=null,TextAnchor align=TextAnchor.UpperLeft){Color tint=color??Ivory;tint.a*=guiOpacity;textStyle.fontSize=size;textStyle.normal.textColor=tint;textStyle.alignment=align;GUI.Label(rect,value,textStyle);}
+        float TextHeight(string text,float width,int size){measureContent.text=text;textStyle.fontSize=size;return Mathf.Ceil(textStyle.CalcHeight(measureContent,width))+4;}
         bool Button(Rect rect,string caption,bool primary=false,bool interactive=true){Fill(rect,primary?Ivory:Ink);Fill(new Rect(rect.x,rect.y,rect.width,1),new Color(Gold.r,Gold.g,Gold.b,.55f));Text(rect,caption,21,primary?Ink:Ivory,TextAnchor.MiddleCenter);return interactive&&GUI.Button(rect,GUIContent.none,GUIStyle.none);}
         void MenuGUI(){if(keyart)GUI.DrawTexture(new Rect(0,0,1280,720),keyart,ScaleMode.ScaleAndCrop);else Fill(new Rect(0,0,1280,720),Ink);
             for(int i=0;i<12;i++)Fill(new Rect(i*49,0,50,720),new Color(.04f,.08f,.15f,(142-i*10)/255f));
@@ -394,52 +401,91 @@ namespace LingyueEchoes
             if(TailStory){TailStoryGUI();return;}
             if(BattleOn||stage=="GATE_DIALOGUE"){
                 if(Button(SettingsButton,"设置",gameSettings))SetGameSettings(true);
+                float lessonBottom=TutorialLessonGUI();
                 if(BattleOn){PlayerHud();
                     if(stage=="GUARDIAN_FIGHT"){Text(new Rect(450,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(490,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),new Color(.71f,.31f,.37f));Bar(new Rect(490,92,455,9),(float)(sim.boss.posture/100),Gold);}
                     if(showKeyHints&&!gameSettings&&!TouchControlsVisible&&!speech.Active)RightControlHints();
                     string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
-                    Text(new Rect(330,TouchControlsVisible?195:155,620,60),status,25,Gold,TextAnchor.MiddleCenter);}
+                    if(status!="")Text(new Rect(330,Mathf.Max(lessonBottom,TouchControlsVisible?195:155),620,44),status,25,Gold,TextAnchor.MiddleCenter);}
                 string interaction=Interaction();
                 if(!TouchControlsVisible&&interaction!=null){
                     if(showKeyHints)KeyPrompt(540,"interact",interaction);
                     else HintText(new Rect(1092,540,160,30),interaction,16,Ivory);
                     if(GUI.Button(new Rect(1030,540,220,30),GUIContent.none,GUIStyle.none))Interact();
                 }
-                if(speech.Active){bool manual=tutorialDialogue||stage=="GATE_DIALOGUE";var actor=speech.Speaker=="hero"?sim.player:sim.boss;Vector3 pos=view.WorldToViewportPoint(new Vector3((float)actor.x/100,((float)actor.y-95+(float)Combat.BodyHeight(actor)+20)/100,0));float x=Mathf.Clamp(pos.x*1280,200,TouchControlsVisible?900:1080),y=Mathf.Clamp((1-pos.y)*720-110,140,TouchControlsVisible?300:450);Fill(new Rect(x-180,y,360,manual?110:86),Ink);Text(new Rect(x-168,y+10,336,68),speech.VisibleText,18);if(manual)Text(new Rect(x-168,y+82,336,24),(showKeyHints?ControlPrompts.Key("interact",device)+" ":"")+"继续交谈",14,Gold);}
-                if(stage=="TUTORIAL"&&tutorial.Practicing&&!speech.Active)
-                    Text(new Rect(360,660,560,32),showKeyHints?ControlPrompts.Format("看准横斩，按 {parry} 成功弹反一次",device):"看准横斩，成功弹反一次",18,Gold,TextAnchor.MiddleCenter);
+                if(speech.Active)DialogueBubble(lessonBottom);
                 if(stage=="TUTORIAL"||stage=="GATE_READY")CheckpointGUI();
             }
             if((BattleOn||stage=="GATE_DIALOGUE")&&TouchControlsVisible)MobileControlsGUI();
             if(debug&&BattleOn){Fill(new Rect(15,385,670,168),Ink);Text(new Rect(30,395,640,72),$"60 Hz  Tick {sim.tick}  Frame {sim.frame}  {clock.Rate}x\n玩家 {sim.player.state} [{sim.player.age}]  Boss {sim.boss.state} [{sim.boss.age}]\n停顿 {sim.hitstop}  慢放 {clock.cinematicTicks}  处决窗 {sim.executeWindow}",16);string[] labels={"AI","无敌","暂停","单帧","慢速","回响","崩解","小处决"};for(int i=0;i<8;i++)if(Button(new Rect(24+i*81,493,76,39),labels[i])){if(i==0)sim.ai=!sim.ai;else if(i==1)sim.god=!sim.god;else Act(new[]{"","","pause","step","slow","charge","stun","echoWindow"}[i]);}}
             if(boxes&&BattleOn){DrawBox(sim.Hurtbox(sim.player),Color.green);DrawBox(sim.Hurtbox(sim.boss),Color.green);foreach(var hit in sim.hits)DrawBox(hit,new Color(1,.3f,.3f,.6f));}
         }
+        float TutorialLessonGUI(){
+            if(stage!="TUTORIAL"||tutorialDialogue||gameSettings)return 0;
+            var id=tutorial.Lesson(sim);
+            if(id==null)return 0;
+            var lesson=Array.Find(content.lessons,l=>l.id==id);
+            if(lesson==null)return 0;
+            const float x=350,y=144,width=580,inside=544;
+            float body=TextHeight(lesson.text,inside,18);
+            bool keys=showKeyHints&&!string.IsNullOrEmpty(lesson.controls);
+            float height=45+body+(keys?29:0);
+            RoundedFill(new Rect(x,y,width,height),Ink,8);
+            Text(new Rect(x+18,y+7,inside,27),lesson.title,19,Gold,TextAnchor.MiddleCenter);
+            Text(new Rect(x+18,y+34,inside,body),lesson.text,18,Ivory,TextAnchor.MiddleCenter);
+            if(keys)Text(new Rect(x+18,y+35+body,inside,26),ControlPrompts.Format(lesson.controls,device),16,Gold,TextAnchor.MiddleCenter);
+            return y+height+8;
+        }
+        void DialogueBubble(float lessonBottom){
+            bool manual=tutorialDialogue||stage=="GATE_DIALOGUE";
+            var actor=speech.Speaker=="hero"?sim.player:sim.boss;
+            var point=StoryPoint(actor,(float)Combat.BodyHeight(actor)+20);
+            const float width=380,pad=16,inside=width-2*pad;
+            float body=TextHeight(speech.LineText,inside,18),height=16+body+(manual?25:0);
+            float x=Mathf.Clamp(point.x-width/2,14,TouchControlsVisible?892-width:1266-width);
+            float y=Mathf.Clamp(point.y-height-14,Mathf.Max(136,lessonBottom),TouchControlsVisible?385:480);
+            RoundedFill(new Rect(x,y,width,height),Ink,7);
+            Text(new Rect(x+pad,y+7,inside,body),speech.VisibleText,18);
+            if(manual)Text(new Rect(x+pad,y+7+body,inside,25),(showKeyHints?ControlPrompts.Key("interact",device)+" ":"")+"继续交谈",14,Gold);
+        }
         void TailStoryGUI(){
             Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);
             if(stage=="FIRST_TAIL"){
                 float handoff=Ease(Mathf.Clamp01(stageTime/1.4f));
-                Vector2 from=StoryPoint(sim.boss,48),to=StoryPoint(sim.player,78);
+                Vector2 from=StoryPoint(sim.boss,72),to=StoryPoint(sim.player,80);
+                to.x-=sim.player.face*25;
                 Vector2 point=Vector2.Lerp(from,to,handoff);
                 point.y-=Mathf.Sin(handoff*Mathf.PI)*48;
                 float appear=Ease(Mathf.Clamp01(stageTime/.3f)),size=Mathf.Lerp(54,82,handoff);
-                if(firstTail){
-                    GUI.color=new Color(1,1,1,appear);GUI.DrawTexture(new Rect(point.x-size/2,point.y-size/2,size,size),firstTail);GUI.color=Color.white;
+                TailLight(point,size,appear,stageTime);
+                if(stageTime>=1.25f){
+                    Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
+                    Text(new Rect(320,173,640,34),"九尾残响：1 / 9",19,Ivory,TextAnchor.MiddleCenter);
                 }
-                if(stageTime>=1.25f)Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
                 return;
             }
             if(stage=="TAIL_EPILOGUE"){
                 Fill(new Rect(0,38,1280,644),new Color(.034f,.051f,.087f,.92f));
                 if(firstTail)GUI.DrawTexture(new Rect(590,175,100,100),firstTail);
-                Text(new Rect(340,278,600,45),"序章 · 月门余音",27,Gold,TextAnchor.MiddleCenter);
+                Text(new Rect(340,278,600,45),"序章结束 · 月门余音",27,Gold,TextAnchor.MiddleCenter);
                 Text(new Rect(275,332,730,118),speech.VisibleText,24,Ivory,TextAnchor.MiddleCenter);
                 if(Button(new Rect(565,475,150,44),"继续"))speech.Confirm();
                 return;
             }
+            if(tailFormTime>0){var point=StoryPoint(sim.boss,72);TailLight(point,62,Ease(Mathf.Clamp01(tailFormTime/.8f)),tailFormTime);}
             RoundedFill(new Rect(252,538,776,123),Ink,8);
             Text(new Rect(276,550,550,30),speech.Speaker=="hero"?"铃月":"守灯人",18,Gold);
             Text(new Rect(276,583,590,60),speech.VisibleText,22,Ivory);
             if(Button(new Rect(896,599,106,42),"继续"))speech.Confirm();
+        }
+        void TailLight(Vector2 point,float size,float alpha,float time){
+            for(int i=0;i<3;i++){
+                float phase=Mathf.Repeat(time*.75f+i/3f,1);
+                float r=3.5f*(1-phase);
+                Vector2 dot=point+new Vector2(Mathf.Sin(i*2.1f+phase*3)*size*.43f,size*(.28f-phase*.9f));
+                RoundedFill(new Rect(dot.x-r,dot.y-r,r*2,r*2),new Color(1,.67f,.46f,alpha*(1-phase)*.85f),r);
+            }
+            if(firstTail){GUI.color=new Color(1,1,1,alpha);GUI.DrawTexture(new Rect(point.x-size/2,point.y-size/2,size,size),firstTail);GUI.color=Color.white;}
         }
         Vector2 StoryPoint(Fighter actor,float height){
             var p=view.WorldToViewportPoint(new Vector3((float)actor.x/100,((float)actor.y+height-95)/100,0));
