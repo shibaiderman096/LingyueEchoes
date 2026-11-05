@@ -27,7 +27,9 @@ namespace LingyueEchoes
         const string SavePicker="saves";
         static readonly Rect SaveBackButton=new Rect(520,476,240,49);
         static Rect SaveRow(int index)=>new Rect(375,192+index*88,530,72);
-        int menuChoice,menuDirection,saveChoice;
+        static readonly string[] SaveDataKeys={PrologueLayout.CheckpointKey,PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.FirstVictoryStoryKey};
+        int menuChoice,menuDirection,saveChoice,deleteSaveSlot,deleteSaveDirection;
+        bool deleteSaveSelected;
         Vector2 menuPointer;
         readonly InputDeviceTracker inputDevice=new InputDeviceTracker();string device=>inputDevice.Device;
         static readonly KeyCode[] keyboardKeys=Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(k=>k>=KeyCode.Backspace&&k<KeyCode.Mouse0).Distinct().ToArray();
@@ -41,8 +43,12 @@ namespace LingyueEchoes
         static int SaveValue(string key,int slot)=>PlayerPrefs.GetInt(PrologueLayout.SaveKey(key,slot),0);
         static bool HasMoonGateSave(int slot)=>SaveValue(PrologueLayout.CheckpointKey,slot)==1;
         static bool StorySeen(int slot)=>SaveValue(PrologueLayout.FirstVictoryStoryKey,slot)==1;
+        static bool HasSaveData(int slot){
+            foreach(string key in SaveDataKeys)if(PlayerPrefs.HasKey(PrologueLayout.SaveKey(key,slot)))return true;
+            return false;
+        }
         bool FirstVictoryStorySeen=>StorySeen(SaveSlot);
-        internal static string SaveStatus(int slot)=>StorySeen(slot)?"序章已完成 · 从月门灯继续":HasMoonGateSave(slot)?"月门灯 · 继续游戏":"空档 · 从序幕开始";
+        internal static string SaveStatus(int slot)=>StorySeen(slot)?"序章已完成 · 从月门灯继续":HasMoonGateSave(slot)?"月门灯 · 继续游戏":HasSaveData(slot)?"旧存档 · 从序幕开始":"空档 · 从序幕开始";
         void WriteSave(string key,int value)=>PlayerPrefs.SetInt(PrologueLayout.SaveKey(key,SaveSlot),value);
         string storyPhase="in";bool tutorialDialogue,phase2Spoken,deathAxisHeld;
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
@@ -95,12 +101,25 @@ namespace LingyueEchoes
             saveChoice=SaveSlot-1;modal=SavePicker;UiSound("ui_confirm");
         }
         internal void ActivateSaveChoice(int choice){
-            if(!SavePickerOpen||choice<0||choice>PrologueLayout.SaveSlots)return;
+            if(!SavePickerOpen||deleteSaveSlot!=0||choice<0||choice>PrologueLayout.SaveSlots)return;
             if(choice==PrologueLayout.SaveSlots){CloseMenuModal();return;}
             SaveSlot=choice+1;modal="";UiSound("ui_confirm");
             if(SceneManager.GetActiveScene().name!="Prologue"){
                 pendingSaveSlot=SaveSlot;SceneManager.LoadScene("Prologue");
             }else BeginTrial();
+        }
+        void RequestSaveDeletion(int slot){
+            if(!SavePickerOpen||deleteSaveSlot!=0||slot<1||slot>PrologueLayout.SaveSlots||!HasSaveData(slot))return;
+            saveChoice=slot-1;deleteSaveSlot=slot;deleteSaveSelected=false;
+            deleteSaveDirection=SaveHorizontalDirection();UiSound("ui_confirm");
+        }
+        void ResolveSaveDeletion(bool remove){
+            if(!SavePickerOpen||deleteSaveSlot==0)return;
+            if(remove){
+                foreach(string key in SaveDataKeys)PlayerPrefs.DeleteKey(PrologueLayout.SaveKey(key,deleteSaveSlot));
+                PlayerPrefs.Save();
+            }
+            deleteSaveSlot=0;UiSound(remove?"ui_confirm":"ui_back");
         }
         public void BeginTrial(){
             bool resume=HasMoonGateSave(SaveSlot);
@@ -120,7 +139,7 @@ namespace LingyueEchoes
             speech.Reset();tutorialDialogue=false;effects.Clear();cameraX=-960;ClearInput();
             world.gameObject.SetActive(true);SetArenaSeals(false);UpdateCheckpointLamp();gameSettings=false;
         }
-        public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";gameSettings=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
+        public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
         void SetStage(string value){stage=value;stageTime=0;}
         void BeginTrialIntro(){
             ClearInput();sim.beforeStep=null;sim.nonlethal=false;sim.dummyBox=null;
@@ -299,6 +318,15 @@ namespace LingyueEchoes
             bool moved=pointer!=menuPointer;
             menuPointer=pointer;
             if(modal!=""){
+                if(deleteSaveSlot!=0){
+                    if(back){ResolveSaveDeletion(false);return;}
+                    int horizontal=SaveHorizontalDirection();
+                    if(horizontal!=0&&horizontal!=deleteSaveDirection)deleteSaveSelected=horizontal>0;
+                    else if(moveSelection)deleteSaveSelected=!deleteSaveSelected;
+                    deleteSaveDirection=horizontal;
+                    if(confirm)ResolveSaveDeletion(deleteSaveSelected);
+                    return;
+                }
                 if(back){CloseMenuModal();return;}
                 if(!SavePickerOpen)return;
                 int count=PrologueLayout.SaveSlots+1;
@@ -308,7 +336,9 @@ namespace LingyueEchoes
                     if(SaveBackButton.Contains(point))saveChoice=PrologueLayout.SaveSlots;
                     else for(int i=0;i<PrologueLayout.SaveSlots;i++)if(SaveRow(i).Contains(point)){saveChoice=i;break;}
                 }
-                if(confirm)ActivateSaveChoice(saveChoice);
+                bool delete=Input.GetKeyDown(KeyCode.Delete)||Input.GetKeyDown(KeyCode.JoystickButton2);
+                if(delete&&saveChoice<PrologueLayout.SaveSlots)RequestSaveDeletion(saveChoice+1);
+                else if(confirm)ActivateSaveChoice(saveChoice);
                 return;
             }
             if(back)return;
@@ -319,6 +349,7 @@ namespace LingyueEchoes
             }
             if(confirm)ActivateMenuOption(menuChoice);
         }
+        static int SaveHorizontalDirection(){float axis=Input.GetAxisRaw("Horizontal");return axis>.5f?1:axis<-.5f?-1:0;}
         void CloseMenuModal(){modal="";UiSound("ui_back");}
         void ActivateMenuOption(int option){
             menuChoice=option;
@@ -426,19 +457,33 @@ namespace LingyueEchoes
         }
         void SavePickerGUI(){
             Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.78f));
+            if(deleteSaveSlot!=0){DeleteSaveGUI();return;}
             RoundedFill(new Rect(333,95,614,499),Ink,10);
             Text(new Rect(375,118,530,50),"选择存档",32,Gold,TextAnchor.MiddleLeft);
             Fill(new Rect(375,175,530,1),new Color(Gold.r,Gold.g,Gold.b,.55f));
             for(int i=0;i<PrologueLayout.SaveSlots;i++){
-                var row=SaveRow(i);bool selected=saveChoice==i;
+                var row=SaveRow(i);bool selected=saveChoice==i,hasData=HasSaveData(i+1);
                 Fill(row,selected?new Color(.22f,.28f,.37f):new Color(.12f,.18f,.27f));
                 Fill(new Rect(row.x,row.y,selected?6:3,row.height),selected?Gold:new Color(.23f,.30f,.40f));
                 Text(new Rect(row.x+21,row.y,145,row.height),$"存档 {i+1:00}",23,Ivory,TextAnchor.MiddleLeft);
-                Text(new Rect(row.x+174,row.y,row.width-197,row.height),SaveStatus(i+1),18,Gold,TextAnchor.MiddleRight);
-                if(GUI.Button(row,GUIContent.none,GUIStyle.none)){ActivateSaveChoice(i);return;}
+                Text(new Rect(row.x+155,row.y,hasData?249:352,row.height),SaveStatus(i+1),18,Gold,TextAnchor.MiddleRight);
+                var play=hasData?new Rect(row.x,row.y,row.width-110,row.height):row;
+                if(GUI.Button(play,GUIContent.none,GUIStyle.none)){ActivateSaveChoice(i);return;}
+                if(hasData&&Button(new Rect(row.xMax-104,row.y+14,82,44),"删除")){RequestSaveDeletion(i+1);return;}
             }
             if(Button(SaveBackButton,"返回",saveChoice==PrologueLayout.SaveSlots))ActivateSaveChoice(PrologueLayout.SaveSlots);
-            Text(new Rect(375,542,530,30),ControlPrompts.MenuHint(device),16,Gold,TextAnchor.MiddleCenter);
+            string hint=ControlPrompts.MenuHint(device)+(device=="pad"?" · X 删除":device=="keyboard"?" · DEL 删除":"");
+            Text(new Rect(375,542,530,30),hint,16,Gold,TextAnchor.MiddleCenter);
+        }
+        void DeleteSaveGUI(){
+            RoundedFill(new Rect(333,218,614,284),Ink,10);
+            Text(new Rect(375,238,530,50),$"删除存档 {deleteSaveSlot:00}？",30,Gold,TextAnchor.MiddleLeft);
+            Fill(new Rect(375,300,530,1),new Color(Gold.r,Gold.g,Gold.b,.55f));
+            Text(new Rect(375,315,530,51),"该档的月门灯、狐尾和剧情进度将被清除，无法恢复。",20,Ivory,TextAnchor.MiddleLeft);
+            if(Button(new Rect(385,388,240,52),"取消",!deleteSaveSelected)){ResolveSaveDeletion(false);return;}
+            if(Button(new Rect(655,388,240,52),"确认删除",deleteSaveSelected)){ResolveSaveDeletion(true);return;}
+            string hint=device=="pad"?"左摇杆 ← / → 选择 · A 确认 · B 取消":device=="keyboard"?"← / → 选择 · ENTER 确认 · ESC 取消":"";
+            Text(new Rect(375,455,530,28),hint,16,Gold,TextAnchor.MiddleCenter);
         }
         void GameSettingsGUI(){
             RoundedFill(new Rect(914,96,330,326),Ink,9);
