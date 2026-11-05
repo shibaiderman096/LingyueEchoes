@@ -14,7 +14,7 @@ public static class PrologueFlowChecks
         var current=UnityEngine.Object.FindAnyObjectByType<LingyueEchoes.LingyueGame>();
         Require(current!=null,"No game found.");
         // Load a saved arena entrance without changing the player's existing save.
-        string key=LingyueEchoes.PrologueLayout.CheckpointKey;
+        string key=LingyueEchoes.PrologueLayout.SaveKey(LingyueEchoes.PrologueLayout.CheckpointKey,current.SaveSlot);
         bool hadCheckpoint=PlayerPrefs.HasKey(key);int checkpoint=PlayerPrefs.GetInt(key,0);
         PlayerPrefs.SetInt(key,1);
         try{current.BeginTrial();}
@@ -34,7 +34,7 @@ public static class PrologueFlowChecks
     {
         EditorApplication.update-=Pump;game=Prepare();phase=0;deadline=EditorApplication.timeSinceStartup+25;
         sawZoom=sawFade=sawReveal=sawWake=false;deathX=game.sim.player.x;
-        progress=PlayerPrefs.GetInt("lingyue.prologue",0);tails=PlayerPrefs.GetInt("lingyue.tails",0);
+        progress=Progress(LingyueEchoes.PrologueLayout.ProgressKey);tails=Progress(LingyueEchoes.PrologueLayout.TailCountKey);
         game.sim.player.y=70;game.sim.player.vy=3;game.sim.player.hp=0;EditorApplication.update+=Pump;
     }
     static void Pump()
@@ -65,8 +65,9 @@ public static class PrologueFlowChecks
                 Require(sawReveal&&sawWake&&Math.Abs(Camera.main.orthographicSize-3.6)<.01,"Respawn plays the same camera reveal and wake-up before returning control.");
                 game.sim.player.hp=0;phase=5;return;}
             if(!game.DeathMenuReady)return;game.Home();Require(game.stage=="MENU","Death menu can return home.");
-            Require(PlayerPrefs.GetInt("lingyue.prologue",0)==progress&&PlayerPrefs.GetInt("lingyue.tails",0)==tails,"Death/retry must not grant progression.");
+            Require(Progress(LingyueEchoes.PrologueLayout.ProgressKey)==progress&&Progress(LingyueEchoes.PrologueLayout.TailCountKey)==tails,"Death/retry must not grant progression.");
             EditorApplication.update-=Pump;Debug.Log("DEATH_MENU_FLOW_PASSED: simultaneous death animation and camera push-in, ongoing enemy move, delayed menu fade, checkpoint respawn with prologue cinematic, home, unchanged progress");
         }catch(Exception error){EditorApplication.update-=Pump;Debug.LogException(error);if(game)game.Home();}
     }
+    static int Progress(string key)=>PlayerPrefs.GetInt(LingyueEchoes.PrologueLayout.SaveKey(key,game.SaveSlot),0);
 }

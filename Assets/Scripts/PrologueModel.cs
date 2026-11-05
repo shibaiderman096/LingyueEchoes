@@ -12,6 +12,10 @@ namespace LingyueEchoes
         public static Box BrokenSteps()=>new Box(StepsLeft,0,StepsWidth,StepsHeight,noFoothold:true);
         public const string CheckpointKey="lingyue.moonGateCheckpoint";
         public const string FirstVictoryStoryKey="lingyue.firstVictoryStoryV2";
+        public const string ProgressKey="lingyue.prologue",TailCountKey="lingyue.tails";
+        public const int SaveSlots=3;
+        // The first slot keeps the original keys, including saves made before the picker existed.
+        public static string SaveKey(string key,int slot)=>slot==1?key:key+".slot"+slot;
     }
     [Serializable] public class DialogueLine {public string speaker,text,cue;}
     [Serializable] public class DialogueScript {public string id;public DialogueLine[] lines;}

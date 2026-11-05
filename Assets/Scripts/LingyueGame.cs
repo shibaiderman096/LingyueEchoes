@@ -12,6 +12,7 @@ namespace LingyueEchoes
         [NonSerialized] public Combat sim; [NonSerialized] public FixedClock clock;
         [NonSerialized] internal double? scriptedAxis;
         static string lastInputDevice;
+        static int? pendingSaveSlot;
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime,tailFormTime;string modal="";
@@ -19,11 +20,14 @@ namespace LingyueEchoes
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
         static readonly (Rect bounds,string label)[] MenuOptions={
-            (new Rect(105,388,340,62),"开始游戏"),
-            (new Rect(105,503,340,58),"操作说明"),
-            (new Rect(105,577,340,58),"声音与界面")
+            (new Rect(105,395,340,62),"开始游戏"),
+            (new Rect(105,477,340,58),"操作说明"),
+            (new Rect(105,553,340,58),"声音与界面")
         };
-        int menuChoice,menuDirection;
+        const string SavePicker="saves";
+        static readonly Rect SaveBackButton=new Rect(520,476,240,49);
+        static Rect SaveRow(int index)=>new Rect(375,192+index*88,530,72);
+        int menuChoice,menuDirection,saveChoice;
         Vector2 menuPointer;
         readonly InputDeviceTracker inputDevice=new InputDeviceTracker();string device=>inputDevice.Device;
         static readonly KeyCode[] keyboardKeys=Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(k=>k>=KeyCode.Backspace&&k<KeyCode.Mouse0).Distinct().ToArray();
@@ -32,9 +36,14 @@ namespace LingyueEchoes
         const float TrialIntroDuration=2.1f,TrialSlashTime=.94f;
         SpriteRenderer checkpointLamp,leftSeal,rightSeal;
         bool checkpointReached;
-        static bool FirstVictoryStorySeen=>PlayerPrefs.GetInt(PrologueLayout.FirstVictoryStoryKey,0)==1;
-        static bool HasMoonGateSave=>PlayerPrefs.GetInt(PrologueLayout.CheckpointKey,0)==1;
-        internal string MenuSaveStatus=>FirstVictoryStorySeen?"存档 · 序章已完成":HasMoonGateSave?"存档 · 月门灯":"暂无存档 · 从序幕开始";
+        public int SaveSlot {get;private set;}=1;
+        internal bool SavePickerOpen=>stage=="MENU"&&modal==SavePicker;
+        static int SaveValue(string key,int slot)=>PlayerPrefs.GetInt(PrologueLayout.SaveKey(key,slot),0);
+        static bool HasMoonGateSave(int slot)=>SaveValue(PrologueLayout.CheckpointKey,slot)==1;
+        static bool StorySeen(int slot)=>SaveValue(PrologueLayout.FirstVictoryStoryKey,slot)==1;
+        bool FirstVictoryStorySeen=>StorySeen(SaveSlot);
+        internal static string SaveStatus(int slot)=>StorySeen(slot)?"序章已完成 · 从月门灯继续":HasMoonGateSave(slot)?"月门灯 · 继续游戏":"空档 · 从序幕开始";
+        void WriteSave(string key,int value)=>PlayerPrefs.SetInt(PrologueLayout.SaveKey(key,SaveSlot),value);
         string storyPhase="in";bool tutorialDialogue,phase2Spoken,deathAxisHeld;
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
@@ -76,11 +85,25 @@ namespace LingyueEchoes
                 if(id=="tail"&&stage=="TAIL_DIALOGUE"){SetStage("FIRST_TAIL");UiSound("victory");}
                 if(id=="tailAfter"&&stage=="TAIL_EPILOGUE")CompleteFirstVictory();
             };
-            Home();if(SceneManager.GetActiveScene().name=="Prologue")BeginTrial();
+            Home();
+            if(SceneManager.GetActiveScene().name=="Prologue"){
+                SaveSlot=pendingSaveSlot??1;pendingSaveSlot=null;BeginTrial();
+            }
         }
-        public void StartTrial(){if(stage!="MENU")return;UiSound("ui_confirm");if(SceneManager.GetActiveScene().name!="Prologue")SceneManager.LoadScene("Prologue");else BeginTrial();}
+        public void StartTrial(){
+            if(stage!="MENU"||modal!="")return;
+            saveChoice=SaveSlot-1;modal=SavePicker;UiSound("ui_confirm");
+        }
+        internal void ActivateSaveChoice(int choice){
+            if(!SavePickerOpen||choice<0||choice>PrologueLayout.SaveSlots)return;
+            if(choice==PrologueLayout.SaveSlots){CloseMenuModal();return;}
+            SaveSlot=choice+1;modal="";UiSound("ui_confirm");
+            if(SceneManager.GetActiveScene().name!="Prologue"){
+                pendingSaveSlot=SaveSlot;SceneManager.LoadScene("Prologue");
+            }else BeginTrial();
+        }
         public void BeginTrial(){
-            bool resume=HasMoonGateSave;
+            bool resume=HasMoonGateSave(SaveSlot);
             PrepareRoute(resume);
             storyIndex=0;storyTime=0;storyPhase="in";
             SetStage(resume?"FADE_IN":"STORY");
@@ -123,14 +146,14 @@ namespace LingyueEchoes
             SetStage("TAIL_DIALOGUE");Say("tail");
         }
         void CompleteFirstVictory(){
-            PlayerPrefs.SetInt("lingyue.tails",Math.Max(1,PlayerPrefs.GetInt("lingyue.tails",0)));
-            PlayerPrefs.SetInt("lingyue.prologue",1);
-            PlayerPrefs.SetInt(PrologueLayout.FirstVictoryStoryKey,1);PlayerPrefs.Save();
+            WriteSave(PrologueLayout.TailCountKey,Math.Max(1,SaveValue(PrologueLayout.TailCountKey,SaveSlot)));
+            WriteSave(PrologueLayout.ProgressKey,1);
+            WriteSave(PrologueLayout.FirstVictoryStoryKey,1);PlayerPrefs.Save();
             SetStage("GATE_READY");
         }
         void SaveCheckpoint(){
             checkpointReached=true;checkpointToast=2.4f;UpdateCheckpointLamp();
-            PlayerPrefs.SetInt(PrologueLayout.CheckpointKey,1);PlayerPrefs.Save();UiSound("ui_confirm");
+            WriteSave(PrologueLayout.CheckpointKey,1);PlayerPrefs.Save();UiSound("ui_confirm");
         }
         void UpdateCheckpointLamp(){checkpointLamp.color=checkpointReached?new Color(1,.84f,.53f):new Color(.51f,.59f,.68f);}
         public void Retry(){if(!DeathMenuReady||sim==null)return;PrepareRoute(checkpointReached);SetStage("FADE_IN");SetMusic("prologue_stage_1");UiSound("ui_confirm");}
@@ -253,8 +276,8 @@ namespace LingyueEchoes
             bool escape=Input.GetKeyDown(KeyCode.Escape),menu=Input.GetKeyDown(KeyCode.JoystickButton7);
             if(gameSettings){ReadGameSettings(confirm,padB||escape||menu);return;}
             if((BattleOn||stage=="GATE_DIALOGUE")&&(escape||menu)){SetGameSettings(true);return;}
-            if(escape){if(modal!="")modal="";else if(stage!="MENU")Home();return;}
-            if(stage=="MENU"){ReadMenuInput(confirm,padB);return;}
+            if(stage=="MENU"){ReadMenuInput(confirm,padB||escape);return;}
+            if(escape){Home();return;}
             if(stage=="STORY"){if(padB){Home();return;}if(confirm)AdvanceStory();return;}
             if(!BattleOn&&stage!="GATE_DIALOGUE")return;
             if(Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5))Interact();
@@ -275,7 +298,20 @@ namespace LingyueEchoes
             Vector2 pointer=Input.mousePosition;
             bool moved=pointer!=menuPointer;
             menuPointer=pointer;
-            if(modal!=""){if(back)modal="";return;}
+            if(modal!=""){
+                if(back){CloseMenuModal();return;}
+                if(!SavePickerOpen)return;
+                int count=PrologueLayout.SaveSlots+1;
+                if(moveSelection)saveChoice=(saveChoice+direction+count)%count;
+                else if(moved&&!TouchControlsVisible){
+                    Vector2 point=UiPoint(pointer);
+                    if(SaveBackButton.Contains(point))saveChoice=PrologueLayout.SaveSlots;
+                    else for(int i=0;i<PrologueLayout.SaveSlots;i++)if(SaveRow(i).Contains(point)){saveChoice=i;break;}
+                }
+                if(confirm)ActivateSaveChoice(saveChoice);
+                return;
+            }
+            if(back)return;
             if(moveSelection)menuChoice=(menuChoice+direction+MenuOptions.Length)%MenuOptions.Length;
             else if(moved&&!TouchControlsVisible){
                 Vector2 point=UiPoint(pointer);
@@ -283,6 +319,7 @@ namespace LingyueEchoes
             }
             if(confirm)ActivateMenuOption(menuChoice);
         }
+        void CloseMenuModal(){modal="";UiSound("ui_back");}
         void ActivateMenuOption(int option){
             menuChoice=option;
             switch(option){
@@ -375,17 +412,33 @@ namespace LingyueEchoes
                 if(Button(option.bounds,option.label,menuChoice==i))ActivateMenuOption(i);
             }
             GUI.enabled=true;
-            Text(new Rect(125,453,320,33),MenuSaveStatus,16,HasMoonGateSave?Gold:new Color(.75f,.78f,.86f));
             Text(new Rect(105,690,550,24),ControlPrompts.MenuHint(device),14);
             Fill(new Rect(1000,640,265,65),Ink);Text(new Rect(1015,650,245,60),"12 帧弹刀 · 8 帧完美\n固定 60Hz 战斗",16,Gold);
             if(motion)for(int i=0;i<14;i++){float t=Time.unscaledTime;Fill(new Rect(60+(i*173)%1160+Mathf.Sin(t*.5f+i*1.7f)*18,((i*97-t*(8+i%4*4))%720+720)%720,8,3),new Color(.95f,.73f,.8f,.5f));}
+            if(SavePickerOpen){SavePickerGUI();return;}
             if(modal!=""){Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.87f));Fill(new Rect(240,70,800,580),Ink);Text(new Rect(285,100,700,45),modal=="controls"?"循响入门":"声音与界面",30,Gold);
                 if(modal=="controls")Text(new Rect(285,160,705,400),ControlPrompts.Summary(device)+"\n\n弹刀前 8 帧完美、共 12 帧；危险招式用闪避或跳跃。\n闪避 / 跳跃 / 格挡消耗 45 / 30 / 20 气力。\n成功闪避 / 格挡回复 34% 回响；完美成功回复 100% 并回满气力。\n小处决消耗 1 回响，大处决消耗全部回响。\n死亡后从菜单选择重试。",20);
                 else{Text(new Rect(285,170,700,55),"声音、动态和序章进度会保存到本机。",21);if(Button(new Rect(350,250,580,60),"樱花动态    "+(motion?"开启":"关闭"))){motion=!motion;PlayerPrefs.SetString("lingyue.menuMotion",motion?"on":"off");}
                     if(Button(new Rect(350,335,580,60),"声音    "+(muted?"关闭":"开启")))ToggleSound();
                     if(Button(new Rect(350,420,580,60),"触屏按键预览    "+(previewTouchControls?"开启":"关闭"))){PreviewTouchControls=!previewTouchControls;PlayerPrefs.SetInt("lingyue.touchControls",previewTouchControls?1:0);PlayerPrefs.Save();}
                     Text(new Rect(285,500,700,50),"手机自动显示触屏按键 · 映射 Xbox 布局\n显示目标 60 FPS · 固定战斗 60Hz",17,Gold);}
-                if(Button(new Rect(530,565,220,55),"返回",true)){UiSound("ui_back");modal="";}}
+                if(Button(new Rect(530,565,220,55),"返回",true))CloseMenuModal();}
+        }
+        void SavePickerGUI(){
+            Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.78f));
+            RoundedFill(new Rect(333,95,614,499),Ink,10);
+            Text(new Rect(375,118,530,50),"选择存档",32,Gold,TextAnchor.MiddleLeft);
+            Fill(new Rect(375,175,530,1),new Color(Gold.r,Gold.g,Gold.b,.55f));
+            for(int i=0;i<PrologueLayout.SaveSlots;i++){
+                var row=SaveRow(i);bool selected=saveChoice==i;
+                Fill(row,selected?new Color(.22f,.28f,.37f):new Color(.12f,.18f,.27f));
+                Fill(new Rect(row.x,row.y,selected?6:3,row.height),selected?Gold:new Color(.23f,.30f,.40f));
+                Text(new Rect(row.x+21,row.y,145,row.height),$"存档 {i+1:00}",23,Ivory,TextAnchor.MiddleLeft);
+                Text(new Rect(row.x+174,row.y,row.width-197,row.height),SaveStatus(i+1),18,Gold,TextAnchor.MiddleRight);
+                if(GUI.Button(row,GUIContent.none,GUIStyle.none)){ActivateSaveChoice(i);return;}
+            }
+            if(Button(SaveBackButton,"返回",saveChoice==PrologueLayout.SaveSlots))ActivateSaveChoice(PrologueLayout.SaveSlots);
+            Text(new Rect(375,542,530,30),ControlPrompts.MenuHint(device),16,Gold,TextAnchor.MiddleCenter);
         }
         void GameSettingsGUI(){
             RoundedFill(new Rect(914,96,330,326),Ink,9);
