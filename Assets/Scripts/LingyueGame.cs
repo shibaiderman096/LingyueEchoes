@@ -63,6 +63,10 @@ namespace LingyueEchoes
         bool TouchControlsVisible=>previewTouchControls||device=="touch";
         public bool BattleOn=>stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GUARDIAN_FIGHT";
         bool TailStory=>stage=="TAIL_DIALOGUE"||stage=="FIRST_TAIL"||stage=="TAIL_EPILOGUE";
+        int guardianDefeatFrame;
+        float guardianDefeatDuration;
+        double GuardianDefeatElapsed=>(sim.frame-guardianDefeatFrame)/60d;
+        internal bool HasActiveDialogue=>speech.Active;
         bool WakeDialogue=>stage=="TUTORIAL"&&speech.Id=="routeWake";
         internal bool BrokenStepsCleared=>tutorial.StepsCleared;
         void Awake(){Application.targetFrameRate=60;QualitySettings.vSyncCount=0;Input.simulateMouseWithTouches=true;
@@ -151,14 +155,27 @@ namespace LingyueEchoes
             phase2Spoken=false;cameraX=(float)PrologueLayout.ArenaCenter;
             SetStage("GUARDIAN_INTRO");SetArenaSeals(true);
         }
+        void BeginGuardianDefeat(){
+            mobileControls.Reset();sim.ClearCommands();clock.paused=false;clock.ClearAccumulation();speech.Reset();
+            var p=sim.player;
+            p.state=p.y>0||p.vy!=0?"air":"idle";p.move=null;p.age=0;
+            guardianDefeatFrame=sim.frame;
+            guardianDefeatDuration=PixelWorld.Definition("guardian8","broken").duration;
+            SetStage("GUARDIAN_DEFEAT");
+        }
+        void UpdateGuardianDefeat(float dt){
+            sim.axis=0;clock.Advance(dt);SyncSounds();
+            if(GuardianDefeatElapsed>=guardianDefeatDuration&&sim.player.vy==0&&sim.boss.vy==0)FinishGuardianFight();
+        }
         void FinishGuardianFight(){
             StopSounds();SetArenaSeals(false);SetMusic("prologue_stage_1");
             sim.boundsMin=-1560;
+            sim.visuals.Clear();effects.Clear();
             // Older save flags describe progression, not whether this closing scene has played.
             if(FirstVictoryStorySeen){
                 SetStage("GATE_READY");Say("rematchWin");return;
             }
-            ClearInput();effects.Clear();speech.Reset();tailFormTime=0;
+            tailFormTime=0;
             var p=sim.player;var b=sim.boss;
             p.state="idle";p.move=null;p.age=0;p.y=p.vy=0;b.y=b.vy=0;
             p.face=b.x>=p.x?1:-1;b.face=-p.face;
@@ -206,13 +223,14 @@ namespace LingyueEchoes
                     if(stageTime>=TrialSlashTime&&stageTime-dt<TrialSlashTime)UiSound("boss_swing");
                     if(stageTime>=TrialIntroDuration){sim.ai=sim.enemyActive=true;SetStage("GUARDIAN_FIGHT");SetMusic("moon_gate_boss");}
                     break;
+                case "GUARDIAN_DEFEAT":UpdateGuardianDefeat(dt);break;
                 case "DYING":case "DEATH":UpdateDeath(dt);break;
                 default:
                     if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();clock.Advance(dt);SyncSounds();
                         if(sim.player.hp<=0&&sim.player.state=="dead"){EnterDeath();}
                         else if(stage=="TUTORIAL"){var id=tutorial.Speech(sim,!speech.Active);if(id!=null)Say(id);
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
-                        else if(stage=="GUARDIAN_FIGHT"&&sim.BossDefeated)FinishGuardianFight();
+                        else if(stage=="GUARDIAN_FIGHT"&&sim.BossDefeated)BeginGuardianDefeat();
                         else if(stage=="GUARDIAN_FIGHT"&&sim.phase==2&&!phase2Spoken){phase2Spoken=true;Say("bossPhase2");}}
                     break;}
             if(speech.Active)speech.Update(dt);if(stage!="MENU")DrawWorld(dt);
@@ -238,7 +256,8 @@ namespace LingyueEchoes
                 int slashCell=stageTime<TrialSlashTime?Mathf.Clamp((int)((stageTime-.22f)*6),0,3):Mathf.Clamp(4+(int)((stageTime-TrialSlashTime)*8),4,7);
                 guardian.Draw(b,sim.frame,pose:stageTime>=.22f&&stageTime<1.62f?"slash":"idle",poseCell:stageTime>=1.62f?0:slashCell);
             }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
-            else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseCell:7);
+            else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
+            else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
             else guardian.Draw(b,sim.frame);
             effects.Draw(sim);
         }
@@ -287,7 +306,7 @@ namespace LingyueEchoes
             lastInputDevice=device;
         }
         void ReadInput(){DetectInputDevice();bool padA=Input.GetKeyDown(KeyCode.JoystickButton0),padB=Input.GetKeyDown(KeyCode.JoystickButton1);bool confirm=Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.Space)||padA;
-            if(stage=="DYING")return;if(stage=="DEATH"){ReadDeathInput(confirm,padB);return;}
+            if(stage=="DYING"||stage=="GUARDIAN_DEFEAT")return;if(stage=="DEATH"){ReadDeathInput(confirm,padB);return;}
             if(TailStory){
                 if(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5))speech.Confirm();
                 return;

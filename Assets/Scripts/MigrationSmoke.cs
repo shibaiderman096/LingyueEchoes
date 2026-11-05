@@ -9,7 +9,7 @@ namespace LingyueEchoes
     public class MigrationSmoke:MonoBehaviour
     {
         float elapsed,beatTime,parryFarewellTime;
-        int phase,firstVictoryFrame,stepsBlockedFrame=-1;
+        int phase,firstVictoryFrame,stepsBlockedFrame=-1,guardianDefeatStartFrame=-1;
         bool editorRun,captured,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued,lostFirstFight,sawOpeningStory,sawDummyStop;
         const int TestSlot=2;
         static readonly string[] progressKeys={PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.CheckpointKey,PrologueLayout.FirstVictoryStoryKey};
@@ -137,6 +137,16 @@ namespace LingyueEchoes
                         }
                         game.scriptedAxis=0;
                         Require(c.BossDefeated&&!c.enemyActive&&b.hp>0&&b.state!="dead"&&game.transform.Find("World/Guardian").gameObject.activeInHierarchy,"The defeated guardian survives and remains visible.");
+                        if(game.stage=="GUARDIAN_DEFEAT"){
+                            if(guardianDefeatStartFrame<0)guardianDefeatStartFrame=c.frame;
+                            game.Interact();
+                            Require(!game.BattleOn&&!game.HasActiveDialogue&&Seal(game,true).enabled,
+                                "The defeat animation plays without combat, dialogue, or premature arena exit.");
+                            return;
+                        }
+                        Require(guardianDefeatStartFrame>=0&&c.frame-guardianDefeatStartFrame>=Mathf.CeilToInt(PixelWorld.Definition("guardian8","broken").duration*60),
+                            "Victory dialogue waits for the full defeat clip.");
+                        guardianDefeatStartFrame=-1;
                         Require(!Seal(game,true).enabled,"The arena exit opens after a victory.");
                         if(phase==9){
                             Require(game.stage=="TAIL_DIALOGUE","First victory automatically starts the tail story.");
