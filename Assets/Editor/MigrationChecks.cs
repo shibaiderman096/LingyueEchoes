@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -52,11 +52,11 @@ public static class MigrationChecks
     static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=c.player,boss=c.boss,visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return JsonUtility.FromJson<Snapshot>(JsonUtility.ToJson(snapshot));}
     static Combat Contact(string state,int age,int energy=0,double echo=0){var c=new Combat{ai=false};c.player.x=0;c.player.state=state;c.player.age=age;c.player.energy=energy;c.player.echo=echo;c.boss.x=90;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;return c;}
     static void CheckDefenseAndTutorial(){
-        foreach(string state in new[]{"parry","dodge"})for(int age=0;age<16;age++){
-            var c=Contact(state,age);c.Step();bool success=state=="parry"?age<12:age>=2&&age<14;bool perfect=success&&(state=="parry"?age<8:age<6);
+        foreach(string state in new[]{"parry","dodge"})for(int age=0;age<22;age++){
+            var c=Contact(state,age);c.Step();bool success=state=="parry"?age<20:age>=2&&age<14;bool perfect=success&&(state=="parry"?age<12:age<10);
             Assert(c.player.hp==(success?120:102),state+" defense window "+age);
             Assert(c.player.energy==(perfect?1:0)&&c.player.echo==(success&&!perfect?34:0),state+" defense reward "+age);}
-        var dodge=Contact("dodge",6);dodge.Step();dodge.boss.attackId=56;dodge.Step();Assert(dodge.player.echo==34,"One echo reward per dodge action");
+        var dodge=Contact("dodge",10);dodge.Step();dodge.boss.attackId=56;dodge.Step();Assert(dodge.player.echo==34,"One echo reward per dodge action");
         var carry=Contact("parry",0,2,80);carry.Step();Assert(carry.player.energy==3&&carry.player.echo==80,"Perfect defense carries existing partial charge");
         var cap=Contact("parry",0,3,80);cap.Step();Assert(cap.player.energy==3&&cap.player.echo==99,"Echo capacity remains three points plus partial charge");
         var empty=new Combat{enemyActive=false,ai=false};empty.Press("dodge");for(int i=0;i<40;i++)empty.Step();empty.Press("parry");for(int i=0;i<40;i++)empty.Step();Assert(empty.player.energy==0&&empty.player.echo==0,"Empty defensive actions do not grant echo");
@@ -71,6 +71,32 @@ public static class MigrationChecks
             route.boss.x+Combat.BodyWidth(route.boss)/2<route.dummyBox.x,"Guide stops clear of the practice dummy");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
         Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
+    }
+    static void CheckExecutionAndEffects(){
+        var c=new Combat{ai=false};var p=c.player;var b=c.boss;p.x=0;p.face=-1;b.x=80;b.posture=80;p.energy=1;c.executeWindow=30;
+        c.DebugBoss(0);b.age=b.move.wind-Rules.Execute.wind;
+        c.Press("attack");c.Step();
+        Assert(p.state=="execute"&&p.face==1&&p.energy==1,"Execution faces the target and pays on contact");
+        b.x=-70;b.y=180;b.vy=1;
+        for(int i=0;i<Rules.Execute.wind;i++)c.Step();
+        Assert(p.face==-1&&b.hp==b.maxHp-Rules.Execute.damage&&p.energy==0&&b.posture==100&&b.state=="stagger"&&b.move==null,
+            "Execution tracks a crossing, airborne target and interrupts even when posture fills");
+        Assert(p.hp==p.maxHp&&c.hitstop==Rules.executeHitstop,"The interrupted boss attack cannot land on the same frame");
+        var trade=new Combat{ai=false};trade.player.x=0;trade.boss.x=80;trade.player.energy=1;trade.executeWindow=30;
+        trade.DebugBoss(0);trade.boss.age=trade.boss.move.wind-Rules.Execute.wind;
+        trade.Press("attack");for(int i=0;i<=Rules.Execute.wind;i++)trade.Step();
+        Assert(trade.player.hp==trade.player.maxHp&&trade.boss.state=="stagger","Execution wins the same-frame clash");
+        var far=new Combat{ai=false};far.player.energy=1;far.executeWindow=30;far.Press("attack");far.Step();
+        Assert(far.player.state=="attack"&&far.player.energy==1,"An out-of-range attack does not spend an execution");
+        var turn=new Combat{ai=false,enemyActive=false};turn.axis=-1;turn.player.y=90;turn.player.vy=3;turn.Press("attack");turn.Step();
+        Assert(turn.player.face==-1,"Turning and attacking on the same airborne frame uses the new direction");
+        var edge=new Combat{ai=false,god=true};edge.player.x=560;edge.boss.x=559;edge.boss.y=65;edge.boss.vy=-2;
+        edge.DebugBoss(2);edge.player.x=500;edge.boss.age=edge.boss.move.wind;edge.Step();
+        var slash=edge.visuals.First(v=>v.kind=="slash");var hit=edge.hits.First(h=>h.owner==2);
+        Assert(edge.boss.x==560&&hit.x==560&&slash.originX==560&&slash.originY==edge.boss.y,"Airborne attack contact and effects share the clamped pose");
+        edge.Step();Assert(slash.TryGetAnchor(edge.boss,out double x,out double y)&&edge.boss.y!=slash.originY&&Math.Abs(y-slash.y-edge.boss.y+slash.originY)<1e-7&&x==slash.x,"The slash follows the moving attack pose");
+        edge.boss.face=-1;Assert(!slash.TryGetAnchor(edge.boss,out _,out _),"An old slash is hidden when the actor turns");
+        Assert(new VisualCue{kind="slash",combo=1,face=-1}.RotationDegrees==40,"Angled combo arcs mirror with the actor");
     }
     static void CheckPrologueContent(){
         var asset=Resources.Load<TextAsset>("Data/prologue-content");

@@ -444,11 +444,11 @@ namespace LingyueEchoes
             }
             GUI.enabled=true;
             Text(new Rect(105,690,550,24),ControlPrompts.MenuHint(device),14);
-            Fill(new Rect(1000,640,265,65),Ink);Text(new Rect(1015,650,245,60),"12 帧弹刀 · 8 帧完美\n固定 60Hz 战斗",16,Gold);
+            Fill(new Rect(1000,640,265,65),Ink);Text(new Rect(1015,650,245,60),$"{Rules.parry} 帧弹刀 · {Rules.parryPerfect} 帧完美\n固定 60Hz 战斗",16,Gold);
             if(motion)for(int i=0;i<14;i++){float t=Time.unscaledTime;Fill(new Rect(60+(i*173)%1160+Mathf.Sin(t*.5f+i*1.7f)*18,((i*97-t*(8+i%4*4))%720+720)%720,8,3),new Color(.95f,.73f,.8f,.5f));}
             if(SavePickerOpen){SavePickerGUI();return;}
             if(modal!=""){Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.87f));Fill(new Rect(240,70,800,580),Ink);Text(new Rect(285,100,700,45),modal=="controls"?"循响入门":"声音与界面",30,Gold);
-                if(modal=="controls")Text(new Rect(285,160,705,400),ControlPrompts.Summary(device)+"\n\n弹刀前 8 帧完美、共 12 帧；危险招式用闪避或跳跃。\n闪避 / 跳跃 / 格挡消耗 45 / 30 / 20 气力。\n成功闪避 / 格挡回复 34% 回响；完美成功回复 100% 并回满气力。\n小处决消耗 1 回响，大处决消耗全部回响。\n死亡后从菜单选择重试。",20);
+                if(modal=="controls")Text(new Rect(285,160,705,400),ControlPrompts.Summary(device)+$"\n\n弹刀前 {Rules.parryPerfect} 帧完美、共 {Rules.parry} 帧；闪避有效 {Rules.dodgeInvulnFrames} 帧，其中前 {Rules.perfectDodgeFrames} 帧完美。\n闪避 / 跳跃 / 格挡消耗 45 / 30 / 20 气力。\n成功闪避 / 格挡回复 34% 回响；完美成功回复 100% 并回满气力。\n小处决在有效范围内锁定目标，命中消耗 1 回响并使守灯人踉跄。大处决消耗全部回响。\n死亡后从菜单选择重试。",20);
                 else{Text(new Rect(285,170,700,55),"声音、动态和序章进度会保存到本机。",21);if(Button(new Rect(350,250,580,60),"樱花动态    "+(motion?"开启":"关闭"))){motion=!motion;PlayerPrefs.SetString("lingyue.menuMotion",motion?"on":"off");}
                     if(Button(new Rect(350,335,580,60),"声音    "+(muted?"关闭":"开启")))ToggleSound();
                     if(Button(new Rect(350,420,580,60),"触屏按键预览    "+(previewTouchControls?"开启":"关闭"))){PreviewTouchControls=!previewTouchControls;PlayerPrefs.SetInt("lingyue.touchControls",previewTouchControls?1:0);PlayerPrefs.Save();}
@@ -506,7 +506,7 @@ namespace LingyueEchoes
                 if(BattleOn){PlayerHud();
                     if(stage=="GUARDIAN_FIGHT"){Text(new Rect(450,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(490,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),new Color(.71f,.31f,.37f));Bar(new Rect(490,92,455,9),(float)(sim.boss.posture/100),Gold);}
                     if(showKeyHints&&!gameSettings&&!TouchControlsVisible&&!speech.Active)RightControlHints();
-                    string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
+                    string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):sim.CanExecute?ControlPrompts.Format("{attack} 回响小处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
                     if(status!="")Text(new Rect(330,Mathf.Max(lessonBottom,TouchControlsVisible?195:155),620,44),status,25,Gold,TextAnchor.MiddleCenter);}
                 string interaction=Interaction();
                 if(!TouchControlsVisible&&interaction!=null){

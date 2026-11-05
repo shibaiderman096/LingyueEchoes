@@ -134,9 +134,10 @@ namespace LingyueEchoes
         public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
             foreach(var e in pool){var cue=e.cue;if(cue==null)continue;string clip=cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
                 var d=PixelWorld.Definition("pixel8",clip);int source=(int)Math.Round(d.duration*60),life=cue.kind=="charge"?Math.Min(12,source):source,age=sim.frame-cue.frame;
-                e.go.SetActive(age>=0&&age<life);if(age>=life){e.cue=null;continue;}float size=cue.kind=="charge"?.22f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:1.8f;
-                e.go.transform.localPosition=new Vector3((float)Math.Floor(cue.x+.5)/100,((float)Math.Floor(cue.y+.5)-95)/100,0);e.go.transform.localScale=new Vector3(cue.face*size,size,1);
-                e.go.transform.localRotation=Quaternion.Euler(0,0,cue.kind=="slash"?cue.combo==1?-40:cue.combo==2?45:0:0);
+                if(age>=life||!cue.TryGetAnchor(cue.owner==1?sim.player:sim.boss,out double x,out double y)){e.cue=null;e.go.SetActive(false);continue;}
+                e.go.SetActive(age>=0);float size=cue.kind=="charge"?.22f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:1.8f;
+                e.go.transform.localPosition=new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100,0);e.go.transform.localScale=new Vector3(cue.face*size,size,1);
+                e.go.transform.localRotation=Quaternion.Euler(0,0,cue.RotationDegrees);
                 e.renderer.color=cue.owner==2&&(cue.kind=="charge"||cue.kind=="slash")?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):Color.white;
                 PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1));}
         }
