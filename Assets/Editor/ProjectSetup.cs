@@ -14,8 +14,9 @@ public class PixelImport:AssetPostprocessor
         var importer=(TextureImporter)assetImporter;importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;importer.spritePixelsPerUnit=100;
         importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.maxTextureSize=8192;
         var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);settings.spriteMeshType=SpriteMeshType.FullRect;settings.spriteAlignment=(int)SpriteAlignment.Custom;
-        bool hero=assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/"}.Any(s=>assetPath.Contains(s));
-        settings.spritePivot=assetPath.Contains("/guardian8/frames/")?new Vector2(.5f,24f/224):hero?new Vector2(.5f,.125f):new Vector2(.5f,.5f);importer.SetTextureSettings(settings);
+        bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/"}.Any(s=>assetPath.Contains(s));
+        bool guardian=assetPath.Contains("/guardian8/frames/")||assetPath.Contains("/guardian8/frames16/");
+        settings.spritePivot=guardian?new Vector2(.5f,24f/224):hero?new Vector2(.5f,.125f):new Vector2(.5f,.5f);importer.SetTextureSettings(settings);
     }
 }
 public static class ProjectSetup

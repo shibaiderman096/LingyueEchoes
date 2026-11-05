@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LingyueEchoes
 {
-    [Serializable] public class ClipDefinition {public string name,folder,path;public float duration,sample;public bool loop;public float[] times;public string[] frames;}
+    [Serializable] public class ClipDefinition {public string name,folder,path;public float duration,sample;public bool loop;public float[] times;public string[] frames;public int contactPose,secondContactPose;}
     [Serializable] public class ClipManifest {public ClipDefinition[] clips;}
     public static class PixelWorld
     {
@@ -24,16 +24,46 @@ namespace LingyueEchoes
             if(!sp.sprite)throw new InvalidOperationException("Missing sprite "+resource);
             go.transform.localPosition=new Vector3((x+width*(.5f-anchor.x))/100,(y+height*(.5f-anchor.y))/100,0);
             go.transform.localScale=new Vector3(width/sp.sprite.rect.width,height/sp.sprite.rect.height,1);return sp;}
-        public static Transform Create(Transform parent){var world=new GameObject("World").transform;world.SetParent(parent,false);
-            float scale=3600f/2172,top=-95+548*scale;
+        public static readonly string[] SceneryNames={"MoonlitGrove","BambooCourtyard","MoonGate"};
+        public const float SceneryWidth=900;
+        // Each reusable module has a local left edge at zero and a shared walking surface at -95.
+        // Canopy and landmarks are 75% of their former size; the ground extends below the camera.
+        public static GameObject CreateSceneryModule(int column){var module=new GameObject(SceneryNames[column-1]);float scale=SceneryWidth/724,top=-95+548*scale;
             string[] rows={"canopy","landmarks","foundation"};int[] edges={0,300,548,724};
-            for(int row=0;row<3;row++){float y=top-edges[row]*scale,h=(edges[row+1]-edges[row])*scale;
-                for(int col=0;col<3;col++)Sprite(world,rows[row]+"-"+(col+1),"prologue_route/parts/"+rows[row]+"-"+(col+1),-1640+col*1200,y,1200,h,row, new Vector2(0,1));
-                var left=Sprite(world,rows[row]+"-left","prologue_route/parts/"+rows[row]+"-1",-2840,y,1200,h,row,new Vector2(0,1));left.flipX=true;
-                var right=Sprite(world,rows[row]+"-right","prologue_route/parts/"+rows[row]+"-3",1960,y,1200,h,row,new Vector2(0,1));right.flipX=true;}
-            Sprite(world,"CollapsedStone","prologue_route/broken_stone",320,-95,160,46,5,new Vector2(.5f,0));
-            Sprite(world,"PracticeDummy","prologue_route/practice_dummy",790,-95,84,120,5,new Vector2(.5f,0));
-            foreach(int x in new[]{1300,1800})Sprite(world,"MoonLantern"+x,"prologue_route/moon_lantern",x,-95,59,118,5,new Vector2(.5f,0));
+            for(int row=0;row<3;row++){float y=top-edges[row]*scale,h=row==2?330:(edges[row+1]-edges[row])*scale;
+                Sprite(module.transform,rows[row],"prologue_route/parts/"+rows[row]+"-"+column,0,y,SceneryWidth,h,row,new Vector2(0,1));}
+            return module;}
+        static GameObject ModuleInstance(Transform parent,string resource){var prefab=Resources.Load<GameObject>("Scenery/"+resource);if(!prefab)return null;
+#if UNITY_EDITOR
+            if(!Application.isPlaying)return (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab,parent);
+#endif
+            return UnityEngine.Object.Instantiate(prefab,parent,false);}
+        static void PlaceScenery(Transform parent,int column,float x,string name,bool mirrored=false){var module=ModuleInstance(parent,SceneryNames[column-1])??CreateSceneryModule(column);
+            module.transform.SetParent(parent,false);module.name=name;module.transform.localPosition=new Vector3((x+(mirrored?SceneryWidth:0))/100,0,0);module.transform.localScale=new Vector3(mirrored?-1:1,1,1);}
+        static void PlaceProp(Transform parent,string name,string resource,float x,float width,float height){var prop=ModuleInstance(parent,name);
+            if(prop){prop.transform.localPosition=new Vector3(x/100,0,0);return;}var root=new GameObject(name);root.transform.SetParent(parent,false);root.transform.localPosition=new Vector3(x/100,0,0);
+            Sprite(root.transform,name,resource,0,-95,width,height,5,new Vector2(.5f,0));}
+        public static SpriteRenderer PlaceCheckpoint(Transform props){
+            var marker=new GameObject("MoonGateCheckpoint").transform;
+            marker.SetParent(props,false);marker.localPosition=new Vector3((float)PrologueLayout.CheckpointX/100,0,0);
+            PlaceProp(marker,"MoonLantern","prologue_route/moon_lantern",0,68,135);
+            return marker.GetComponentInChildren<SpriteRenderer>();
+        }
+        public static SpriteRenderer PlaceArenaSeal(Transform props,bool left){
+            int boundary=(int)(left?PrologueLayout.ArenaMin:PrologueLayout.ArenaMax);
+            var old=props.Find("MoonLantern"+boundary);
+            if(old)old.gameObject.SetActive(false);
+            // Fighters' centers stop at the boundary; leave their feet in front of the stone.
+            return Sprite(props,left?"ArenaSealLeft":"ArenaSealRight","prologue_route/moon-boundary",
+                boundary+(left?-54:54),-98,61,176,8,new Vector2(.5f,0));
+        }
+        public static Transform Create(Transform parent){var world=new GameObject("World").transform;world.SetParent(parent,false);
+            var scenery=new GameObject("SceneryModules").transform;scenery.SetParent(world,false);
+            PlaceScenery(scenery,1,-2540,"GroveBoundary",true);PlaceScenery(scenery,1,-1640,"01_WakingGrove");
+            PlaceScenery(scenery,2,-740,"02_OldRoad");PlaceScenery(scenery,3,160,"03_TrainingCourtyard");
+            PlaceScenery(scenery,3,1060,"04_MoonGateArena",true);PlaceScenery(scenery,2,1960,"05_ArenaExtension",true);
+            var props=new GameObject("Props").transform;props.SetParent(world,false);
+            PlaceProp(props,"PracticeDummy","prologue_route/practice_dummy",790,84,120);
             var boss=new GameObject("Guardian");boss.transform.SetParent(world,false);boss.AddComponent<SpriteRenderer>().sortingOrder=10;boss.transform.localPosition=new Vector3(-12.35f,-.95f,0);boss.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("guardian8/frames/idle/idle-01");
             var hero=new GameObject("Hero");hero.transform.SetParent(world,false);hero.AddComponent<SpriteRenderer>().sortingOrder=12;hero.transform.localPosition=new Vector3(-14,-.95f,0);hero.transform.localScale=Vector3.one*1.5f;hero.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("pixel8/frames/idle/idle-01");
             return world;
@@ -45,10 +75,18 @@ namespace LingyueEchoes
         public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
         public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1){
             string clip=hero?(a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
-            if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";if(PixelWorld.Definition(folder,clip)==null)clip="idle";
+            if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";var definition=PixelWorld.Definition(folder,clip);
+            if(definition==null){clip="idle";definition=PixelWorld.Definition(folder,clip);}
             if(clip!=previous||frame<previousFrame||actor!=a||(!hero&&attackId!=a.attackId)){started=frame;previous=clip;actor=a;attackId=a.attackId;}previousFrame=frame;
             int cell=-1;
-            if(pose!=null)cell=poseCell;
+            if(pose!=null){
+                cell=poseCell;
+                if(definition.contactPose>0){
+                    int contact=definition.contactPose;
+                    cell=poseCell<=4?poseCell*contact/4:contact+(poseCell-4)*(definition.frames.Length-1-contact)/3;
+                }
+            }
+            else if(a.move!=null&&definition.contactPose>0)cell=DrawnAttackCell(definition,a.move,a.age);
             else if(hero&&a.move!=null&&(clip.StartsWith("attack")||clip=="execute"||clip=="finisher"))cell=AttackCell(clip,a.move,a.age);
             else if(!hero&&a.move!=null){var m=a.move;int age=Math.Max(0,a.age-1),contact=clip=="double"||clip=="spin"?3:4;
                 if(age<m.wind){int slots=Math.Max(1,(int)Math.Ceiling(m.wind*8d/60));cell=1+(int)Math.Floor(Math.Floor(age*8d/60)*(contact-2)/Math.Max(1,slots-1));}
@@ -64,6 +102,19 @@ namespace LingyueEchoes
             renderer.color=hero&&pose==null&&a.invuln>0&&(frame/3)%2==0?new Color(1,.86f,.86f,.65f):new Color(1,1,1,alpha);go.SetActive(alpha>0);
         }
         static string GuardianClip(Fighter a){if(a.move!=null){switch(a.move.name){case "双连斩":return "double";case "突刺":return "thrust";case "震地":return "slam";case "跃击":return "leap";case "赤月回旋":return "spin";default:return "slash";}}return a.state=="air"?"jump":a.state=="hurt"?"stagger":a.state;}
+        // Art is retimed around resolved contacts; this never advances the combat clock.
+        public static int DrawnAttackCell(ClipDefinition clip,Move move,int age){
+            int tick=Math.Max(0,age-1),contact=clip.contactPose;
+            if(tick<move.wind)return tick*contact/Math.Max(1,move.wind);
+            int startTick=move.wind,startPose=contact;
+            if(clip.secondContactPose>contact&&move.pulses!=null&&move.pulses.Length>1){
+                int pulse=move.pulses[1];
+                if(tick<move.wind+pulse)return contact+(tick-move.wind)*(clip.secondContactPose-contact)/Math.Max(1,pulse);
+                startTick+=pulse;startPose=clip.secondContactPose;
+            }
+            int endTick=move.wind+move.active+move.recovery-1,last=clip.frames.Length-1;
+            return Math.Min(last,startPose+(tick-startTick)*(last-startPose)/Math.Max(1,endTick-startTick));
+        }
         public static int AttackCell(string clip,Move move,int age){int contact=clip=="finisher"?4:3,resolved=Math.Max(0,age-1);if(resolved<move.wind){int slots=Math.Max(1,(int)Math.Ceiling(move.wind*8d/60)),slot=(int)Math.Floor(resolved*8d/60);return 1+(int)Math.Floor(slot*(contact-2d)/Math.Max(1,slots-1));}
             int after=(int)Math.Floor((resolved-move.wind)*8d/60),count=Math.Max(1,(int)Math.Ceiling((move.active+move.recovery)*8d/60));return Math.Min(7,contact+(int)Math.Ceiling(after*(7d-contact)/Math.Max(1,count-1)));}
     }

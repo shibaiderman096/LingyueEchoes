@@ -13,7 +13,10 @@ public static class MigrationChecks
     [Serializable] class Golden {public Case[] cases;public ClockCase[] clocks;}
     static int compared;
     [MenuItem("Lingyue/Run migration checks")]
-    public static void Run(){compared=0;var data=JsonUtility.FromJson<Golden>(File.ReadAllText("Assets/Editor/Tests/combat-golden.json"));
+    public static void Run()=>RunSuite(false);
+    [MenuItem("Lingyue/Update combat expectations")]
+    public static void UpdateExpectations()=>RunSuite(true);
+    static void RunSuite(bool update){compared=0;var data=JsonUtility.FromJson<Golden>(File.ReadAllText("Assets/Editor/Tests/combat-golden.json"));
         foreach(var test in data.cases){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;
             if(test.kind=="contact"){c.god=false;c.ai=false;c.boss.x=90;c.player.state=test.state;c.player.age=test.age;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;}
             if(test.kind=="terrain"){c.enemyActive=false;c.terrain.Add(new Box(240,0,160,46));c.dummyBox=new Box(450,0,56,120);}
@@ -23,13 +26,56 @@ public static class MigrationChecks
             if(test.kind=="route"){c.god=false;c.player.x=-1400;c.boss.x=-1235;c.boundsMin=-1560;c.boundsMax=1800;var tutorial=new TutorialDirector();tutorial.Begin(c);c.beforeStep=tutorial.Pump;}
             for(int t=0;t<test.steps;t++){if(test.kind=="route"){c.axis=1;if(t%90==0)c.Press("jump");if(t%37==0)c.Press("attack");}
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
-                c.Step();Compare(c,test.expected[t],test.name+" tick "+t);}}
-        foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);Compare(c,test.expected,"clock "+test.hz);}
+                c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
+        foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
+        CheckDefenseAndTutorial();CheckDeathAftermath();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
-        try{foreach(var clip in manifest.clips){Assert(Resources.Load<AnimationClip>(clip.path),"Native clip: "+clip.path);for(int cell=0;cell<8;cell++){PixelWorld.Sample(go,clip.folder,clip.name,0,cell);Assert(renderer.sprite==Resources.Load<Sprite>(clip.frames[cell]),"Exact animation frame: "+clip.folder+"/"+clip.name+" cell "+cell);}}}finally{UnityEngine.Object.DestroyImmediate(go);}
-        Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" exact original snapshots; 30/60/120/144 Hz clocks; dialogue; tutorial; "+manifest.clips.Length+" native animations");}
+        try{foreach(var clip in manifest.clips){Assert(Resources.Load<AnimationClip>(clip.path),"Native clip: "+clip.path);for(int cell=0;cell<clip.frames.Length;cell++){
+                    PixelWorld.Sample(go,clip.folder,clip.name,0,cell);var sprite=Resources.Load<Sprite>(clip.frames[cell]);
+                    Assert(sprite&&renderer.sprite==sprite,"Exact animation frame: "+clip.folder+"/"+clip.name+" cell "+cell);
+                    if(clip.frames[cell].Contains("/frames16/")){
+                        var foot=clip.folder=="pixel8"?new Vector2(96,16):new Vector2(128,24);
+                        Assert((sprite.pivot-foot).sqrMagnitude<.001f,"Imported foot pivot: "+clip.frames[cell]+" actual "+sprite.pivot);
+                    }}
+                if(clip.contactPose>0){
+                    int index=Array.IndexOf(clip.folder=="guardian8"?new[]{"slash","double","thrust","slam","leap","spin"}:new[]{"attack1","attack2","attack3"},clip.name);
+                    if(index<0)continue;
+                    var move=clip.folder=="guardian8"?Rules.Boss[index]:Rules.Player[index];
+                    Assert(PixelActor.DrawnAttackCell(clip,move,move.wind)<clip.contactPose&&PixelActor.DrawnAttackCell(clip,move,move.wind+1)==clip.contactPose,"Drawn contact: "+clip.path);
+                    if(clip.secondContactPose>0)Assert(PixelActor.DrawnAttackCell(clip,move,move.wind+move.pulses[1]+1)==clip.secondContactPose,"Drawn second contact: "+clip.path);
+                }}}finally{UnityEngine.Object.DestroyImmediate(go);}
+        if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
+        else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; manual dialogue; waiting guide and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
+    static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=c.player,boss=c.boss,visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return JsonUtility.FromJson<Snapshot>(JsonUtility.ToJson(snapshot));}
+    static Combat Contact(string state,int age,int energy=0,double echo=0){var c=new Combat{ai=false};c.player.x=0;c.player.state=state;c.player.age=age;c.player.energy=energy;c.player.echo=echo;c.boss.x=90;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;return c;}
+    static void CheckDefenseAndTutorial(){
+        foreach(string state in new[]{"parry","dodge"})for(int age=0;age<16;age++){
+            var c=Contact(state,age);c.Step();bool success=state=="parry"?age<12:age>=2&&age<14;bool perfect=success&&(state=="parry"?age<8:age<6);
+            Assert(c.player.hp==(success?120:102),state+" defense window "+age);
+            Assert(c.player.energy==(perfect?1:0)&&c.player.echo==(success&&!perfect?34:0),state+" defense reward "+age);}
+        var dodge=Contact("dodge",6);dodge.Step();dodge.boss.attackId=56;dodge.Step();Assert(dodge.player.echo==34,"One echo reward per dodge action");
+        var carry=Contact("parry",0,2,80);carry.Step();Assert(carry.player.energy==3&&carry.player.echo==80,"Perfect defense carries existing partial charge");
+        var cap=Contact("parry",0,3,80);cap.Step();Assert(cap.player.energy==3&&cap.player.echo==99,"Echo capacity remains three points plus partial charge");
+        var empty=new Combat{enemyActive=false,ai=false};empty.Press("dodge");for(int i=0;i<40;i++)empty.Step();empty.Press("parry");for(int i=0;i<40;i++)empty.Step();Assert(empty.player.energy==0&&empty.player.echo==0,"Empty defensive actions do not grant echo");
+        var dialogue=new DialogueDirector();dialogue.Play(new DialogueScript{id="manual",lines=new[]{new DialogueLine{speaker="guardian",text="按 E 继续"}}},false);for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(dialogue.Active,"Teaching waits for a dialogue key");dialogue.Confirm();Assert(!dialogue.Active,"Dialogue key advances teaching");
+        var route=new Combat{ai=false,enemyActive=false,boundsMin=-1560,boundsMax=PrologueLayout.ArenaMax};route.player.x=-1400;route.boss.x=-1235;var hero=route.player;var tutorial=new TutorialDirector();tutorial.Begin(route);route.beforeStep=tutorial.Pump;
+        for(int i=0;i<600;i++)route.Step();Assert(route.boss.x==-1235&&!route.enemyActive&&tutorial.CanInteract(route),"Guide waits without attacking before interaction");
+        Assert(tutorial.Interact(route)=="routeWake","Initial dialogue prompt");tutorial.BeginDialogue("routeWake");
+        route.player.x=1280;for(int i=0;i<60;i++)route.Step();
+        Assert(route.boss.x==-1235&&!tutorial.GateBound,"Running past the lesson cannot interrupt active dialogue");
+        route.player.x=-1400;tutorial.FinishDialogue(route,"routeWake");
+        for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==790,"Guide walks to and waits at the next teaching point");
+        route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
+        Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
+    }
+    static void CheckDeathAftermath(){var c=new Combat{continueAfterDeath=true};c.player.x=0;c.player.y=65;c.player.vy=3;c.player.hp=0;c.player.state="dead";c.boss.x=100;c.DebugBoss(2);
+        c.axis=1;c.Press("attack");c.Press("jump");for(int i=0;i<180;i++)c.Step();
+        Assert(c.frame==180&&c.player.hp==0&&c.player.x==0&&c.player.y==0&&c.player.move==null&&c.player.state=="dead","Death keeps gravity running without player control or revival");
+        Assert(c.boss.move==null&&c.boss.state=="idle"&&c.moveIndex==0,"Enemy completes its pending move but does not start new attacks on a corpse");
+        Assert(c.sounds.Exists(s=>s.name=="boss_swing")&&!c.sounds.Exists(s=>s.name=="hit_player")&&c.visuals.Exists(v=>v.kind=="slash"),"Enemy sounds and effects continue without hitting the dead player");
+    }
     static void Compare(Combat c,Snapshot expected,string label){CompareActor(c.player,expected.player,label+" player");CompareActor(c.boss,expected.boss,label+" boss");
         foreach(var f in typeof(Snapshot).GetFields()){if(f.Name=="player"||f.Name=="boss")continue;object actual=f.Name=="visuals"?(object)c.visuals.Count:f.Name=="sounds"?c.sounds.Count:typeof(Combat).GetField(f.Name).GetValue(c);if(!actual.Equals(f.GetValue(expected)))throw new Exception(label+" "+f.Name+": "+actual+" != "+f.GetValue(expected));}compared++;}
     static void CompareActor(Fighter actual,Fighter expected,string label){foreach(var f in typeof(Fighter).GetFields()){if(f.Name=="move")continue;object a=f.GetValue(actual),b=f.GetValue(expected);if(a is double){if(Math.Abs((double)a-(double)b)>1e-7)throw new Exception(label+" "+f.Name+": "+a+" != "+b);}else if(!Equals(a,b))throw new Exception(label+" "+f.Name+": "+a+" != "+b);}}

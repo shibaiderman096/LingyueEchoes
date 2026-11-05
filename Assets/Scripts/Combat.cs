@@ -17,7 +17,7 @@ namespace LingyueEchoes
             parryFrames=30, hurtFrames=28, successSlowFrames=24, executeWindow=30, executeCost=1, executeHitstop=8, staggerFrames=36;
         public const double speed=5, jump=13, gravity=.6, dodgeSpeed=9, successSlowRate=.25, finisherReach=195, finisherBase=45,
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
-            echoMax=100, echoPerDamage=.9, echoParry=34, echoPerfect=50;
+            echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
         public static readonly Move[] Player={
             M("斩一",8,6,18,100,90,18,12,true), M("斩二",7,6,19,115,95,22,15,true), M("斩三",12,7,29,140,110,35,26,true)};
         public static readonly Move[] Boss={
@@ -49,7 +49,8 @@ namespace LingyueEchoes
     {
         public Fighter player=new Fighter(1,-250,120),boss=new Fighter(2,250,650);
         public int frame,tick,hitstop,phase=1,moveIndex,tempoSerial,successFrame=-100,executeWindow,deflectSerial,dummyHits,dodgeEvades;
-        public bool ai=true,god,enemyActive=true,nonlethal;
+        public bool ai=true,god,enemyActive=true,nonlethal,continueAfterDeath,bossYields;
+        public bool BossDefeated {get;private set;}
         public double axis,boundsMin=-560,boundsMax=560;
         public string successKind="";
         public List<Hitbox> hits=new List<Hitbox>(); public List<string> events=new List<string>();
@@ -65,6 +66,11 @@ namespace LingyueEchoes
         public static double BodyWidth(Fighter a)=>a.id==1?54:78;
         public static double BodyHeight(Fighter a)=>a.id==1?117:146;
         public void TuneBoss(double hp,int open=90,int wait=46,int wait2=24){boss.maxHp=boss.hp=hp;aiOpenWait=open;aiWaitPhase1=wait;aiWaitPhase2=wait2;aiWait=open;}
+        public void ResetBoss(double x,double hp){
+            boss=new Fighter(2,x,hp);TuneBoss(hp);
+            BossDefeated=false;phase=1;moveIndex=0;lastChoice=-1;
+            hitstop=executeWindow=0;successFrame=-100;successKind="";hits.Clear();visuals.Clear();
+        }
         public void Press(string action){queue.Add(new Command{action=action,until=frame+Rules.buffer});if(queue.Count>16)queue.RemoveAt(0);}
         public void ClearCommands(){queue.Clear();axis=0;}
         public Box Hurtbox(Fighter a)=>new Box(a.x-BodyWidth(a)/2,a.y,BodyWidth(a),BodyHeight(a));
@@ -85,10 +91,11 @@ namespace LingyueEchoes
         public void Step()
         {
             tick++;if(hitstop>0){hitstop--;return;}frame++;hits.Clear();if(executeWindow>0)executeWindow--;queue.RemoveAll(q=>q.until<frame);
-            if(player.hp<=0||(enemyActive&&boss.hp<=0))return;
+            if(player.hp<=0&&!continueAfterDeath||(enemyActive&&boss.hp<=0))return;
             var p=player;var b=boss;double oldPX=p.x,oldBX=b.x;beforeStep?.Invoke(this);
-            if(enemyActive&&!nonlethal&&phase==1&&b.hp<=b.maxHp*.5&&b.state!="broken"&&b.state!="stagger"&&p.state!="finisher"){phase=2;Enter(b,"phase");Log("第二阶段：节奏加速");}
-            ControlPlayer();ControlBoss();
+            if(continueAfterDeath&&p.hp<=0&&p.state!="dead")Enter(p,"dead");
+            if(p.hp>0&&enemyActive&&!nonlethal&&phase==1&&b.hp<=b.maxHp*.5&&b.state!="broken"&&b.state!="stagger"&&p.state!="finisher"){phase=2;Enter(b,"phase");Log("第二阶段：节奏加速");}
+            if(p.hp>0)ControlPlayer();ControlBoss();
             foreach(var a in new[]{p,b}){
                 if(a.invuln>0)a.invuln--;
                 if(a.id==2&&a.move?.name=="跃击"){if(a.age==a.move.wind-24)a.vy=7.2;if(a.age>=a.move.wind-24&&a.age<a.move.wind)a.x+=a.face*5;}
@@ -110,7 +117,7 @@ namespace LingyueEchoes
                 dummyHits++;dummyContacts.Add(new DummyContact{id=dummyHits,attackId=h.attackId,combo=p.combo,frame=frame});if(dummyContacts.Count>32)dummyContacts.RemoveAt(0);
                 Visual("impact",dummyBox.x+dummyBox.w*.5,dummyBox.y+dummyBox.h*.5,p);Sound("hit_boss");}
             foreach(var h in hits){var target=h.owner==1?b:p;if(target.id==2&&!enemyActive)continue;if(Box.Overlaps(h,Hurtbox(target)))Resolve(h,target);}
-            foreach(var a in new[]{p,b}){a.age++;if(a.hp<=0){Enter(a,"dead");continue;}
+            foreach(var a in new[]{p,b}){a.age++;if(a.hp<=0){if(!continueAfterDeath||a.state!="dead")Enter(a,"dead");continue;}
                 if(a.move!=null&&a.age>=a.move.wind+a.move.active+a.move.recovery)Enter(a,a.y>0?"air":"idle");
                 else if((a.state=="parry"&&a.age>=30)||(a.state=="dodge"&&a.age>=28)||(a.state=="hurt"&&a.age>=28)||(a.state=="stagger"&&a.age>=36)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=90)){
                     if(a.state=="broken")a.posture=0;Enter(a,a.y>0?"air":"idle");}
@@ -129,28 +136,32 @@ namespace LingyueEchoes
                     else if(p.vy==0&&Consume("jump")){if(Spend(p,30)){p.vy=13;Enter(p,"air");Sound("jump");}else Log("气力不足 · 无法跳跃");}}
                 else if(p.state=="attack"&&p.combo<2&&Consume("attack")){p.combo++;StartAttack(p,Rules.Player[p.combo]);}}
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
-        void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;b.face=p.x>=b.x?1:-1;
+        void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;
+            if(p.hp<=0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}b.face=p.x>=b.x?1:-1;
             if(--aiWait>0){bool moving=Math.Abs(p.x-b.x)>215;if(moving)b.x+=b.face*(phase==2?3:2);string next=moving?"run":"idle";if(b.state!=next)Enter(b,next);return;}
             double distance=Math.Abs(p.x-b.x);int choice=moveIndex++%6;if(distance>330&&choice<2)choice=2;if(choice==lastChoice)choice=(choice+1)%6;lastChoice=choice;var m=Rules.Boss[choice].Copy();
             if(phase==2){m.wind=(int)Math.Ceiling(m.wind*.75);m.recovery=(int)Math.Ceiling(m.recovery*.75);}StartAttack(b,m);aiWait=phase==2?aiWaitPhase2:aiWaitPhase1;Log(m.name+(m.parry?" · 可弹反":" · 危险招式"));}
         public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;boss.face=player.x>=boss.x?1:-1;StartAttack(boss,Rules.Boss[index].Copy());}
         void Resolve(Hitbox h,Fighter t){string key=h.attackId+":"+h.pulse+":"+t.id;if(!seen.Add(key))return;if(t.hp<=0||t.state=="phase"||t.invuln>0)return;
             var attacker=h.owner==1?player:boss;if(attacker.attackId!=h.attackId||attacker.move==null)return;
-            if(t.state=="dodge"&&t.age>=2&&t.age<14){if(t.id==1)dodgeEvades++;if(t.id==1&&t.age<6&&!dodgeRewarded){dodgeRewarded=true;t.stamina=100;GainEcho(t,50);Visual("perfectDodge",t.x,t.y+42,t);Sound("perfect_dodge");Success("perfectDodge");executeWindow=30;Log("极限闪避 · 气力回满");}return;}
-            if(t.id==1&&t.state=="parry"&&t.age<12&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<8;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,attacker);Sound("parry");attacker.posture+=32;GainEcho(t,perfect?50:34);
+            if(t.state=="dodge"&&t.age>=2&&t.age<14){if(t.id==1){dodgeEvades++;if(!dodgeRewarded){dodgeRewarded=true;bool perfect=t.age<6;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoDodge);
+                        if(perfect){t.stamina=100;Visual("perfectDodge",t.x,t.y+42,t);Sound("perfect_dodge");Success("perfectDodge");executeWindow=30;Log("极限闪避 · 回响充满 · 气力回满");}else Log("闪避成功 · 回复回响");}}return;}
+            if(t.id==1&&t.state=="parry"&&t.age<12&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<8;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,attacker);Sound("parry");attacker.posture+=32;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
                 if(perfect){t.stamina=100;executeWindow=30;Success("perfectParry");Log("完美弹刀 · 气力回满");}else Log("弹刀成功");if(attacker.posture>=100){Enter(attacker,"broken");Log("Boss 架势崩解");}Enter(t,t.y>0?"air":"idle");return;}
             bool finisher=attacker.state=="finisher",small=attacker.state=="execute";double dealt=h.move.damage*(t.state=="broken"&&!finisher?1.5:1);
             if(!(t.id==1&&(god||nonlethal)))t.hp=Math.Max(nonlethal?1:0,t.hp-dealt);
             if(attacker.id==1&&!finisher)GainEcho(attacker,dealt*.9);Visual("impact",t.x,t.y+Hurtbox(t).h*.55,attacker);Sound(t.id==1?"hit_player":"hit_boss");t.invuln=10;
             if(t.id==2)t.posture=finisher?0:t.posture+h.move.posture;
-            if(t.hp==0)Enter(t,"dead");else if(t.id==2&&t.posture>=100){t.posture=100;Enter(t,"broken");}else if(t.id==2&&(small||finisher))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
+            if(t.hp==0&&t.id==2&&bossYields){
+                t.hp=1;BossDefeated=true;enemyActive=ai=false;Enter(t,"broken");
+            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&t.posture>=100){t.posture=100;Enter(t,"broken");}else if(t.id==2&&(small||finisher))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
             hitstop=small||finisher?8:3;Log((t.id==1?"玩家":"Boss")+" 受击 "+h.move.damage);
         }
     }
     public class FixedClock
     {
         public double accumulator,speed=1;public bool paused;public int cinematicTicks;double fraction;int tempoSeen;public Combat combat;
-        public FixedClock(Combat combat){this.combat=combat;}
+        public FixedClock(Combat combat){this.combat=combat;tempoSeen=combat.tempoSerial;}
         public double Rate=>speed*(cinematicTicks>0?.25:1);
         public void ClearAccumulation(){accumulator=0;fraction=0;}
         void ObserveTempo(){if(tempoSeen!=combat.tempoSerial){tempoSeen=combat.tempoSerial;cinematicTicks=24;fraction=0;}}

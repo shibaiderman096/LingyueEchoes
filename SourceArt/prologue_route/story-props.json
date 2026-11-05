@@ -1,0 +1,12 @@
+{
+  "moon-boundary": {
+    "prompt": "Create ONE finished side-on game sprite, a magical boundary marker for the moonlit trial arena, on true transparent background. Attached images are style references only: mossy slate, teal stone shadows, violet wisteria, antique gold and red shrine light in a hand-clustered 2D pixel game. Object is an upright narrow shrine sealing monolith 2.35 times as tall as it is wide, three stacked slate blocks on a shallow compact stone foot, inset warm gold crescent emblem at mid-height, a single cool lavender vertical sealing channel within the stone from the crescent towards the peaked top, a little wisteria and moss low on stone. Front-facing orthographic exact side-scroll framing, no vanishing point, strongly readable at about 50x140 in gameplay. Top silhouette distinct from a lantern: no hanging light, no roof, no candle, no side branches, no background or ground. Little to no exterior effects. Full foot, all extremities visible, very generous transparent margin. One isolated prop, centered, no labels, no contact shadow, no text, no UI, no decorative frame.",
+    "source": "moon-boundary-source.png",
+    "route": "Codex built-in image generation"
+  },
+  "first-fox-tail": {
+    "prompt": "Draw ONE story quest item sprite on real transparent background: the original soft ivory fox tail that belongs to the white-haired fox heroine in the reference. NOT a character edit; output just the separate mystical tail item. An elegant compact diagonal C curve from a small curled base lower-left towards a full sweeping pointed tip upper-right. Soft pale cream white fur with muted blush pink in the shadows and warmer rosy hint at the tip, using distinct intentional stepped pixel clusters and a dark mauve rim for legibility against pale ground, as on the reference heroine. A thin red cord tied near the small base with one tiny antique golden crescent bead, keeping the tail the dominant silhouette. Enchanted and precious, no wound, no gore. At 48 px it should read instantly as a fluffy fox tail and not a feather or flame. Isolated fully inside the canvas with generous blank alpha margins; no character, no second tail, no background, no cast shadow, no clouds, no FX halo, no labels, no UI border. Match the supplied side-scrolling pixel game style.",
+    "source": "first-fox-tail-source.png",
+    "route": "Codex built-in image generation"
+  }
+}

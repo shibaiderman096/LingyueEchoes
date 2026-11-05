@@ -1,1 +1,188 @@
-{"scripts":[{"id":"routeWake","lines":[{"speaker":"guardian","text":"醒了？沿着灯火走吧，我在月门等你。"}]},{"id":"routeJump","lines":[{"speaker":"guardian","text":"前面的崩石，轻轻一跃就能过去。"}]},{"id":"routeDummy","lines":[{"speaker":"guardian","text":"试试这只木桩。每刀落下后再接下一刀。"}]},{"id":"routeSpar","lines":[{"speaker":"guardian","text":"想切磋就靠近些，不损生命。看准刀落，弹开或闪过。"}]},{"id":"routeGate","lines":[{"speaker":"guardian","text":"气力留一点。过了月门，便是真正的试炼。"}]},{"id":"routeHit","lines":[{"speaker":"guardian","text":"很好。连斩由你掌握，不必在这里停留。"}]},{"id":"routeDodge","lines":[{"speaker":"guardian","text":"漂亮！极限闪避后，可接小处决，让对手踉跄。"}]},{"id":"routeParry","lines":[{"speaker":"guardian","text":"听见刀鸣了吗？完美弹刀后，可接小处决，让对手踉跄。"}]},{"id":"bossPre","lines":[{"speaker":"guardian","text":"来吧，铃月。让我看看你的决心。"}]},{"id":"tail","lines":[{"speaker":"guardian","text":"这条狐尾，终于等到主人了。"},{"speaker":"guardian","text":"去吧，铃月。七罪仍在月光尽头等你。"}]}],"zones":[{"id":"A","name":"苏醒之庭","min":-1600,"max":-800},{"id":"B","name":"旧日参道","min":-800,"max":520},{"id":"C","name":"练武之庭","min":520,"max":1240},{"id":"D","name":"月门试炼场","min":1240,"max":1900}],"story":["昔日，灵月高悬，照彻人妖两界。","直至七种欲念侵蚀月光，灾厄降临。","一位九尾天狐斩断九尾，换来短暂的安宁。","数百年后，残月之下，一只白狐重新睁开了双眼。"]}
+{
+  "scripts": [
+    {
+      "id": "routeWake",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "醒了？别急着站起来。想不起从前的事，也没关系。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你……认识我？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "叫你铃月，好吗？我会在这里等你。靠近后按{interact}，就能与我交谈。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "先用{move}走两步。不舒服就停下。我会在前面的灯下等你。"
+        }
+      ]
+    },
+    {
+      "id": "routeDummy",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "别握得太紧，手会疼。按{attack}出刀，慢一点，先听清刀铃的声音。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "成功闪避、格挡回复 34% 回响，完美时回复 100%。别把气力空耗在风里。"
+        }
+      ]
+    },
+    {
+      "id": "routeSpar",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "怕也没关系。看我的手，按{parry}格挡，按{dodge}闪避。看准了再动。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "完美格挡或极限闪避，会回满气力与一格回响。再按{attack}，接上小处决。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "这里只是练习，我会收着力。挡住我一刀，我们就去月门。"
+        }
+      ]
+    },
+    {
+      "id": "routeHit",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "对，就是这样。手腕放松些，你已经做得很好了。"
+        }
+      ]
+    },
+    {
+      "id": "routeDodge",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "躲开了。别急着庆幸，先站稳。极闪后按{attack}，还能接上小处决。"
+        }
+      ]
+    },
+    {
+      "id": "routeParry",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "听见那声清响了吗？这就对了。走吧，我在月门等你。"
+        }
+      ]
+    },
+    {
+      "id": "bossPre",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "门外的灯会记住你的脚步。想歇一会儿的话，现在还来得及。"
+        },
+        {
+          "speaker": "hero",
+          "text": "我准备好了。请你教我最后一课。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "好。到了场上，我就不会收刀。抬头，铃月，看着我。"
+        }
+      ]
+    },
+    {
+      "id": "bossRetry",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "还想再试一次？好。站稳了，这次我也不会让你。"
+        }
+      ]
+    },
+    {
+      "id": "bossPhase2",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "别等我停手。把刀举起来！"
+        }
+      ]
+    },
+    {
+      "id": "tail",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "这一刀……很好。狐尾，该还给你了。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你还站得起来吗？来，抓着我的手。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "我只是累了。把它收好，铃月。这回换你循着灯走了。"
+        }
+      ]
+    },
+    {
+      "id": "tailAfter",
+      "lines": [
+        {
+          "speaker": "narration",
+          "text": "铃月握住他的手。苏醒以来，第一个愿意扶她起来的人，刚刚被她亲手击倒。"
+        },
+        {
+          "speaker": "narration",
+          "text": "守灯人坐回月门灯下。铃月收起第一尾，终于知道自己要找回什么。"
+        }
+      ]
+    },
+    {
+      "id": "rematchWin",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "这局你赢了。等你准备好，我们再来。"
+        }
+      ]
+    }
+  ],
+  "zones": [
+    {
+      "id": "A",
+      "name": "苏醒之庭",
+      "min": -1600,
+      "max": -800
+    },
+    {
+      "id": "B",
+      "name": "旧日参道",
+      "min": -800,
+      "max": 520
+    },
+    {
+      "id": "C",
+      "name": "练武之庭",
+      "min": 520,
+      "max": 1200
+    },
+    {
+      "id": "D",
+      "name": "月门试炼场",
+      "min": 1200,
+      "max": 2280
+    }
+  ],
+  "story": [
+    "昔日，灵月高悬，照彻人妖两界。",
+    "直至七种欲念侵蚀月光，灾厄降临。",
+    "一位九尾天狐斩断九尾，换来短暂的安宁。",
+    "数百年后，残月之下，一只白狐重新睁开了双眼。"
+  ]
+}

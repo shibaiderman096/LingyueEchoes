@@ -1,0 +1,315 @@
+{
+  "route": "Codex built-in image generation",
+  "model_requested": "Images 2.6",
+  "model_reported": null,
+  "layout": [
+    4,
+    4
+  ],
+  "clips": {
+    "pixel8/attack1": {
+      "source": "hero-attack.png",
+      "sha256": "9a4e5e2b548bf760eff25f3bbd52eb75e53e6a7834e1b680d102f1f816c27d7c",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 6,
+      "references": [
+        "pixel8/hero-master.png",
+        "pixel8/jump-attack1-source.png"
+      ]
+    },
+    "pixel8/run": {
+      "source": "hero-run.png",
+      "sha256": "382a1c5b8371eb53a31fe9cabf43953630cd11a3b068d4e039f1a6b83cea43df",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "references": [
+        "pixel8/hero-master.png",
+        "pixel8/locomotion-source.png"
+      ]
+    },
+    "guardian8/slash": {
+      "source": "guardian-attack.png",
+      "sha256": "5704708c55f0fb41decdea2309498dbbd5bc78dae7805ff830480e7eb004c7ff",
+      "order": [
+        0,
+        7,
+        1,
+        2,
+        3,
+        4,
+        8,
+        9,
+        13,
+        10,
+        11,
+        5,
+        12,
+        6,
+        14,
+        15
+      ],
+      "contact": 5,
+      "references": [
+        "combat8/guardian_blades.png"
+      ]
+    },
+    "guardian8/run": {
+      "source": "guardian-run.png",
+      "sha256": "02fa4ad96ffed8ba3d45d3264146c1698e199bacdfb6d2d6f35aed40df9b91c0",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "references": [
+        "combat8/guardian_locomotion.png"
+      ]
+    },
+    "pixel8/attack2": {
+      "source": "hero-attack2.png",
+      "sha256": "4dafdaea15497dab5ca718d2ee4ec75fba4fe68985f050803eea79fb0e68ac32",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 6,
+      "references": [
+        "pixel8/hero-master.png",
+        "pixel8/jump-attack1-source.png"
+      ]
+    },
+    "pixel8/attack3": {
+      "source": "hero-attack3.png",
+      "sha256": "12cf45c15d47e5a69977edfab0a733ef689e7cd8c7e38dd41cc93262cc5cfb2a",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 7,
+      "references": [
+        "pixel8/hero-master.png",
+        "pixel8/jump-attack1-source.png"
+      ]
+    },
+    "guardian8/double": {
+      "source": "guardian-double.png",
+      "sha256": "31a8b895d42e9b3f9acffffd07687799a1c5396c750359aa04f38ab3cccf5653",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 7,
+      "references": [
+        "combat8/guardian_blades.png"
+      ],
+      "secondContact": 10
+    },
+    "guardian8/thrust": {
+      "source": "guardian-thrust.png",
+      "sha256": "6513297c1704bbea3978eaf0ed2841724ef8140a2da16ed9170075ce83c30274",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 8,
+      "references": [
+        "combat8/guardian_thrust_slam.png"
+      ],
+      "cellOverrides": {
+        "8": [
+          0,
+          627,
+          341,
+          941
+        ],
+        "9": [
+          341,
+          627,
+          627,
+          941
+        ]
+      }
+    },
+    "guardian8/slam": {
+      "source": "guardian-slam.png",
+      "sha256": "dc036456f83c25c4ab7fe8910ba80b2af549ceabdecb77b81a7e0d6a437431be",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 8,
+      "references": [
+        "combat8/guardian_thrust_slam.png"
+      ]
+    },
+    "guardian8/leap": {
+      "source": "guardian-leap.png",
+      "sha256": "866cfffc837046dd77274e90ea0a8c85d736b49246e2ef984c8fca271c6a1eb4",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 8,
+      "references": [
+        "combat8/guardian_leap_spin.png"
+      ]
+    },
+    "guardian8/spin": {
+      "source": "guardian-spin.png",
+      "sha256": "65a0ce36adb5ac379c2cc34f71ef6d9406da45042eac2a3143126c69f5b6d300",
+      "order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "contact": 6,
+      "references": [
+        "combat8/guardian_leap_spin.png"
+      ],
+      "secondContact": 10
+    }
+  }
+}
