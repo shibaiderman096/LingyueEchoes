@@ -9,9 +9,9 @@ namespace LingyueEchoes
     {
         float elapsed,beatTime,parryFarewellTime;
         int phase,firstVictoryFrame,stepsBlockedFrame=-1;
-        bool editorRun,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued;
-        readonly string[] saveKeys={"lingyue.prologue","lingyue.tails",PrologueLayout.CheckpointKey};
-        readonly int?[] saved=new int?[3];
+        bool editorRun,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued,lostFirstFight,sawOpeningStory,sawDummyStop;
+        static readonly string[] saveKeys={"lingyue.prologue","lingyue.tails",PrologueLayout.CheckpointKey,PrologueLayout.FirstVictoryStoryKey};
+        readonly int?[] saved=new int?[saveKeys.Length];
         double originalHp;
         Fighter originalPlayer;
 #if UNITY_EDITOR
@@ -29,14 +29,20 @@ namespace LingyueEchoes
             var game=FindAnyObjectByType<LingyueGame>();if(!game)return;
             elapsed+=Time.unscaledDeltaTime;beatTime+=Time.unscaledDeltaTime;
             try{
-                Require(elapsed<150,$"Timed out in phase {phase} ({game.stage}).");
-                if(phase==0&&game.stage=="MENU"){Next();game.StartTrial(true);return;}
+                Require(elapsed<180,$"Timed out in phase {phase} ({game.stage}).");
+                if(phase==0&&game.stage=="MENU"){
+                    Require(game.MenuSaveStatus=="暂无存档 · 从序幕开始","Main menu describes a new game when no save exists.");
+                    Next();game.StartTrial();return;
+                }
+                if(phase==1&&game.stage=="STORY")sawOpeningStory=true;
                 if(phase==1&&game.stage=="TUTORIAL"){
+                    Require(sawOpeningStory,"Starting without a save plays the opening.");
                     var world=game.transform.Find("World");
                     Require(game.sim.terrain.Count==1&&world.Find("SceneryModules").childCount==6,"Expected one broken-step obstacle on the modular route.");
                     var steps=world.Find("Props/BrokenSteps").GetComponent<SpriteRenderer>();
-                    Require(steps.sprite&&Math.Abs(steps.bounds.min.x-PrologueLayout.StepsLeft/100)<.01&&
-                        Math.Abs(steps.bounds.max.y-(-.95+PrologueLayout.StepsHeight/100))<.01,"The visible broken steps align with the ground and collision.");
+                    float pad=PixelWorld.RubblePadding/100;
+                    Require(steps.sprite&&steps.sprite.name.StartsWith("broken-rubble")&&Math.Abs(steps.bounds.min.x+pad-PrologueLayout.StepsLeft/100)<.01&&
+                        Math.Abs(steps.bounds.max.y-pad-(-.95+PrologueLayout.StepsHeight/100))<.01,"The visible rubble aligns with the ground and collision.");
                     Require(!Seal(game,true).enabled&&Seal(game,false).enabled,"Only the outer arena boundary is sealed during exploration.");
                     originalPlayer=game.sim.player;originalHp=originalPlayer.hp;game.sim.god=true;Next();
                 }
@@ -60,8 +66,13 @@ namespace LingyueEchoes
                         Require(stepsJumpIssued&&p.x-Combat.BodyWidth(p)/2>=PrologueLayout.StepsLeft+PrologueLayout.StepsWidth,
                             "Tutorial completes only after crossing and landing beyond the steps.");
                         game.scriptedAxis=p.x<770?1:0;
-                        if(p.x>=770)game.Interact();
-                        if(b.x>790)Next();
+                        if(b.x==PrologueLayout.DummyGuideX&&b.state=="idle"){
+                            var dummy=game.transform.Find("World/Props/PracticeDummy");
+                            Require(dummy&&Math.Abs(dummy.position.x-b.x/100)>1,"Guide stands apart from the visible dummy.");
+                            sawDummyStop=true;
+                            if(p.x>=770)game.Interact();
+                        }
+                        if(b.x>PrologueLayout.PracticeDummyX&&sawDummyStop)Next();
                         break;
                     case 4:
                         game.scriptedAxis=p.x<910?1:0;
@@ -101,6 +112,10 @@ namespace LingyueEchoes
                             return;
                         }
                         Require(game.stage=="GUARDIAN_FIGHT"&&c.enemyActive&&c.ai&&sawOpeningPose,"Camera and intro precede active combat.");
+                        if(!lostFirstFight){
+                            c.god=c.ai=false;p.hp=1;p.x=b.x-90;game.scriptedAxis=0;c.DebugBoss(0);
+                            phase=14;beatTime=0;break;
+                        }
                         Next();break;
                     case 9:case 13:
                         if(game.stage=="GUARDIAN_FIGHT"){
@@ -118,7 +133,7 @@ namespace LingyueEchoes
                         }
                         else{
                             Require(game.stage=="GATE_READY"&&PlayerPrefs.GetInt("lingyue.tails",0)==1,"Rematch ends in the arena without another tail.");
-                            Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: broken steps physically block walking and clear on landing, stationary farewell, checkpoint, V2 first-victory story and tail, nonlethal rematch.");
+                            Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: fresh/saved game start, rubble and guide placement, real loss, checkpoint retry, first victory with older save flags, epilogue, nonlethal rematch.");
                             Finish(0);
                         }
                         break;
@@ -126,11 +141,37 @@ namespace LingyueEchoes
                         if(game.stage=="FIRST_TAIL")sawTail=true;
                         if(game.stage=="TAIL_EPILOGUE")sawEpilogue=true;
                         if(game.stage!="GATE_READY"){
-                            Require(!game.BattleOn&&c.frame==firstVictoryFrame&&PlayerPrefs.GetInt("lingyue.tails",0)==0,"Story blocks combat and commits the tail only on completion.");
+                            Require(!game.BattleOn&&c.frame==firstVictoryFrame&&!PlayerPrefs.HasKey(PrologueLayout.FirstVictoryStoryKey),"Story blocks combat and is marked seen only after completion.");
                             return;
                         }
-                        Require(sawTail&&sawEpilogue&&PlayerPrefs.GetInt("lingyue.tails",0)==1&&PlayerPrefs.GetInt("lingyue.prologue",0)==1,"First tail, epilogue and saved progression.");
+                        Require(sawTail&&sawEpilogue&&PlayerPrefs.GetInt("lingyue.tails",0)==1&&PlayerPrefs.GetInt("lingyue.prologue",0)==1&&
+                            PlayerPrefs.GetInt(PrologueLayout.FirstVictoryStoryKey,0)==1&&game.MenuSaveStatus=="存档 · 序章已完成","First tail, epilogue and saved progression.");
                         game.Interact();if(game.stage=="GATE_DIALOGUE")Next();
+                        break;
+                    case 14:
+                        if(!game.DeathMenuReady)return;
+                        Require(p.hp==0&&!c.BossDefeated&&!PlayerPrefs.HasKey(PrologueLayout.FirstVictoryStoryKey)&&PlayerPrefs.GetInt("lingyue.tails",0)==0,
+                            "A real first defeat opens the death menu without granting victory progress.");
+                        // Simulate a pre-update save with progression flags but no record of this closing scene.
+                        PlayerPrefs.SetInt("lingyue.prologue",1);PlayerPrefs.SetInt("lingyue.tails",1);
+                        lostFirstFight=true;game.Retry();
+                        Require(game.stage=="FADE_IN"&&game.sim.player.x==PrologueLayout.CheckpointX&&game.sim.player.hp==game.sim.player.maxHp,
+                            "Retry returns a living player to the moon gate checkpoint.");
+                        Next();break;
+                    case 15:
+                        if(game.stage!="GATE_READY")return;
+                        game.Home();
+                        Require(game.MenuSaveStatus=="存档 · 月门灯","Main menu shows the saved location, even if older progress flags exist.");
+                        Next();game.StartTrial();break;
+                    case 16:
+                        Require(game.stage!="STORY"&&game.stage!="TUTORIAL","Starting from a saved checkpoint skips the opening.");
+                        if(game.stage!="GATE_READY")return;
+                        Require(!PlayerPrefs.HasKey(PrologueLayout.FirstVictoryStoryKey),"Retry and reload cannot mark the story as seen.");
+                        c.god=true;originalPlayer=p;originalHp=p.hp;
+                        game.scriptedAxis=p.x<PrologueLayout.GuardianWaitX-120?1:0;
+                        if(p.x>=PrologueLayout.GuardianWaitX-120){
+                            game.Interact();if(game.stage=="GATE_DIALOGUE"){phase=7;beatTime=0;}
+                        }
                         break;
                 }
             }catch(Exception error){Debug.LogError("MIGRATION_RUNTIME_SMOKE_FAILED: "+error);Finish(1);}

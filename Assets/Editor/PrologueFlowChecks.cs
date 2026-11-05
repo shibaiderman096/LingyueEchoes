@@ -17,7 +17,7 @@ public static class PrologueFlowChecks
         string key=LingyueEchoes.PrologueLayout.CheckpointKey;
         bool hadCheckpoint=PlayerPrefs.HasKey(key);int checkpoint=PlayerPrefs.GetInt(key,0);
         PlayerPrefs.SetInt(key,1);
-        try{current.BeginTrial(false);}
+        try{current.BeginTrial();}
         finally{if(hadCheckpoint)PlayerPrefs.SetInt(key,checkpoint);else PlayerPrefs.DeleteKey(key);}
         current.stage="GUARDIAN_FIGHT";
         current.sim.player.x=LingyueEchoes.PrologueLayout.PlayerFightX;

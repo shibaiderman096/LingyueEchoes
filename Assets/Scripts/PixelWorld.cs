@@ -49,10 +49,11 @@ namespace LingyueEchoes
             PlaceProp(marker,"MoonLantern","prologue_route/moon_lantern",0,68,135);
             return marker.GetComponentInChildren<SpriteRenderer>();
         }
+        public const float RubblePadding=3;
         public static void PlaceBrokenSteps(Transform props){
             if(props.Find("BrokenSteps"))return;
-            Sprite(props,"BrokenSteps","prologue_route/broken_stone",(float)PrologueLayout.StepsLeft,-95,
-                (float)PrologueLayout.StepsWidth,(float)PrologueLayout.StepsHeight,6,Vector2.zero);
+            Sprite(props,"BrokenSteps","prologue_route/broken-rubble",(float)PrologueLayout.StepsLeft-RubblePadding,-95-RubblePadding,
+                (float)PrologueLayout.StepsWidth+2*RubblePadding,(float)PrologueLayout.StepsHeight+2*RubblePadding,6,Vector2.zero);
         }
         public static SpriteRenderer PlaceArenaSeal(Transform props,bool left){
             int boundary=(int)(left?PrologueLayout.ArenaMin:PrologueLayout.ArenaMax);
@@ -69,7 +70,7 @@ namespace LingyueEchoes
             PlaceScenery(scenery,3,1060,"04_MoonGateArena",true);PlaceScenery(scenery,2,1960,"05_ArenaExtension",true);
             var props=new GameObject("Props").transform;props.SetParent(world,false);
             PlaceBrokenSteps(props);
-            PlaceProp(props,"PracticeDummy","prologue_route/practice_dummy",790,84,120);
+            PlaceProp(props,"PracticeDummy","prologue_route/practice_dummy",(float)PrologueLayout.PracticeDummyX,84,120);
             var boss=new GameObject("Guardian");boss.transform.SetParent(world,false);boss.AddComponent<SpriteRenderer>().sortingOrder=10;boss.transform.localPosition=new Vector3(-12.35f,-.95f,0);boss.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("guardian8/frames/idle/idle-01");
             var hero=new GameObject("Hero");hero.transform.SetParent(world,false);hero.AddComponent<SpriteRenderer>().sortingOrder=12;hero.transform.localPosition=new Vector3(-14,-.95f,0);hero.transform.localScale=Vector3.one*1.5f;hero.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("pixel8/frames/idle/idle-01");
             return world;

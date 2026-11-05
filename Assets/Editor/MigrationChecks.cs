@@ -67,7 +67,8 @@ public static class MigrationChecks
         route.player.x=1280;for(int i=0;i<60;i++)route.Step();
         Assert(route.boss.x==-1235&&!tutorial.GateBound,"Running past the lesson cannot interrupt active dialogue");
         route.player.x=-1400;tutorial.FinishDialogue(route,"routeWake");
-        for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==790,"Guide walks to and waits at the next teaching point");
+        for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==PrologueLayout.DummyGuideX&&
+            route.boss.x+Combat.BodyWidth(route.boss)/2<route.dummyBox.x,"Guide stops clear of the practice dummy");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
         Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
     }
@@ -100,6 +101,15 @@ public static class MigrationChecks
         Assert(sim.player.x==wall&&!guide.StepsCleared&&guide.Lesson(sim)=="steps","Walking is blocked; a hint alone does not complete the jump");
         sim.axis=0;sim.Press("jump");for(int i=0;i<60;i++)sim.Step();
         Assert(sim.player.x==wall&&!guide.StepsCleared,"Jumping in place cannot complete the obstacle");
+        sim.axis=1;sim.Press("jump");bool aboveRubble=false;
+        for(int i=0;i<60;i++){
+            if(sim.player.x>=steps.x+15)sim.axis=0;
+            sim.Step();
+            if(sim.player.x>=steps.x&&sim.player.y>steps.h)aboveRubble=true;
+            Assert(sim.player.y!=steps.h||sim.player.vy!=0,"Loose rubble never supports standing");
+        }
+        Assert(aboveRubble&&sim.player.x==wall&&sim.player.y==0&&!guide.StepsCleared,
+            "A short jump onto the rubble slips back to ground without clearing the route");
         sim.axis=1;sim.Press("jump");
         bool pastInAir=false;
         for(int i=0;i<85&&!guide.StepsCleared;i++){

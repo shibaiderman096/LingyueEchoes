@@ -11,7 +11,7 @@ namespace LingyueEchoes
         public string stage="MENU";
         [NonSerialized] public Combat sim; [NonSerialized] public FixedClock clock;
         [NonSerialized] internal double? scriptedAxis;
-        static bool replayRequested;static string lastInputDevice;
+        static string lastInputDevice;
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime,tailFormTime;string modal="";
@@ -19,10 +19,9 @@ namespace LingyueEchoes
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
         static readonly (Rect bounds,string label)[] MenuOptions={
-            (new Rect(105,395,340,62),"开始试炼"),
-            (new Rect(105,477,340,58),"操作说明"),
-            (new Rect(105,553,340,58),"声音与界面"),
-            (new Rect(105,628,340,42),"重温序章")
+            (new Rect(105,388,340,62),"开始游戏"),
+            (new Rect(105,503,340,58),"操作说明"),
+            (new Rect(105,577,340,58),"声音与界面")
         };
         int menuChoice,menuDirection;
         Vector2 menuPointer;
@@ -33,6 +32,9 @@ namespace LingyueEchoes
         const float TrialIntroDuration=2.1f,TrialSlashTime=.94f;
         SpriteRenderer checkpointLamp,leftSeal,rightSeal;
         bool checkpointReached;
+        static bool FirstVictoryStorySeen=>PlayerPrefs.GetInt(PrologueLayout.FirstVictoryStoryKey,0)==1;
+        static bool HasMoonGateSave=>PlayerPrefs.GetInt(PrologueLayout.CheckpointKey,0)==1;
+        internal string MenuSaveStatus=>FirstVictoryStorySeen?"存档 · 序章已完成":HasMoonGateSave?"存档 · 月门灯":"暂无存档 · 从序幕开始";
         string storyPhase="in";bool tutorialDialogue,phase2Spoken,deathAxisHeld;
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
@@ -74,16 +76,15 @@ namespace LingyueEchoes
                 if(id=="tail"&&stage=="TAIL_DIALOGUE"){SetStage("FIRST_TAIL");UiSound("victory");}
                 if(id=="tailAfter"&&stage=="TAIL_EPILOGUE")CompleteFirstVictory();
             };
-            Home();if(SceneManager.GetActiveScene().name=="Prologue")BeginTrial(replayRequested);
+            Home();if(SceneManager.GetActiveScene().name=="Prologue")BeginTrial();
         }
-        public void StartTrial(bool replay){if(stage!="MENU")return;UiSound("ui_confirm");replayRequested=replay;if(SceneManager.GetActiveScene().name!="Prologue")SceneManager.LoadScene("Prologue");else BeginTrial(replay);}
-        public void BeginTrial(bool replay){
-            bool resume=!replay&&PlayerPrefs.GetInt(PrologueLayout.CheckpointKey,0)==1;
+        public void StartTrial(){if(stage!="MENU")return;UiSound("ui_confirm");if(SceneManager.GetActiveScene().name!="Prologue")SceneManager.LoadScene("Prologue");else BeginTrial();}
+        public void BeginTrial(){
+            bool resume=HasMoonGateSave;
             PrepareRoute(resume);
             storyIndex=0;storyTime=0;storyPhase="in";
-            bool skipStory=resume||!replay&&PlayerPrefs.GetInt("lingyue.prologue",0)==1;
-            SetStage(skipStory?"FADE_IN":"STORY");
-            if(skipStory)SetMusic("prologue_stage_1");
+            SetStage(resume?"FADE_IN":"STORY");
+            if(resume)SetMusic("prologue_stage_1");
         }
         void PrepareRoute(bool fromCheckpoint){
             sim=new Combat{continueAfterDeath=true,bossYields=true,ai=false,enemyActive=false};
@@ -111,7 +112,8 @@ namespace LingyueEchoes
         void FinishGuardianFight(){
             StopSounds();SetArenaSeals(false);SetMusic("prologue_stage_1");
             sim.boundsMin=-1560;
-            if(PlayerPrefs.GetInt("lingyue.prologue",0)==1&&PlayerPrefs.GetInt("lingyue.tails",0)>0){
+            // Older save flags describe progression, not whether this closing scene has played.
+            if(FirstVictoryStorySeen){
                 SetStage("GATE_READY");Say("rematchWin");return;
             }
             ClearInput();effects.Clear();speech.Reset();tailFormTime=0;
@@ -122,7 +124,8 @@ namespace LingyueEchoes
         }
         void CompleteFirstVictory(){
             PlayerPrefs.SetInt("lingyue.tails",Math.Max(1,PlayerPrefs.GetInt("lingyue.tails",0)));
-            PlayerPrefs.SetInt("lingyue.prologue",1);PlayerPrefs.Save();
+            PlayerPrefs.SetInt("lingyue.prologue",1);
+            PlayerPrefs.SetInt(PrologueLayout.FirstVictoryStoryKey,1);PlayerPrefs.Save();
             SetStage("GATE_READY");
         }
         void SaveCheckpoint(){
@@ -202,7 +205,7 @@ namespace LingyueEchoes
         void Say(string id){var script=Array.Find(content.scripts,s=>s.id==id);if(script!=null){if(stage=="TUTORIAL")tutorial.BeginDialogue(id);speech.Play(script);}}
         string Interaction(){
             if((tutorialDialogue||stage=="GATE_DIALOGUE")&&speech.Active)return "继续";
-            if(stage=="GATE_READY"&&Math.Abs(sim.player.x-sim.boss.x)<210)return PlayerPrefs.GetInt("lingyue.prologue",0)==1?"再次挑战":"交谈";
+            if(stage=="GATE_READY"&&Math.Abs(sim.player.x-sim.boss.x)<210)return FirstVictoryStorySeen?"再次挑战":"交谈";
             return stage=="TUTORIAL"&&tutorial.CanInteract(sim)?"交谈":null;
         }
         public void Interact(){
@@ -283,10 +286,9 @@ namespace LingyueEchoes
         void ActivateMenuOption(int option){
             menuChoice=option;
             switch(option){
-                case 0:StartTrial(false);break;
+                case 0:StartTrial();break;
                 case 1:UiSound("ui_confirm");modal="controls";break;
                 case 2:UiSound("ui_confirm");modal="settings";break;
-                case 3:StartTrial(true);break;
             }
         }
         void SetGameSettings(bool open){
@@ -373,6 +375,7 @@ namespace LingyueEchoes
                 if(Button(option.bounds,option.label,menuChoice==i))ActivateMenuOption(i);
             }
             GUI.enabled=true;
+            Text(new Rect(125,453,320,33),MenuSaveStatus,16,HasMoonGateSave?Gold:new Color(.75f,.78f,.86f));
             Text(new Rect(105,690,550,24),ControlPrompts.MenuHint(device),14);
             Fill(new Rect(1000,640,265,65),Ink);Text(new Rect(1015,650,245,60),"12 帧弹刀 · 8 帧完美\n固定 60Hz 战斗",16,Gold);
             if(motion)for(int i=0;i<14;i++){float t=Time.unscaledTime;Fill(new Rect(60+(i*173)%1160+Mathf.Sin(t*.5f+i*1.7f)*18,((i*97-t*(8+i%4*4))%720+720)%720,8,3),new Color(.95f,.73f,.8f,.5f));}

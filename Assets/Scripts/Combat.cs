@@ -38,7 +38,8 @@ namespace LingyueEchoes
     [Serializable] public class Box
     {
         public double x,y,w,h;
-        public Box(){} public Box(double x,double y,double w,double h){this.x=x;this.y=y;this.w=w;this.h=h;}
+        public bool noFoothold;
+        public Box(){} public Box(double x,double y,double w,double h,bool noFoothold=false){this.x=x;this.y=y;this.w=w;this.h=h;this.noFoothold=noFoothold;}
         public static bool Overlaps(Box a,Box b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
     }
     public class Hitbox:Box {public int owner,attackId,pulse;public Move move;}
@@ -104,7 +105,15 @@ namespace LingyueEchoes
                 double radius=BodyWidth(a)/2,floor=0,oldX=a.id==1?oldPX:oldBX;
                 foreach(var slab in terrain){double top=slab.y+slab.h;
                     if(a.y<top&&oldY<top){if(oldX+radius<=slab.x&&a.x+radius>slab.x)a.x=slab.x-radius;if(oldX-radius>=slab.x+slab.w&&a.x-radius<slab.x+slab.w)a.x=slab.x+slab.w+radius;}
-                    if(a.x+radius>slab.x&&a.x-radius<slab.x+slab.w&&oldY>=top&&a.y<=top&&a.vy<=0)floor=Math.Max(floor,top);}
+                    if(a.x+radius>slab.x&&a.x-radius<slab.x+slab.w&&a.y<=top&&a.vy<=0){
+                        if(slab.noFoothold&&oldY>slab.y){
+                            // Follow the loose face to either side without resetting the fall or granting another jump.
+                            double edge=oldX<=slab.x+slab.w*.5?slab.x-radius:slab.x+slab.w+radius;
+                            a.x+=Math.Sign(edge-a.x)*Math.Min(12,Math.Abs(edge-a.x));
+                            double slope=slab.h*Math.Abs(edge-a.x)/(slab.w*.5+radius);
+                            a.y=Math.Max(a.y,slab.y+slope);
+                        }else if(!slab.noFoothold&&oldY>=top)floor=Math.Max(floor,top);
+                    }}
                 if(a.y<=floor){a.y=floor;a.vy=0;if(airborne&&a.id==1)Sound("land");}
                 if(a.move!=null){var m=a.move;int t=a.age-m.wind;
                     if(a.id==2&&t==-12){var pt=WeaponPoint(m.name);Visual("charge",a.x+a.face*pt.Item1,a.y+pt.Item2,a);}

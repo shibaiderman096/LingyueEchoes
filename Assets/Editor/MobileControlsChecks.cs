@@ -59,7 +59,7 @@ namespace LingyueEchoes.EditorTools
         [MenuItem("Lingyue/Preview mobile controls")]
         public static void Preview(){if(!EditorApplication.isPlaying){Debug.LogWarning("Enter Play mode before previewing mobile controls.");return;}
             var game=UnityEngine.Object.FindAnyObjectByType<LingyueGame>();if(!game)return;
-            game.PreviewTouchControls=true;game.BeginTrial(false);game.stage="TUTORIAL";
+            game.PreviewTouchControls=true;game.BeginTrial();game.stage="TUTORIAL";
         }
     }
 }

@@ -7,9 +7,11 @@ namespace LingyueEchoes
     {
         public const double ArenaMin=1200,ArenaMax=2280,ArenaCenter=(ArenaMin+ArenaMax)/2,GateEntry=1340;
         public const double CheckpointX=1100,GuardianWaitX=ArenaCenter,PlayerFightX=1530,GuardianFightX=1940;
+        public const double PracticeDummyX=790,DummyGuideX=640;
         public const double StepsLeft=-448,StepsWidth=112,StepsHeight=36;
-        public static Box BrokenSteps()=>new Box(StepsLeft,0,StepsWidth,StepsHeight);
+        public static Box BrokenSteps()=>new Box(StepsLeft,0,StepsWidth,StepsHeight,noFoothold:true);
         public const string CheckpointKey="lingyue.moonGateCheckpoint";
+        public const string FirstVictoryStoryKey="lingyue.firstVictoryStoryV2";
     }
     [Serializable] public class DialogueLine {public string speaker,text,cue;}
     [Serializable] public class DialogueScript {public string id;public DialogueLine[] lines;}
@@ -41,7 +43,7 @@ namespace LingyueEchoes
         bool moving,practicing,farewell,approachedSteps,aboveSteps,hitPending,dodgePending;
         string speaking;
         Box steps;
-        readonly double[] route={-1235,-190,790,1030,PrologueLayout.GuardianWaitX};
+        readonly double[] route={-1235,-190,PrologueLayout.DummyGuideX,1030,PrologueLayout.GuardianWaitX};
         public bool GateBound=>waypoint==Gate;
         public bool Practicing=>practicing;
         public bool StepsCleared=>stepsClearFrame>0;
@@ -50,7 +52,7 @@ namespace LingyueEchoes
             spoken.Clear();wait=45;waypoint=Wake;stepsClearFrame=0;
             moving=practicing=farewell=approachedSteps=aboveSteps=hitPending=dodgePending=false;
             speaking=null;this.steps=steps;lastDodge=sim.dodgeEvades;lastDummy=sim.dummyHits;
-            sim.dummyBox=new Box(762,0,56,120);sim.terrain=new List<Box>();if(steps!=null)sim.terrain.Add(steps);
+            sim.dummyBox=new Box(PrologueLayout.PracticeDummyX-28,0,56,120);sim.terrain=new List<Box>();if(steps!=null)sim.terrain.Add(steps);
         }
         public string Interact(Combat sim){if(!CanInteract(sim))return null;return new[]{"routeWake",null,"routeDummy","routeSpar","bossPre"}[waypoint];}
         public void BeginDialogue(string id){speaking=id;}
@@ -111,7 +113,7 @@ namespace LingyueEchoes
                 if(x>=steps.x-270&&x<steps.x&&spoken.Add("routeSteps"))return "routeSteps";
             }
             if(Math.Abs(sim.boss.x-x)<420){
-                if(hitPending&&Math.Abs(x-790)<320&&spoken.Add("routeHit")){hitPending=false;return "routeHit";}
+                if(hitPending&&Math.Abs(x-PrologueLayout.PracticeDummyX)<320&&spoken.Add("routeHit")){hitPending=false;return "routeHit";}
                 if(dodgePending&&practicing&&spoken.Add("routeDodge")){dodgePending=false;return "routeDodge";}
             }
             return null;}
