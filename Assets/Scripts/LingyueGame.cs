@@ -206,7 +206,7 @@ namespace LingyueEchoes
         }
         void Update(){float dt=Math.Min(Time.unscaledDeltaTime,.25f);UpdateViewport();if(!focused&&!Application.isBatchMode)return;ReadInput();
             if(music)music.mute=muted;
-            if(gameSettings)return;
+            if(gameSettings){DrawActors(dt);return;}
             stageTime+=dt;
             switch(stage){case "MENU":break;
                 case "STORY":UpdateStory(dt);break;
@@ -246,20 +246,26 @@ namespace LingyueEchoes
                 else if(TailStory){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
                 else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
+            // Noninteractive scenes still need idle loops, even when the battle clock is stopped.
+            bool ticked=BattleOn||stage=="GUARDIAN_DEFEAT"||stage=="DYING"||stage=="DEATH";
+            DrawActors(ticked?(double?)null:dt);
+            effects.Draw(sim);
+        }
+        void DrawActors(double? idleDelta){
+            var p=sim.player;var b=sim.boss;
             string pose=null;int cell=7;float angle=0,lift=0;
             if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){pose="dead";cell=7;angle=-8;}
             if(stage=="WAKE_UP"){float t=Ease(Mathf.Clamp01(stageTime/.95f));pose=stageTime<.95f*.45f?"dead":"hurt";cell=pose=="dead"?7:3;angle=(pose=="dead"?-8:-46)*(1-t);lift=pose=="dead"?0:-6*(1-t);}
             if(stage=="DYING"||stage=="DEATH"){pose="dead";cell=Math.Min(7,(sim.frame-deathFrame)*8/60);}
             if(stage=="GUARDIAN_INTRO"&&stageTime>=.65f&&stageTime<1.65f){pose="parry";cell=Mathf.Clamp((int)((stageTime-.65f)*8),0,7);}
-            hero.Draw(p,sim.frame,false,pose,cell,angle,lift);
-            if(stage=="GUARDIAN_INTRO"){
+            hero.Draw(p,sim.frame,false,pose,cell,angle,lift,idleDelta:idleDelta);
+            if(stage=="GUARDIAN_INTRO"&&stageTime>=.22f&&stageTime<1.62f){
                 int slashCell=stageTime<TrialSlashTime?Mathf.Clamp((int)((stageTime-.22f)*6),0,3):Mathf.Clamp(4+(int)((stageTime-TrialSlashTime)*8),4,7);
-                guardian.Draw(b,sim.frame,pose:stageTime>=.22f&&stageTime<1.62f?"slash":"idle",poseCell:stageTime>=1.62f?0:slashCell);
+                guardian.Draw(b,sim.frame,pose:"slash",poseCell:slashCell);
             }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
             else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
-            else guardian.Draw(b,sim.frame);
-            effects.Draw(sim);
+            else guardian.Draw(b,sim.frame,idleDelta:idleDelta);
         }
         float RouteCameraX()=>Mathf.Clamp((float)sim.player.x+100,-960,(float)PrologueLayout.ArenaCenter);
         static float Ease(float t)=>t<.5f?4*t*t*t:1-Mathf.Pow(-2*t+2,3)/2;

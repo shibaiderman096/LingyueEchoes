@@ -79,12 +79,16 @@ namespace LingyueEchoes
     public class PixelActor
     {
         readonly GameObject go;readonly SpriteRenderer renderer;readonly bool hero;string previous="";int started,previousFrame=-1,attackId=-1;Fighter actor;
+        double idleSeconds;
         public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
-        public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1,double? poseSeconds=null){
+        public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1,double? poseSeconds=null,double? idleDelta=null){
             string clip=hero?(a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
             if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";var definition=PixelWorld.Definition(folder,clip);
             if(definition==null){clip="idle";definition=PixelWorld.Definition(folder,clip);}
-            if(clip!=previous||frame<previousFrame||actor!=a||(!hero&&attackId!=a.attackId)){started=frame;previous=clip;actor=a;attackId=a.attackId;}previousFrame=frame;
+            if(clip!=previous||frame<previousFrame||actor!=a||(!hero&&attackId!=a.attackId)){
+                started=frame;idleSeconds=0;previous=clip;actor=a;attackId=a.attackId;
+            }else if(clip=="idle")idleSeconds+=idleDelta??(frame-previousFrame)/60d;
+            previousFrame=frame;
             int cell=-1;
             if(pose!=null){
                 if(!poseSeconds.HasValue)cell=poseCell;
@@ -102,7 +106,7 @@ namespace LingyueEchoes
             else if(clip=="jump")cell=hero?(a.y==0?7:a.vy>10?0:a.vy>6?1:a.vy>2?2:a.vy>-1?3:a.vy>-5?4:a.y<25?6:5):(a.y==0?7:a.vy>6?1:a.vy>1?2:a.vy>-2?3:a.vy>-6?4:5);
             else if(!hero&&clip=="stagger")cell=new[]{1,2,4,6,7}[Math.Min(4,(int)Math.Floor(a.age*8d/60))];
             else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
-            double seconds=poseSeconds??((clip=="idle"||clip=="run"||clip=="dead"||clip=="victory"?frame-started:a.age)/60d+1e-7);
+            double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:a.age)/60d+1e-7);
             PixelWorld.Sample(go,folder,clip,seconds,cell);
             go.transform.localPosition=new Vector3((float)Math.Floor(a.x+.5)/100,((float)Math.Floor(a.y+.5)-95+lift)/100,0);
             float scale=hero?1.5f:1;go.transform.localScale=new Vector3(a.face*scale,scale,1);go.transform.localRotation=Quaternion.Euler(0,0,angle*a.face);
