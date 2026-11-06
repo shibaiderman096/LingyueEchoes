@@ -18,7 +18,6 @@ namespace LingyueEchoes
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
         const float TailAppear=.55f,TailDepart=.88f,TailPickup=1.85f,TailGone=2.65f,TailEnd=3.2f;
         double tailSpawnX;
-        int tailGrowthFrom;
         const int TailStarPoints=7;
         static readonly Rect BackpackPortrait=new Rect(35,32,110,112);
         bool backpackOpen,backpackGuideSeen;
@@ -65,7 +64,7 @@ namespace LingyueEchoes
         readonly GUIContent measureContent=new GUIContent();
         Color[] hudRingPixels;float[] hudRingCoverage,hudRingPosition;int hudEcho=-1,hudEchoTrail=-1,lastEchoPoints;
         StatusTrail healthTrail,staminaTrail,echoTrail,echoPointsTrail,bossHealthTrail,postureTrail;
-        float healthBarWidth=302,staminaBarWidth=266;
+        HudBarGrowth healthBar,staminaBar;
         AudioSource[] voices;AudioSource uiVoice,music;readonly Dictionary<string,AudioClip> soundClips=new Dictionary<string,AudioClip>();
         Combat soundModel;string musicKey="";
         readonly MobileControls mobileControls=new MobileControls();bool previewTouchControls;
@@ -151,8 +150,8 @@ namespace LingyueEchoes
             sim.ApplyTailUpgrades(SaveValue(PrologueLayout.TailCountKey,SaveSlot));
             backpackOpen=false;
             healthTrail.Reset(1);staminaTrail.Reset(1);echoTrail.Reset(0);echoPointsTrail.Reset(0);lastEchoPoints=0;
-            healthBarWidth=GrowthBarWidth(302,398,sim.player.maxHp-Rules.playerMaxHp);
-            staminaBarWidth=GrowthBarWidth(266,374,sim.PlayerMaxStamina-Rules.staminaMax);
+            healthBar.Reset(HealthHudWidth);
+            staminaBar.Reset(StaminaHudWidth);
             clock=new FixedClock(sim);sim.boundsMin=-1560;sim.boundsMax=PrologueLayout.ArenaMax;
             checkpointReached=fromCheckpoint;checkpointToast=0;tutorial=new TutorialDirector();
             sim.player.x=fromCheckpoint?PrologueLayout.CheckpointX:-1400;
@@ -202,7 +201,6 @@ namespace LingyueEchoes
             SetStage("TAIL_DIALOGUE");Say("tail");
         }
         void BeginTailHandoff(){
-            tailGrowthFrom=sim.TailUpgrades;
             double p=sim.player.x,b=sim.boss.x,side=p>=b?1:-1;
             double min=PrologueLayout.ArenaMin+50,max=PrologueLayout.ArenaMax-50;
             // Choose open floor on either side before falling back to the space between the fighters.
@@ -656,15 +654,6 @@ namespace LingyueEchoes
             Text(new Rect(rect.x+15,rect.y,140,rect.height),label,18,Ivory,TextAnchor.MiddleLeft);
             Text(new Rect(rect.x+150,rect.y,rect.width-166,rect.height),value.ToString("0"),24,color,TextAnchor.MiddleRight);
         }
-        void TailGrowthStat(Rect rect,string label,int oldValue,float progress,Color color){
-            RoundedFill(rect,Ink,8);
-            Text(new Rect(rect.x+14,rect.y+6,170,30),label,17,Ivory,TextAnchor.MiddleLeft);
-            Text(new Rect(rect.x+14,rect.y+31,160,34),(oldValue+Mathf.RoundToInt(progress*Rules.tailStatBonus)).ToString(),24,color,TextAnchor.MiddleLeft);
-            Text(new Rect(rect.x+135,rect.y+25-9*progress,60,40),$"+{Rules.tailStatBonus}",24,Gold,TextAnchor.MiddleRight);
-            Fill(new Rect(rect.x+14,rect.y+71,rect.width-28,5),new Color(.17f,.23f,.30f));
-            Fill(new Rect(rect.x+14,rect.y+71,rect.width-62,5),color);
-            if(progress>0)Fill(new Rect(rect.x+rect.width-48,rect.y+71,34*progress,5),Gold);
-        }
         void GameGUI(){if(stage=="DYING")return;if(stage=="DEATH"){DeathGUI();return;}if(stage=="STORY"){Fill(new Rect(0,0,1280,720),Color.black);if(stageTime>=.4f&&storyIndex<content.story.Length){float a=storyPhase=="in"?storyTime/.4f:storyPhase=="out"?1-storyTime/.4f:1;Text(new Rect(90,300,1100,150),content.story[storyIndex],30,new Color(.96f,.94f,.88f,a),TextAnchor.MiddleCenter);Text(new Rect(900,650,300,35),ControlPrompts.StoryHint(device),16,Gold);}
                 if(Event.current.type==EventType.MouseUp)AdvanceStory();return;}
             if(stage=="FADE_IN")Fill(new Rect(0,0,1280,720),new Color(0,0,0,1-Mathf.Clamp01(stageTime/.8f)));
@@ -723,7 +712,6 @@ namespace LingyueEchoes
         void TailStoryGUI(){
             Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);
             if(stage=="FIRST_TAIL"){
-                PlayerHud();
                 float reveal=Ease(Mathf.Clamp01(stageTime/TailAppear));
                 float travel=Ease(Mathf.InverseLerp(TailDepart,TailPickup,stageTime));
                 float fade=Ease(Mathf.InverseLerp(TailPickup,TailGone,stageTime));
@@ -745,12 +733,8 @@ namespace LingyueEchoes
                     }
                     Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
                     Text(new Rect(320,173,640,34),"九尾残响：1 / 9",19,Ivory,TextAnchor.MiddleCenter);
-                    if(sim.TailUpgrades>tailGrowthFrom){
-                        float growth=Ease(Mathf.InverseLerp(TailPickup,TailPickup+.85f,stageTime));
-                        TailGrowthStat(new Rect(412,495,212,91),"生命上限",(int)Rules.playerMaxHp+tailGrowthFrom*Rules.tailStatBonus,growth,new Color(.30f,.84f,.52f));
-                        TailGrowthStat(new Rect(656,495,212,91),"气力上限",(int)Rules.staminaMax+tailGrowthFrom*Rules.tailStatBonus,growth,new Color(1,.81f,.31f));
-                    }
                 }
+                PlayerHud();
                 return;
             }
             if(stage=="TAIL_EPILOGUE"){
@@ -892,11 +876,26 @@ namespace LingyueEchoes
             gain=Math.Max(0,gain);
             return Mathf.Lerp(baseWidth,limit,(float)(gain/(gain+30)));
         }
+        float HealthHudWidth=>GrowthBarWidth(302,398,sim.player.maxHp-Rules.playerMaxHp);
+        float StaminaHudWidth=>GrowthBarWidth(266,374,sim.PlayerMaxStamina-Rules.staminaMax);
+        struct HudBarGrowth{
+            const float ExtendTime=.72f,FadeTime=.36f;
+            float target,elapsed;
+            public float Width {get;private set;}
+            public float FromWidth {get;private set;}
+            public float Glow=>1-Ease(Mathf.Clamp01((elapsed-ExtendTime)/FadeTime));
+            public void Reset(float width){Width=FromWidth=target=width;elapsed=ExtendTime+FadeTime;}
+            public void Update(float width,float dt){
+                if(width<target){Reset(width);return;}
+                if(width>target){FromWidth=Width;target=width;elapsed=0;return;}
+                elapsed=Mathf.Min(ExtendTime+FadeTime,elapsed+dt);
+                Width=Mathf.Lerp(FromWidth,target,Ease(Mathf.Clamp01(elapsed/ExtendTime)));
+            }
+        }
         void UpdateStatusTrails(float dt){
             var p=sim.player;var b=sim.boss;
-            float widthEase=1-Mathf.Exp(-10*dt);
-            healthBarWidth=Mathf.Lerp(healthBarWidth,GrowthBarWidth(302,398,p.maxHp-Rules.playerMaxHp),widthEase);
-            staminaBarWidth=Mathf.Lerp(staminaBarWidth,GrowthBarWidth(266,374,sim.PlayerMaxStamina-Rules.staminaMax),widthEase);
+            healthBar.Update(HealthHudWidth,dt);
+            staminaBar.Update(StaminaHudWidth,dt);
             healthTrail.Update(Mathf.Clamp01((float)(p.hp/p.maxHp)),dt);
             staminaTrail.Update(Mathf.Clamp01((float)(p.stamina/sim.PlayerMaxStamina)),dt);
             float echo=Mathf.Clamp01((float)(p.echo/Rules.echoMax));
@@ -909,8 +908,8 @@ namespace LingyueEchoes
             }
         }
         void PlayerHud(){if(Event.current.type!=EventType.Repaint)return;var p=sim.player;
-            HudBar(new Rect(136,61,healthBarWidth,20),(float)(p.hp/p.maxHp),healthTrail.Width,new Color(.12f,.78f,.32f));
-            HudBar(new Rect(136,87,staminaBarWidth,15),(float)(p.stamina/sim.PlayerMaxStamina),staminaTrail.Width,new Color(1,.81f,.12f));
+            HudBar(new Rect(136,61,healthBar.Width,20),(float)(p.hp/p.maxHp),healthTrail.Width,new Color(.12f,.78f,.32f),healthBar);
+            HudBar(new Rect(136,87,staminaBar.Width,15),(float)(p.stamina/sim.PlayerMaxStamina),staminaTrail.Width,new Color(1,.81f,.12f),staminaBar);
             RoundedFill(new Rect(38,35,106,106),new Color(.025f,.035f,.05f,.98f),53);
             RoundedFill(new Rect(42,39,98,98),new Color(.14f,.18f,.23f),49);
             if(hudPortrait)GUI.DrawTexture(new Rect(43,40,96,96),hudPortrait);
@@ -930,10 +929,21 @@ namespace LingyueEchoes
                     if(spent>0)RoundedFill(new Rect(x-6,y-6,12,12),new Color(1,1,1,spent),6);
                 }}
         }
-        void HudBar(Rect rect,float ratio,float trail,Color color){RoundedFill(rect,new Color(.025f,.035f,.05f,.96f),rect.height/2);
+        void HudBar(Rect rect,float ratio,float trail,Color color,HudBarGrowth growth){RoundedFill(rect,new Color(.025f,.035f,.05f,.96f),rect.height/2);
             Rect inner=new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6);RoundedFill(inner,new Color(color.r*.18f,color.g*.18f,color.b*.18f),inner.height/2);
             if(trail>ratio){float oldWidth=inner.width*Mathf.Clamp01(trail);RoundedFill(new Rect(inner.x,inner.y,oldWidth,inner.height),Color.white,Math.Min(inner.height,oldWidth)/2);}
-            float width=inner.width*Mathf.Clamp01(ratio);if(width>0)RoundedFill(new Rect(inner.x,inner.y,width,inner.height),color,Math.Min(inner.height,width)/2);}
+            float width=inner.width*Mathf.Clamp01(ratio);if(width>0)RoundedFill(new Rect(inner.x,inner.y,width,inner.height),color,Math.Min(inner.height,width)/2);
+            float glow=growth.Glow, start=growth.FromWidth-6;
+            float added=inner.width-start;
+            if(glow<=0||added<=0)return;
+            float filled=width-start;
+            if(filled>0)RoundedFill(new Rect(inner.x+start,inner.y,filled,inner.height),new Color(1,.9f,.6f,.76f*glow),Mathf.Min(filled,inner.height)/2);
+            // The edge marks new capacity even if part of the bar is empty.
+            var gold=new Color(1,.86f,.52f,.85f*glow);
+            float edge=added-inner.height*.5f,tip=Mathf.Min(added,2.5f);
+            if(edge>0)RoundedFill(new Rect(inner.x+start,inner.y-1,edge,2),gold,1);
+            RoundedFill(new Rect(inner.xMax-tip,inner.center.y-2,tip,4),gold,tip/2);
+        }
         void Bar(Rect rect,float ratio,float trail,Color color){Fill(rect,Ink);
             if(trail>ratio)Fill(new Rect(rect.x+2,rect.y+2,(rect.width-4)*trail,rect.height-4),Color.white);
             Fill(new Rect(rect.x+2,rect.y+2,(rect.width-4)*Mathf.Clamp01(ratio),rect.height-4),color);}
