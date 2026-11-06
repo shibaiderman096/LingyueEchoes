@@ -27,6 +27,7 @@ namespace LingyueEchoes
         bool debug,boxes,focused=true,motion,muted,hadTouch,showKeyHints,gameSettings;
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
+        const float RightHintKeyEdge=1180,HintRightMargin=18,HintKeyGap=10;
         static readonly (Rect bounds,string label)[] MenuOptions={
             (new Rect(105,395,340,62),"开始游戏"),
             (new Rect(105,477,340,58),"操作说明"),
@@ -107,7 +108,7 @@ namespace LingyueEchoes
             motion=PlayerPrefs.GetString("lingyue.menuMotion","on")!="off";muted=PlayerPrefs.GetString("lingyue.sfxMuted","off")=="on";previewTouchControls=PlayerPrefs.GetInt("lingyue.touchControls",0)==1;
             showKeyHints=PlayerPrefs.GetInt("lingyue.keyHints",1)==1;
             inputDevice.Select(lastInputDevice??(Application.isMobilePlatform||previewTouchControls?"touch":Input.GetJoystickNames().Any(n=>!string.IsNullOrWhiteSpace(n))?"pad":"keyboard"));
-            voices=new AudioSource[12];for(int i=0;i<12;i++)voices[i]=gameObject.AddComponent<AudioSource>();uiVoice=gameObject.AddComponent<AudioSource>();music=gameObject.AddComponent<AudioSource>();music.loop=true;music.volume=.22f;
+            CreateAudioSources();
             foreach(string name in new[]{"step","jump","land","slash1","slash2","slash3","guard","dodge","counter","hit_player","hit_boss","parry","perfect_dodge","boss_swing","break","phase","death","victory","heal","ui_confirm","ui_back"})soundClips[name]=Resources.Load<AudioClip>("audio/sfx/"+name);
             speech.onClose=id=>{
                 if(stage=="GATE_DIALOGUE"){BeginTrialIntro();return;}
@@ -119,6 +120,15 @@ namespace LingyueEchoes
             if(SceneManager.GetActiveScene().name=="Prologue"){
                 SaveSlot=pendingSaveSlot??1;pendingSaveSlot=null;BeginTrial();
             }
+        }
+        void CreateAudioSources(){
+            var audioRoot=new GameObject("2D Audio");
+            audioRoot.transform.SetParent(transform,false);
+            // Non-spatial audio can stay behind the camera, away from on-screen editor gizmos.
+            audioRoot.transform.localPosition=Vector3.back*100;
+            AudioSource AddVoice(){var source=audioRoot.AddComponent<AudioSource>();source.spatialBlend=0;return source;}
+            voices=new AudioSource[12];for(int i=0;i<voices.Length;i++)voices[i]=AddVoice();
+            uiVoice=AddVoice();music=AddVoice();music.loop=true;music.volume=.22f;
         }
         public void StartTrial(){
             if(stage!="MENU"||modal!="")return;
@@ -553,8 +563,8 @@ namespace LingyueEchoes
         }
         static Color Ivory=>new Color(.98f,.93f,.85f);static Color Gold=>new Color(.85f,.74f,.53f);static Color Ink=>new Color(.075f,.11f,.18f,.95f);
         void Fill(Rect rect,Color color){color.a*=guiOpacity;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=Color.white;}
-        void Text(Rect rect,string value,int size=20,Color? color=null,TextAnchor align=TextAnchor.UpperLeft){Color tint=color??Ivory;tint.a*=guiOpacity;textStyle.fontSize=size;textStyle.normal.textColor=tint;textStyle.alignment=align;GUI.Label(rect,value,textStyle);}
-        float TextHeight(string text,float width,int size){measureContent.text=text;textStyle.fontSize=size;return Mathf.Ceil(textStyle.CalcHeight(measureContent,width))+4;}
+        void Text(Rect rect,string value,int size=20,Color? color=null,TextAnchor align=TextAnchor.UpperLeft,bool wrap=true){Color tint=color??Ivory;tint.a*=guiOpacity;textStyle.fontSize=size;textStyle.normal.textColor=tint;textStyle.alignment=align;textStyle.wordWrap=wrap;GUI.Label(rect,value,textStyle);}
+        float TextHeight(string text,float width,int size){measureContent.text=text;textStyle.fontSize=size;textStyle.wordWrap=true;return Mathf.Ceil(textStyle.CalcHeight(measureContent,width))+4;}
         bool Button(Rect rect,string caption,bool selected=false,bool interactive=true,string key=null,bool hover=true){
             bool hovered=hover&&GUI.enabled&&interactive&&device=="keyboard"&&rect.Contains(Event.current.mousePosition);
             bool highlight=selected||hovered;
@@ -851,7 +861,7 @@ namespace LingyueEchoes
             return new Vector2(p.x*1280,(1-p.y)*720);
         }
         void RightControlHints(){
-            float y=SettingsButton.yMax+12,keyRight=SettingsButton.center.x+31;
+            float y=SettingsButton.yMax+12,keyRight=RightHintKeyEdge;
             KeyPrompt(y,"move","移动",keyRight);
             KeyPrompt(y+31,"jump","跳跃",keyRight);
             KeyPrompt(y+62,"attack","攻击",keyRight);
@@ -872,18 +882,19 @@ namespace LingyueEchoes
             Rect cap=new Rect(keyRight-width,y+2,width,26);
             RoundedFill(cap,new Color(.85f,.74f,.53f,.85f),5);
             RoundedFill(new Rect(cap.x+1,cap.y+1,cap.width-2,cap.height-2),new Color(.055f,.08f,.125f,.91f),4);
-            Text(cap,key,14,Ivory,TextAnchor.MiddleCenter);
-            HintText(new Rect(keyRight+10,y,Mathf.Min(160,1270-keyRight),30),caption,16,Ivory);
+            Text(cap,key,14,Ivory,TextAnchor.MiddleCenter,wrap:false);
+            float captionX=keyRight+HintKeyGap;
+            HintText(new Rect(captionX,y,Mathf.Min(160,1280-HintRightMargin-captionX),30),caption,16,Ivory);
         }
         void HintText(Rect rect,string caption,int size,Color color){
             if(Event.current.type!=EventType.Repaint)return;
             Color edge=new Color(.025f,.035f,.055f,1);
             Rect outline=rect;
-            outline.x=rect.x-1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft);
-            outline.x=rect.x+1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft);
-            outline.x=rect.x;outline.y=rect.y-1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft);
-            outline.y=rect.y+1.5f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft);
-            Text(rect,caption,size,color,TextAnchor.MiddleLeft);
+            outline.x=rect.x-1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft,wrap:false);
+            outline.x=rect.x+1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft,wrap:false);
+            outline.x=rect.x;outline.y=rect.y-1.2f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft,wrap:false);
+            outline.y=rect.y+1.5f;Text(outline,caption,size,edge,TextAnchor.MiddleLeft,wrap:false);
+            Text(rect,caption,size,color,TextAnchor.MiddleLeft,wrap:false);
         }
         void CheckpointGUI(){
             if(Math.Abs(sim.player.x-PrologueLayout.CheckpointX)>330)return;
