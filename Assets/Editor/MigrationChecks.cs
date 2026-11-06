@@ -24,7 +24,7 @@ public static class MigrationChecks
             if(test.kind=="practice")c.nonlethal=true;
             if(test.kind=="finisher"){c.boss.state="broken";c.boss.age=0;c.boss.posture=100;c.player.energy=2;c.player.echo=57;}
             if(test.kind=="execute"){c.player.energy=1;c.executeWindow=30;}
-            if(test.kind=="route"){c.god=false;c.player.x=-1400;c.boss.x=-1235;c.boundsMin=-1560;c.boundsMax=1800;var tutorial=new TutorialDirector();tutorial.Begin(c);c.beforeStep=tutorial.Pump;}
+            if(test.kind=="route"){c.god=false;c.player.x=PrologueLayout.WakeX;c.boss.x=PrologueLayout.WakeGuideX;c.boundsMin=PrologueLayout.RouteStart;c.boundsMax=PrologueLayout.ArenaMax;var tutorial=new TutorialDirector();tutorial.Begin(c);c.beforeStep=tutorial.Pump;}
             for(int t=0;t<test.steps;t++){if(test.kind=="route"){c.axis=1;if(t%90==0)c.Press("jump");if(t%37==0)c.Press("attack");}
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
@@ -91,16 +91,16 @@ public static class MigrationChecks
         var cap=Contact("parry",0,3,80);cap.Step();Assert(cap.player.energy==3&&cap.player.echo==99,"Echo capacity remains three points plus partial charge");
         var empty=new Combat{enemyActive=false,ai=false};empty.Press("dodge");for(int i=0;i<40;i++)empty.Step();empty.Press("parry");for(int i=0;i<40;i++)empty.Step();Assert(empty.player.energy==0&&empty.player.echo==0,"Empty defensive actions do not grant echo");
         var dialogue=new DialogueDirector();dialogue.Play(new DialogueScript{id="manual",lines=new[]{new DialogueLine{speaker="guardian",text="按 E 继续"}}},false);for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(dialogue.Active,"Teaching waits for a dialogue key");dialogue.Confirm();Assert(!dialogue.Active,"Dialogue key advances teaching");
-        var route=new Combat{ai=false,enemyActive=false,boundsMin=-1560,boundsMax=PrologueLayout.ArenaMax};route.player.x=-1400;route.boss.x=-1235;var hero=route.player;var tutorial=new TutorialDirector();tutorial.Begin(route);route.beforeStep=tutorial.Pump;
-        for(int i=0;i<600;i++)route.Step();Assert(route.boss.x==-1235&&!route.enemyActive&&tutorial.CanInteract(route),"Guide waits without attacking before interaction");
+        var route=new Combat{ai=false,enemyActive=false,boundsMin=PrologueLayout.RouteStart,boundsMax=PrologueLayout.ArenaMax};route.player.x=PrologueLayout.WakeX;route.boss.x=PrologueLayout.WakeGuideX;var hero=route.player;var tutorial=new TutorialDirector();tutorial.Begin(route);route.beforeStep=tutorial.Pump;
+        for(int i=0;i<600;i++)route.Step();Assert(route.boss.x==PrologueLayout.WakeGuideX&&!route.enemyActive&&tutorial.CanInteract(route),"Guide waits without attacking before interaction");
         Assert(tutorial.Interact(route)=="routeWake","Initial dialogue prompt");tutorial.BeginDialogue("routeWake");
-        route.player.x=1280;for(int i=0;i<60;i++)route.Step();
-        Assert(route.boss.x==-1235&&!tutorial.GateBound,"Running past the lesson cannot interrupt active dialogue");
-        route.player.x=-1400;tutorial.FinishDialogue(route,"routeWake");
+        route.player.x=PrologueLayout.GateEntry+40;for(int i=0;i<60;i++)route.Step();
+        Assert(route.boss.x==PrologueLayout.WakeGuideX&&!tutorial.GateBound,"Running past the lesson cannot interrupt active dialogue");
+        route.player.x=PrologueLayout.WakeX;tutorial.FinishDialogue(route,"routeWake");
         for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==PrologueLayout.DummyGuideX&&
             route.boss.x+Combat.BodyWidth(route.boss)/2<route.dummyBox.x,"Guide stops clear of the practice dummy");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
-        Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
+        Assert(PrologueLayout.MoonGateX-PrologueLayout.WakeX==1775&&PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Half-length route keeps the trial arena width");
     }
     static void CheckTailUpgrades(){
         var c=new Combat{ai=false,enemyActive=false};
@@ -250,9 +250,9 @@ public static class MigrationChecks
         dialogue.Update(.11);Assert(closed==1&&!dialogue.Active,"Automatic dialogue advances after the reading hold");
     }
     static void CheckBrokenSteps(){
-        var sim=new Combat{ai=false,enemyActive=false,boundsMin=-1560,boundsMax=PrologueLayout.ArenaMax};
+        var sim=new Combat{ai=false,enemyActive=false,boundsMin=PrologueLayout.RouteStart,boundsMax=PrologueLayout.ArenaMax};
         var steps=PrologueLayout.BrokenSteps();var guide=new TutorialDirector();
-        sim.player.x=steps.x-100;sim.boss.x=-1235;
+        sim.player.x=steps.x-100;sim.boss.x=PrologueLayout.WakeGuideX;
         guide.Begin(sim,steps);sim.beforeStep=guide.Pump;sim.axis=1;
         for(int i=0;i<50;i++)sim.Step();
         double wall=steps.x-Combat.BodyWidth(sim.player)/2;

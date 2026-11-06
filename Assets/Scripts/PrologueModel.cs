@@ -5,10 +5,15 @@ namespace LingyueEchoes
 {
     public static class PrologueLayout
     {
-        public const double ArenaMin=1200,ArenaMax=2280,ArenaCenter=(ArenaMin+ArenaMax)/2,GateEntry=1340;
-        public const double CheckpointX=1100,GuardianWaitX=ArenaCenter,PlayerFightX=1530,GuardianFightX=1940;
-        public const double PracticeDummyX=790,DummyGuideX=640;
-        public const double StepsLeft=-448,StepsWidth=112,StepsHeight=36;
+        public const double RouteStart=-1560,WakeX=-1400,WakeGuideX=-1235;
+        // Shorten the walk to the exit from 3550 to 1775, while keeping the trial 1080 wide.
+        public const double MoonGateX=WakeX+1775,ArenaMax=MoonGateX+100,ArenaMin=ArenaMax-1080;
+        public const double ArenaCenter=(ArenaMin+ArenaMax)/2,GateEntry=-635,CheckpointX=-620;
+        public const double GuardianWaitX=ArenaCenter,PlayerFightX=ArenaMin+330,GuardianFightX=ArenaMin+740;
+        public const double PracticeDummyX=-810,DummyGuideX=-940,SparGuideX=-705;
+        public const double StepsLeft=-1160,StepsWidth=112,StepsHeight=36,StepsGuideX=-980;
+        public const double WakeEnd=-1210,RoadEnd=-920;
+        public const float CameraMinX=-960,CameraMaxX=300;
         public static Box BrokenSteps()=>new Box(StepsLeft,0,StepsWidth,StepsHeight,noFoothold:true);
         public const string CheckpointKey="lingyue.moonGateCheckpoint";
         public const string FirstVictoryStoryKey="lingyue.firstVictoryStoryV2";
@@ -61,7 +66,7 @@ namespace LingyueEchoes
         bool moving,practicing,farewell,approachedSteps,aboveSteps,hitPending,dodgePending;
         string speaking;
         Box steps;
-        readonly double[] route={-1235,-190,PrologueLayout.DummyGuideX,1030,PrologueLayout.GuardianWaitX};
+        readonly double[] route={PrologueLayout.WakeGuideX,PrologueLayout.StepsGuideX,PrologueLayout.DummyGuideX,PrologueLayout.SparGuideX,PrologueLayout.GuardianWaitX};
         public bool GateBound=>waypoint==Gate;
         public bool Practicing=>practicing;
         public bool StepsCleared=>stepsClearFrame>0;
@@ -88,8 +93,8 @@ namespace LingyueEchoes
             TrackSteps(sim);
             if(practicing&&sim.deflectSerial>practiceDeflect){practicing=false;farewell=true;dodgePending=false;b.move=null;b.state="idle";b.age=0;}
             // Players can skip the optional lesson before starting it.
-            if(!practicing&&!farewell&&speaking==null&&p.x>=1240&&waypoint<Gate)Depart(Gate);
-            bool spar=practicing&&p.x>=880&&p.x<1200&&Math.Abs(p.x-b.x)<210;
+            if(!practicing&&!farewell&&speaking==null&&p.x>=PrologueLayout.GateEntry&&waypoint<Gate)Depart(Gate);
+            bool spar=practicing&&p.x>=PrologueLayout.SparGuideX-150&&p.x<PrologueLayout.ArenaMin&&Math.Abs(p.x-b.x)<210;
             sim.ai=false;sim.enemyActive=spar;sim.nonlethal=spar;if(!spar&&b.move!=null){b.move=null;b.state=b.y>0?"air":"idle";b.age=0;}
             double target=route[waypoint];if(b.state=="idle"||b.state=="run"||b.state=="air"){double delta=target-b.x;
                 if(Math.Abs(delta)>8){
@@ -112,12 +117,13 @@ namespace LingyueEchoes
             double x=sim.player.x;
             if(practicing)return "spar";
             if(steps!=null){
-                if(!StepsCleared&&x>=steps.x-268&&x<steps.x+steps.w)return "steps";
+                double approach=Math.Max(PrologueLayout.WakeEnd,steps.x-268);
+                if(!StepsCleared&&x>=approach&&x<steps.x+steps.w)return "steps";
                 if(StepsCleared&&sim.frame-stepsClearFrame<150)return "stepsClear";
-                if(waypoint==Steps&&x<steps.x-268)return "move";
+                if(waypoint==Steps&&x<approach)return "move";
             }
             if(waypoint==Wake&&CanInteract(sim))return "meet";
-            if(x>=590&&x<=870&&sim.dummyHits==0)return "dummy";
+            if(x>=PrologueLayout.RoadEnd&&x<=PrologueLayout.PracticeDummyX+50&&sim.dummyHits==0)return "dummy";
             if(waypoint==Spar&&CanInteract(sim))return "sparOffer";
             return null;
         }
@@ -135,6 +141,6 @@ namespace LingyueEchoes
                 if(dodgePending&&practicing&&spoken.Add("routeDodge")){dodgePending=false;return "routeDodge";}
             }
             return null;}
-        public static string Title(double x)=>x<=-800?"苏醒之庭":x<=520?"旧日参道":x<=1240?"练武之庭":"月门试炼场";
+        public static string Title(double x)=>x<PrologueLayout.WakeEnd?"苏醒之庭":x<PrologueLayout.RoadEnd?"旧日参道":x<PrologueLayout.GateEntry?"练武之庭":"月门试炼场";
     }
 }

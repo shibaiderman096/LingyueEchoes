@@ -13,7 +13,7 @@ namespace LingyueEchoes
         bool editorRun,captured,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued,lostFirstFight,sawOpeningStory,sawDummyStop;
         const int TestSlot=2;
         static readonly string[] progressKeys={PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.CheckpointKey,PrologueLayout.FirstVictoryStoryKey};
-        static readonly string[] saveKeys=new[]{1,TestSlot}.SelectMany(slot=>progressKeys.Select(key=>PrologueLayout.SaveKey(key,slot))).ToArray();
+        static readonly string[] saveKeys=new[]{1,TestSlot}.SelectMany(slot=>progressKeys.Concat(WrathRoute.SaveKeys).Select(key=>PrologueLayout.SaveKey(key,slot))).ToArray();
         static string TestKey(string key)=>PrologueLayout.SaveKey(key,TestSlot);
         readonly int?[] saved=new int?[saveKeys.Length];
         double originalHp;
@@ -50,19 +50,23 @@ namespace LingyueEchoes
                     Require(sawOpeningStory&&game.SaveSlot==TestSlot,"Selecting an empty slot plays the opening even with a completed first slot.");
                     game.SetBackpack(true);Require(!game.BackpackUnlocked&&!game.BackpackOpen,"Backpack is locked before the first tail.");
                     var world=game.transform.Find("World");
-                    Require(game.sim.terrain.Count==1&&world.Find("SceneryModules").childCount==6,"Expected one broken-step obstacle on the modular route.");
+                    var scenery=world.Find("SceneryModules");
+                    var gate=world.Find("Props/MoonGateExit");
+                    Require(game.sim.terrain.Count==1&&scenery.Find("Shared sunrise backdrop")&&scenery.childCount==5&&gate&&
+                        !world.Find("Props/SevenSinsStele")&&Math.Abs(gate.position.x-PrologueLayout.MoonGateX/100)<.01,
+                        "One shared background, three stand-alone landmarks, paving, and a moon gate replacing the stone at the exit.");
                     var steps=world.Find("Props/BrokenSteps").GetComponent<SpriteRenderer>();
                     float pad=PixelWorld.RubblePadding/100;
                     Require(steps.sprite&&steps.sprite.name.StartsWith("broken-rubble")&&Math.Abs(steps.bounds.min.x+pad-PrologueLayout.StepsLeft/100)<.01&&
                         Math.Abs(steps.bounds.max.y-pad-(-.95+PrologueLayout.StepsHeight/100))<.01,"The visible rubble aligns with the ground and collision.");
-                    Require(!Seal(game,true).enabled&&Seal(game,false).enabled,"Only the outer arena boundary is sealed during exploration.");
+                    Require(!Seal(game,true).enabled&&!Seal(game,false).enabled,"Trial markers stay hidden during exploration.");
                     originalPlayer=game.sim.player;originalHp=originalPlayer.hp;game.sim.god=true;Next();
                 }
                 if(phase<2)return;
                 var c=game.sim;var p=c.player;var b=c.boss;
                 switch(phase){
                     case 2: // Complete each lesson by interacting while the guardian is stationary.
-                        game.Interact();if(b.x>-1235)Next();break;
+                        game.Interact();if(b.x>PrologueLayout.WakeGuideX)Next();break;
                     case 3:
                         if(!game.BrokenStepsCleared){
                             game.scriptedAxis=1;
@@ -77,24 +81,24 @@ namespace LingyueEchoes
                         }
                         Require(stepsJumpIssued&&p.x-Combat.BodyWidth(p)/2>=PrologueLayout.StepsLeft+PrologueLayout.StepsWidth,
                             "Tutorial completes only after crossing and landing beyond the steps.");
-                        game.scriptedAxis=p.x<770?1:0;
+                        game.scriptedAxis=p.x<PrologueLayout.PracticeDummyX-20?1:0;
                         if(b.x==PrologueLayout.DummyGuideX&&b.state=="idle"){
                             var dummy=game.transform.Find("World/Props/PracticeDummy");
                             Require(dummy&&Math.Abs(dummy.position.x-b.x/100)>1,"Guide stands apart from the visible dummy.");
                             sawDummyStop=true;
-                            if(p.x>=770)game.Interact();
+                            if(p.x>=PrologueLayout.PracticeDummyX-20)game.Interact();
                         }
                         if(b.x>PrologueLayout.PracticeDummyX&&sawDummyStop)Next();
                         break;
                     case 4:
-                        game.scriptedAxis=p.x<910?1:0;
-                        if(p.x>=910&&b.x==1030&&!c.enemyActive)game.Interact();
+                        game.scriptedAxis=p.x<PrologueLayout.SparGuideX-95?1:0;
+                        if(p.x>=PrologueLayout.SparGuideX-95&&b.x==PrologueLayout.SparGuideX&&!c.enemyActive)game.Interact();
                         if(c.enemyActive)Next();
                         break;
                     case 5:
                         if(b.move!=null&&b.age>=b.move.wind-4&&b.age<b.move.wind)game.Act("parry");
-                        if(c.deflectSerial==1&&b.x==1030)parryFarewellTime+=Time.unscaledDeltaTime;
-                        if(b.x>1030){
+                        if(c.deflectSerial==1&&b.x==PrologueLayout.SparGuideX)parryFarewellTime+=Time.unscaledDeltaTime;
+                        if(b.x>PrologueLayout.SparGuideX){
                             Require(c.deflectSerial==1&&!c.enemyActive&&parryFarewellTime>1f,"After one parry, the guide stays for the farewell before moving.");
                             Next();
                         }
@@ -206,9 +210,19 @@ namespace LingyueEchoes
                         }
                         break;
                     case 17:
+                        if(game.stage!="GATE_READY")return;
                         Require(game.SaveSlot==TestSlot&&game.BackpackUnlocked&&c.TailUpgrades==1&&p.hp==130&&p.stamina==110,
                             "Reload restores exactly one tail, both caps, and backpack access.");
-                        Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker, checkpoint retry, first victory, tail upgrades and backpack, rematch and reload.");
+                        Next();break;
+                    case 18:
+                        game.scriptedAxis=p.x<PrologueLayout.MoonGateX?1:0;
+                        if(p.x>=PrologueLayout.MoonGateX){game.Interact();if(game.stage=="WRATH_DIALOGUE")Next();}
+                        break;
+                    case 19:
+                        if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!=WrathRoute.Scene){game.Interact();return;}
+                        Require(game.SaveSlot==TestSlot&&PlayerPrefs.GetInt(TestKey(WrathRoute.Current))==1&&c.TailUpgrades==1,
+                            "The final moon gate enters the first chapter with the same slot and tail progression.");
+                        Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker, checkpoint retry, first victory, tail upgrades and backpack, rematch, reload and moon gate chapter transfer.");
                         Finish(0);break;
                 }
             }catch(Exception error){Debug.LogError("MIGRATION_RUNTIME_SMOKE_FAILED: "+error);Finish(1);}

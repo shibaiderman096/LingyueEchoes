@@ -38,18 +38,23 @@ namespace LingyueEchoes
             if(!Application.isPlaying)return (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab,parent);
 #endif
             return UnityEngine.Object.Instantiate(prefab,parent,false);}
-        static void PlaceScenery(Transform parent,int column,float x,string name,bool mirrored=false){var module=ModuleInstance(parent,SceneryNames[column-1])??CreateSceneryModule(column);
-            module.transform.SetParent(parent,false);module.name=name;module.transform.localPosition=new Vector3((x+(mirrored?SceneryWidth:0))/100,0,0);module.transform.localScale=new Vector3(mirrored?-1:1,1,1);}
         static void PlaceProp(Transform parent,string name,string resource,float x,float width,float height){var prop=ModuleInstance(parent,name);
             if(prop){prop.transform.localPosition=new Vector3(x/100,0,0);return;}var root=new GameObject(name);root.transform.SetParent(parent,false);root.transform.localPosition=new Vector3(x/100,0,0);
             Sprite(root.transform,name,resource,0,-95,width,height,5,new Vector2(.5f,0));}
         public static SpriteRenderer PlaceCheckpoint(Transform props){
+            var existing=props.Find("MoonGateCheckpoint");
+            if(existing)return existing.GetComponentInChildren<SpriteRenderer>();
             var marker=new GameObject("MoonGateCheckpoint").transform;
             marker.SetParent(props,false);marker.localPosition=new Vector3((float)PrologueLayout.CheckpointX/100,0,0);
             PlaceProp(marker,"MoonLantern","prologue_route/moon_lantern",0,68,135);
             return marker.GetComponentInChildren<SpriteRenderer>();
         }
         public const float RubblePadding=3;
+        public static void PlacePracticeDummy(Transform props){
+            var dummy=props.Find("PracticeDummy");
+            if(dummy){var p=dummy.localPosition;p.x=(float)PrologueLayout.PracticeDummyX/100;dummy.localPosition=p;return;}
+            PlaceProp(props,"PracticeDummy","prologue_route/practice_dummy",(float)PrologueLayout.PracticeDummyX,84,120);
+        }
         public static void PlaceBrokenSteps(Transform props){
             if(props.Find("BrokenSteps"))return;
             Sprite(props,"BrokenSteps","prologue_route/broken-rubble",(float)PrologueLayout.StepsLeft-RubblePadding,-95-RubblePadding,
@@ -57,44 +62,41 @@ namespace LingyueEchoes
         }
         public static SpriteRenderer PlaceArenaSeal(Transform props,bool left){
             int boundary=(int)(left?PrologueLayout.ArenaMin:PrologueLayout.ArenaMax);
-            var old=props.Find("MoonLantern"+boundary);
-            if(old)old.gameObject.SetActive(false);
             // Fighters' centers stop at the boundary; leave their feet in front of the stone.
             return Sprite(props,left?"ArenaSealLeft":"ArenaSealRight","prologue_route/moon-boundary",
                 boundary+(left?-54:54),-98,61,176,8,new Vector2(.5f,0));
         }
+        const string WarmArt="prologue_route/warm/";
+        public static readonly Color PrologueSky=new Color(.88f,.74f,.59f);
+        public static SpriteRenderer PlacePrologueGate(Transform props){
+            var existing=props.Find("MoonGateExit");
+            if(existing)return existing.GetComponent<SpriteRenderer>();
+            return Sprite(props,"MoonGateExit",WarmArt+"moon-gate",(float)PrologueLayout.MoonGateX,-98,278,287,3,new Vector2(.5f,0));
+        }
         public static GameObject CreatePrologueBackdrop(Transform world){
-            const string art="prologue_route/layout/";
-            string[] images={"waking-grove","old-road","training-yard","moon-gate"};
-            foreach(string name in images)if(!Resources.Load<Sprite>(art+name))return null;
-            if(!Resources.Load<Sprite>(art+"moonlit-paving"))return null;
             var group=new GameObject("SceneryModules");group.transform.SetParent(world,false);
-            // Anchors live in world space: the arch stays over the arena and the road stays behind the rubble.
-            Sprite(group.transform,"01 · 苏醒地",art+images[0],-2200,92,1930,700,-20,new Vector2(0,.5f));
-            Sprite(group.transform,"02 · 旧日参道",art+images[1],-1080,125,1620,700,-19,new Vector2(0,.5f));
-            Sprite(group.transform,"03 · 练武庭",art+images[2],-240,101,1680,650,-18,new Vector2(0,.5f));
-            Sprite(group.transform,"04 · 月门试炼场",art+images[3],(float)PrologueLayout.ArenaCenter,71,1740,584,-17,new Vector2(.5f,.5f));
-            var floor=new GameObject("Moonlit paving · reusable modules").transform;
+            Sprite(group.transform,"Shared sunrise backdrop",WarmArt+"sunrise-valley",-1660,40,2690,920,-20,new Vector2(0,.5f));
+            Sprite(group.transform,"01 · 苏醒地",WarmArt+"waking-tree",(float)PrologueLayout.WakeX-150,-98,415,284,-3,new Vector2(.5f,0));
+            Sprite(group.transform,"02 · 断阶参道",WarmArt+"road-balustrade",(float)(PrologueLayout.StepsLeft+PrologueLayout.StepsWidth/2),-98,260,64,-3,new Vector2(.5f,0));
+            Sprite(group.transform,"03 · 练武庭",WarmArt+"training-pavilion",(float)PrologueLayout.PracticeDummyX,-98,424,173,-3,new Vector2(.5f,0));
+            var floor=new GameObject("Warm paving · reusable modules").transform;
             floor.SetParent(group.transform,false);
-            const int tileWidth=960;
-            for(int i=0;i<6;i++){
-                var tile=Sprite(floor,"Paving "+(i+1),art+"moonlit-paving",-2220+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
+            const int tileWidth=930;
+            for(int i=0;i<3;i++){
+                var tile=Sprite(floor,"Paving "+(i+1),WarmArt+"warm-paving",-1660+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
                 tile.flipX=i%2==1;
             }
             return group;
         }
         public static Transform Create(Transform parent){var world=new GameObject("World").transform;world.SetParent(parent,false);
-            if(!CreatePrologueBackdrop(world)){
-                var scenery=new GameObject("SceneryModules").transform;scenery.SetParent(world,false);
-                PlaceScenery(scenery,1,-2540,"GroveBoundary",true);PlaceScenery(scenery,1,-1640,"01_WakingGrove");
-                PlaceScenery(scenery,2,-740,"02_OldRoad");PlaceScenery(scenery,3,160,"03_TrainingCourtyard");
-                PlaceScenery(scenery,3,1060,"04_MoonGateArena",true);PlaceScenery(scenery,2,1960,"05_ArenaExtension",true);
-            }
+            CreatePrologueBackdrop(world);
             var props=new GameObject("Props").transform;props.SetParent(world,false);
             PlaceBrokenSteps(props);
-            PlaceProp(props,"PracticeDummy","prologue_route/practice_dummy",(float)PrologueLayout.PracticeDummyX,84,120);
-            var boss=new GameObject("Guardian");boss.transform.SetParent(world,false);boss.AddComponent<SpriteRenderer>().sortingOrder=10;boss.transform.localPosition=new Vector3(-12.35f,-.95f,0);boss.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("guardian8/frames/idle/idle-01");
-            var hero=new GameObject("Hero");hero.transform.SetParent(world,false);hero.AddComponent<SpriteRenderer>().sortingOrder=12;hero.transform.localPosition=new Vector3(-14,-.95f,0);hero.transform.localScale=Vector3.one*1.5f;hero.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("pixel8/frames/idle/idle-01");
+            PlacePracticeDummy(props);
+            PlaceCheckpoint(props);
+            PlacePrologueGate(props);
+            var boss=new GameObject("Guardian");boss.transform.SetParent(world,false);boss.AddComponent<SpriteRenderer>().sortingOrder=10;boss.transform.localPosition=new Vector3((float)PrologueLayout.WakeGuideX/100,-.95f,0);boss.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("guardian8/frames/idle/idle-01");
+            var hero=new GameObject("Hero");hero.transform.SetParent(world,false);hero.AddComponent<SpriteRenderer>().sortingOrder=12;hero.transform.localPosition=new Vector3((float)PrologueLayout.WakeX/100,-.95f,0);hero.transform.localScale=Vector3.one*1.5f;hero.GetComponent<SpriteRenderer>().sprite=Resources.Load<Sprite>("pixel8/frames/idle/idle-01");
             return world;
         }
     }

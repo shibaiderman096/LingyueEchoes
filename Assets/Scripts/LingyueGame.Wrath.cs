@@ -7,11 +7,10 @@ namespace LingyueEchoes
     public partial class LingyueGame
     {
         const string WrathRoam="WRATH_ROUTE",WrathDialogue="WRATH_DIALOGUE",WrathArrive="WRATH_ARRIVE",WrathTransfer="WRATH_TRANSFER";
-        const string ShrineEntrance="七罪石碑 · 前往焚心之城",ShrineReturn="返回残月神社";
-        const double ShrineStoneX=2150;
+        const string ShrineEntrance="月门 · 前往焚心之城",ShrineReturn="返回残月神社";
         WrathChapter wrath;
         PrologueContent wrathText;
-        SpriteRenderer shrineStone;
+        SpriteRenderer shrineGate;
         int wrathCheckpoint,wrathNext,wrathActive=-1,wrathArea;
         float wrathAreaTime,wrathHintTime,wrathWeaponAsh;
         bool wrathShowOpening;
@@ -28,10 +27,9 @@ namespace LingyueEchoes
         float ChapterCameraX()=>Mathf.Clamp((float)sim.player.x+118,520,3820);
         void PlaceShrineEntrance()
         {
-            shrineStone=PixelWorld.Sprite(world.Find("Props"),"SevenSinsStele","prologue_route/moon-boundary",(float)ShrineStoneX,-95,78,179,8,new Vector2(.5f,0));
-            shrineStone.color=new Color(.83f,.67f,.62f);
+            shrineGate=PixelWorld.PlacePrologueGate(world.Find("Props"));
         }
-        void UpdateShrineEntrance(){if(shrineStone)shrineStone.enabled=ChapterUnlocked(SaveSlot);}
+        void UpdateShrineEntrance(){if(shrineGate)shrineGate.color=ChapterUnlocked(SaveSlot)?Color.white:new Color(.85f,.81f,.78f);}
         void LoadCampaignScene(string name)
         {
             pendingSaveSlot=SaveSlot;
@@ -74,7 +72,7 @@ namespace LingyueEchoes
         string ChapterInteraction()
         {
             if(!wrath){
-                if(stage=="GATE_READY"&&ChapterUnlocked(SaveSlot)&&Math.Abs(sim.player.x-ShrineStoneX)<113)return ShrineEntrance;
+                if(stage=="GATE_READY"&&ChapterUnlocked(SaveSlot)&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<113)return ShrineEntrance;
                 return null;
             }
             if(stage!=WrathRoam)return null;
@@ -242,8 +240,10 @@ namespace LingyueEchoes
         void ChapterFieldGUI()
         {
             if(!wrath){
-                if(WrathCompleted&&stage=="GATE_READY"&&Math.Abs(sim.player.x-ShrineStoneX)<310)
-                    Text(new Rect(420,115,440,31),TailProgress(sim.TailUpgrades),17,MoonGold,TextAnchor.MiddleCenter);
+                if(WrathCompleted&&stage=="GATE_READY"&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<310){
+                    RoundedFill(new Rect(536,115,208,31),Ink,6);
+                    Text(new Rect(536,115,208,31),TailProgress(sim.TailUpgrades),17,MoonGold,TextAnchor.MiddleCenter);
+                }
                 return;
             }
             if(wrathAreaTime>0)
