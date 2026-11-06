@@ -15,7 +15,9 @@ namespace LingyueEchoes
         static int? pendingSaveSlot;
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
-        float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime,tailFormTime;string modal="";
+        float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
+        const float TailAppear=.55f,TailDepart=.88f,TailPickup=1.85f,TailGone=2.65f,TailEnd=3.2f;
+        double tailSpawnX;
         bool debug,boxes,focused=true,motion,muted,hadTouch,showKeyHints,gameSettings;
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
@@ -55,7 +57,8 @@ namespace LingyueEchoes
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
         Texture2D keyart,hudPortrait,hudRing,firstTail;Font font;GUIStyle textStyle,buttonStyle;
         readonly GUIContent measureContent=new GUIContent();
-        Color[] hudRingPixels;float[] hudRingCoverage,hudRingPosition;int hudEcho=-1;
+        Color[] hudRingPixels;float[] hudRingCoverage,hudRingPosition;int hudEcho=-1,hudEchoTrail=-1,lastEchoPoints;
+        StatusTrail healthTrail,staminaTrail,echoTrail,echoPointsTrail,bossHealthTrail,postureTrail;
         AudioSource[] voices;AudioSource uiVoice,music;readonly Dictionary<string,AudioClip> soundClips=new Dictionary<string,AudioClip>();
         Combat soundModel;string musicKey="";
         readonly MobileControls mobileControls=new MobileControls();bool previewTouchControls;
@@ -92,7 +95,7 @@ namespace LingyueEchoes
             speech.onClose=id=>{
                 if(stage=="GATE_DIALOGUE"){BeginTrialIntro();return;}
                 if(stage=="TUTORIAL"){tutorialDialogue=false;tutorial.FinishDialogue(sim,id);}
-                if(id=="tail"&&stage=="TAIL_DIALOGUE"){SetStage("FIRST_TAIL");UiSound("victory");}
+                if(id=="tail"&&stage=="TAIL_DIALOGUE")BeginTailHandoff();
                 if(id=="tailAfter"&&stage=="TAIL_EPILOGUE")CompleteFirstVictory();
             };
             Home();
@@ -134,6 +137,7 @@ namespace LingyueEchoes
         }
         void PrepareRoute(bool fromCheckpoint){
             sim=new Combat{continueAfterDeath=true,bossYields=true,ai=false,enemyActive=false};
+            healthTrail.Reset(1);staminaTrail.Reset(1);echoTrail.Reset(0);echoPointsTrail.Reset(0);lastEchoPoints=0;
             clock=new FixedClock(sim);sim.boundsMin=-1560;sim.boundsMax=PrologueLayout.ArenaMax;
             checkpointReached=fromCheckpoint;checkpointToast=0;tutorial=new TutorialDirector();
             sim.player.x=fromCheckpoint?PrologueLayout.CheckpointX:-1400;
@@ -149,6 +153,7 @@ namespace LingyueEchoes
             ClearInput();sim.beforeStep=null;sim.nonlethal=false;sim.dummyBox=null;
             sim.boundsMin=PrologueLayout.ArenaMin;sim.boundsMax=PrologueLayout.ArenaMax;
             sim.ResetBoss(PrologueLayout.GuardianFightX,520);
+            bossHealthTrail.Reset(1);postureTrail.Reset(0);
             var p=sim.player;p.x=PrologueLayout.PlayerFightX;p.y=p.vy=0;p.face=1;
             p.state="idle";p.move=null;p.age=p.combo=p.invuln=0;
             sim.ai=sim.enemyActive=false;clock=new FixedClock(sim);effects.Clear();
@@ -159,6 +164,7 @@ namespace LingyueEchoes
             mobileControls.Reset();sim.ClearCommands();clock.paused=false;clock.ClearAccumulation();speech.Reset();
             var p=sim.player;
             p.state=p.y>0||p.vy!=0?"air":"idle";p.move=null;p.age=0;
+            p.hp=p.maxHp;
             guardianDefeatFrame=sim.frame;
             guardianDefeatDuration=PixelWorld.Definition("guardian8","broken").duration;
             SetStage("GUARDIAN_DEFEAT");
@@ -175,11 +181,22 @@ namespace LingyueEchoes
             if(FirstVictoryStorySeen){
                 SetStage("GATE_READY");Say("rematchWin");return;
             }
-            tailFormTime=0;
             var p=sim.player;var b=sim.boss;
             p.state="idle";p.move=null;p.age=0;p.y=p.vy=0;b.y=b.vy=0;
             p.face=b.x>=p.x?1:-1;b.face=-p.face;
             SetStage("TAIL_DIALOGUE");Say("tail");
+        }
+        void BeginTailHandoff(){
+            double p=sim.player.x,b=sim.boss.x,side=p>=b?1:-1;
+            double min=PrologueLayout.ArenaMin+50,max=PrologueLayout.ArenaMax-50;
+            // Choose open floor on either side before falling back to the space between the fighters.
+            double[] spots={p+side*150,p-side*150,Math.Min(p,b)-120,Math.Max(p,b)+120,(p+b)*.5};
+            tailSpawnX=(p+b)*.5;
+            foreach(double spot in spots){
+                if(spot<min||spot>max||Math.Abs(spot-p)<100||Math.Abs(spot-b)<100)continue;
+                tailSpawnX=spot;break;
+            }
+            SetStage("FIRST_TAIL");
         }
         void CompleteFirstVictory(){
             WriteSave(PrologueLayout.TailCountKey,Math.Max(1,SaveValue(PrologueLayout.TailCountKey,SaveSlot)));
@@ -214,10 +231,11 @@ namespace LingyueEchoes
                 case "CAMERA_REVEAL":if(stageTime>=3.5f)SetStage("WAKE_UP");break;
                 case "WAKE_UP":if(stageTime>=.95f){SetStage(checkpointReached?"GATE_READY":"TUTORIAL");SetMusic("prologue_stage_1");}break;
                 case "GATE_DIALOGUE":if(speech.Cue=="drawBlade")bladeDrawTime+=dt;break;
-                case "TAIL_DIALOGUE":if(speech.Cue=="formTail"||tailFormTime>0)tailFormTime+=dt;break;
+                case "TAIL_DIALOGUE":break;
                 case "TAIL_EPILOGUE":break;
                 case "FIRST_TAIL":
-                    if(stageTime>=2.75f){SetStage("TAIL_EPILOGUE");Say("tailAfter");}
+                    if(stageTime>=TailPickup&&stageTime-dt<TailPickup)UiSound("victory");
+                    if(stageTime>=TailEnd){SetStage("TAIL_EPILOGUE");Say("tailAfter");}
                     break;
                 case "GUARDIAN_INTRO":
                     if(stageTime>=TrialSlashTime&&stageTime-dt<TrialSlashTime)UiSound("boss_swing");
@@ -233,7 +251,8 @@ namespace LingyueEchoes
                         else if(stage=="GUARDIAN_FIGHT"&&sim.BossDefeated)BeginGuardianDefeat();
                         else if(stage=="GUARDIAN_FIGHT"&&sim.phase==2&&!phase2Spoken){phase2Spoken=true;Say("bossPhase2");}}
                     break;}
-            if(speech.Active)speech.Update(dt);if(stage!="MENU")DrawWorld(dt);
+            if(speech.Active)speech.Update(dt);
+            if(stage!="MENU"){UpdateStatusTrails(dt);DrawWorld(dt);}
             checkpointToast=Math.Max(0,checkpointToast-dt);
         }
         void UpdateStory(float dt){if(stageTime<.4f)return;storyTime+=dt;float span=storyPhase=="hold"?(float)DialogueDirector.ReadingHold(content.story[storyIndex].Length):.4f;if(storyTime>=span){storyTime=0;if(storyPhase=="in")storyPhase="hold";else if(storyPhase=="hold")storyPhase="out";else AdvanceStory();}}
@@ -524,12 +543,13 @@ namespace LingyueEchoes
                 if(Event.current.type==EventType.MouseUp)AdvanceStory();return;}
             if(stage=="FADE_IN")Fill(new Rect(0,0,1280,720),new Color(0,0,0,1-Mathf.Clamp01(stageTime/.8f)));
             if(stage=="GUARDIAN_INTRO"){TrialIntroGUI();return;}
+            if(stage=="GUARDIAN_DEFEAT"){PlayerHud();return;}
             if(TailStory){TailStoryGUI();return;}
             if(BattleOn||stage=="GATE_DIALOGUE"){
                 if(Button(SettingsButton,"设置",gameSettings))SetGameSettings(true);
                 float lessonBottom=TutorialLessonGUI();
                 if(BattleOn){PlayerHud();
-                    if(stage=="GUARDIAN_FIGHT"){Text(new Rect(450,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(490,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),new Color(.71f,.31f,.37f));Bar(new Rect(490,92,455,9),(float)(sim.boss.posture/100),Gold);}
+                    if(stage=="GUARDIAN_FIGHT"){Text(new Rect(450,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(490,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),bossHealthTrail.Width,new Color(.71f,.31f,.37f));Bar(new Rect(490,92,455,9),(float)(sim.boss.posture/100),postureTrail.Width,Gold);}
                     if(showKeyHints&&!gameSettings&&!TouchControlsVisible&&!speech.Active)RightControlHints();
                     string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):sim.CanExecute?ControlPrompts.Format("{attack} 回响小处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
                     if(status!="")Text(new Rect(330,Mathf.Max(lessonBottom,TouchControlsVisible?195:155),620,44),status,25,Gold,TextAnchor.MiddleCenter);}
@@ -577,14 +597,25 @@ namespace LingyueEchoes
         void TailStoryGUI(){
             Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);
             if(stage=="FIRST_TAIL"){
-                float handoff=Ease(Mathf.Clamp01(stageTime/1.4f));
-                Vector2 from=StoryPoint(sim.boss,72),to=StoryPoint(sim.player,80);
-                to.x-=sim.player.face*25;
-                Vector2 point=Vector2.Lerp(from,to,handoff);
-                point.y-=Mathf.Sin(handoff*Mathf.PI)*48;
-                float appear=Ease(Mathf.Clamp01(stageTime/.3f)),size=Mathf.Lerp(54,82,handoff);
-                TailLight(point,size,appear,stageTime);
-                if(stageTime>=1.25f){
+                float reveal=Ease(Mathf.Clamp01(stageTime/TailAppear));
+                float travel=Ease(Mathf.InverseLerp(TailDepart,TailPickup,stageTime));
+                float fade=Ease(Mathf.InverseLerp(TailPickup,TailGone,stageTime));
+                float height=18+reveal*22+Mathf.Sin(stageTime*6)*3*(1-travel);
+                var from=StoryPoint(tailSpawnX,height);
+                var point=Vector2.Lerp(from,StoryPoint(sim.player,78),travel);
+                point.y-=Mathf.Sin(travel*Mathf.PI)*58;
+                if(stageTime<TailDepart){
+                    var floor=StoryPoint(tailSpawnX,4);
+                    float glow=reveal*(1-Mathf.InverseLerp(TailAppear,TailDepart,stageTime));
+                    RoundedFill(new Rect(floor.x-34,floor.y-5,68,10),new Color(1,.72f,.38f,glow*.44f),5);
+                }
+                if(fade<1)TailLight(point,Mathf.Lerp(Mathf.Lerp(40,76,reveal),36,fade),reveal*(1-fade),stageTime);
+                if(stageTime>=TailPickup){
+                    float light=1-Mathf.InverseLerp(TailPickup,TailPickup+.42f,stageTime);
+                    if(light>0){
+                        float radius=Mathf.Lerp(15,50,1-light);
+                        RoundedFill(new Rect(point.x-radius,point.y-radius,2*radius,2*radius),new Color(1,.77f,.47f,.27f*light),radius);
+                    }
                     Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
                     Text(new Rect(320,173,640,34),"九尾残响：1 / 9",19,Ivory,TextAnchor.MiddleCenter);
                 }
@@ -592,13 +623,11 @@ namespace LingyueEchoes
             }
             if(stage=="TAIL_EPILOGUE"){
                 Fill(new Rect(0,38,1280,644),new Color(.034f,.051f,.087f,.92f));
-                if(firstTail)GUI.DrawTexture(new Rect(590,175,100,100),firstTail);
                 Text(new Rect(340,278,600,45),"序章结束 · 月门余音",27,Gold,TextAnchor.MiddleCenter);
                 Text(new Rect(275,332,730,118),speech.VisibleText,24,Ivory,TextAnchor.MiddleCenter);
                 if(Button(new Rect(565,475,150,44),"继续"))speech.Confirm();
                 return;
             }
-            if(tailFormTime>0){var point=StoryPoint(sim.boss,72);TailLight(point,62,Ease(Mathf.Clamp01(tailFormTime/.8f)),tailFormTime);}
             RoundedFill(new Rect(252,538,776,123),Ink,8);
             Text(new Rect(276,550,550,30),speech.Speaker=="hero"?"铃月":"守灯人",18,Gold);
             Text(new Rect(276,583,590,60),speech.VisibleText,22,Ivory);
@@ -611,10 +640,11 @@ namespace LingyueEchoes
                 Vector2 dot=point+new Vector2(Mathf.Sin(i*2.1f+phase*3)*size*.43f,size*(.28f-phase*.9f));
                 RoundedFill(new Rect(dot.x-r,dot.y-r,r*2,r*2),new Color(1,.67f,.46f,alpha*(1-phase)*.85f),r);
             }
-            if(firstTail){GUI.color=new Color(1,1,1,alpha);GUI.DrawTexture(new Rect(point.x-size/2,point.y-size/2,size,size),firstTail);GUI.color=Color.white;}
+            if(firstTail){GUI.color=new Color(1,1,1,alpha);GUI.DrawTexture(new Rect(point.x-size/2,point.y-size/2,size,size),firstTail,ScaleMode.ScaleToFit);GUI.color=Color.white;}
         }
-        Vector2 StoryPoint(Fighter actor,float height){
-            var p=view.WorldToViewportPoint(new Vector3((float)actor.x/100,((float)actor.y+height-95)/100,0));
+        Vector2 StoryPoint(Fighter actor,float height)=>StoryPoint(actor.x,(float)actor.y+height);
+        Vector2 StoryPoint(double x,float height){
+            var p=view.WorldToViewportPoint(new Vector3((float)x/100,(height-95)/100,0));
             return new Vector2(p.x*1280,(1-p.y)*720);
         }
         void RightControlHints(){
@@ -726,27 +756,48 @@ namespace LingyueEchoes
                 hudPortrait.SetPixels(pixels);hudPortrait.Apply(false,true);
             }finally{RenderTexture.active=previous;RenderTexture.ReleaseTemporary(copy);if(readable)Destroy(readable);}}
         void RoundedFill(Rect rect,Color color,float radius){color.a*=guiOpacity;GUI.DrawTexture(rect,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,color,Vector4.zero,radius);}
+        void UpdateStatusTrails(float dt){
+            var p=sim.player;var b=sim.boss;
+            healthTrail.Update(Mathf.Clamp01((float)(p.hp/p.maxHp)),dt);
+            staminaTrail.Update(Mathf.Clamp01((float)(p.stamina/Rules.staminaMax)),dt);
+            float echo=Mathf.Clamp01((float)(p.echo/Rules.echoMax));
+            if(p.energy>lastEchoPoints)echoTrail.Reset(echo);else echoTrail.Update(echo,dt);
+            lastEchoPoints=p.energy;
+            echoPointsTrail.Update(Mathf.Clamp01(p.energy/3f),dt);
+            if(stage=="GUARDIAN_FIGHT"){
+                bossHealthTrail.Update(Mathf.Clamp01((float)(b.hp/b.maxHp)),dt);
+                postureTrail.Update(Mathf.Clamp01((float)(b.posture/100)),dt);
+            }
+        }
         void PlayerHud(){if(Event.current.type!=EventType.Repaint)return;var p=sim.player;
-            HudBar(new Rect(136,61,302,20),(float)(p.hp/p.maxHp),new Color(.12f,.78f,.32f));
-            HudBar(new Rect(136,87,266,15),(float)(p.stamina/Rules.staminaMax),new Color(1,.81f,.12f));
+            HudBar(new Rect(136,61,302,20),(float)(p.hp/p.maxHp),healthTrail.Width,new Color(.12f,.78f,.32f));
+            HudBar(new Rect(136,87,266,15),(float)(p.stamina/Rules.staminaMax),staminaTrail.Width,new Color(1,.81f,.12f));
             RoundedFill(new Rect(38,35,106,106),new Color(.025f,.035f,.05f,.98f),53);
             RoundedFill(new Rect(42,39,98,98),new Color(.14f,.18f,.23f),49);
             if(hudPortrait)GUI.DrawTexture(new Rect(43,40,96,96),hudPortrait);
-            int echo=Mathf.RoundToInt(Mathf.Clamp01((float)(p.echo/Rules.echoMax))*100);
-            if(hudRing&&echo!=hudEcho){hudEcho=echo;for(int i=0;i<hudRingPixels.Length;i++){
-                    Color color=hudRingPosition[i]<=echo/100f&&echo>0?EchoOrange:new Color(.72f,.28f,.06f,.8f);
+            int echo=Mathf.RoundToInt(Mathf.Clamp01((float)(p.echo/Rules.echoMax))*100),trail=Mathf.RoundToInt(echoTrail.Width*100);
+            if(hudRing&&(echo!=hudEcho||trail!=hudEchoTrail)){hudEcho=echo;hudEchoTrail=trail;for(int i=0;i<hudRingPixels.Length;i++){
+                    float arc=hudRingPosition[i]*100;
+                    Color color=arc<=echo&&echo>0?EchoOrange:arc<=trail&&trail>echo?Color.white:new Color(.72f,.28f,.06f,.8f);
                     color.a*=hudRingCoverage[i];hudRingPixels[i]=color;}
                 hudRing.SetPixels(hudRingPixels);hudRing.Apply(false,false);}
             if(hudRing)GUI.DrawTexture(new Rect(27,24,128,128),hudRing);
             for(int i=0;i<3;i++){float angle=(75-i*25)*Mathf.Deg2Rad;float x=91+60*Mathf.Cos(angle),y=88+60*Mathf.Sin(angle);
                 RoundedFill(new Rect(x-8,y-8,16,16),new Color(.025f,.035f,.05f,.98f),8);
                 RoundedFill(new Rect(x-6,y-6,12,12),EchoOrange,6);
-                if(i>=p.energy)RoundedFill(new Rect(x-4,y-4,8,8),new Color(.12f,.09f,.08f),4);}
+                if(i>=p.energy){
+                    RoundedFill(new Rect(x-4,y-4,8,8),new Color(.12f,.09f,.08f),4);
+                    float spent=Mathf.Clamp01(echoPointsTrail.Width*3-i);
+                    if(spent>0)RoundedFill(new Rect(x-6,y-6,12,12),new Color(1,1,1,spent),6);
+                }}
         }
-        void HudBar(Rect rect,float ratio,Color color){RoundedFill(rect,new Color(.025f,.035f,.05f,.96f),rect.height/2);
+        void HudBar(Rect rect,float ratio,float trail,Color color){RoundedFill(rect,new Color(.025f,.035f,.05f,.96f),rect.height/2);
             Rect inner=new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6);RoundedFill(inner,new Color(color.r*.18f,color.g*.18f,color.b*.18f),inner.height/2);
+            if(trail>ratio){float oldWidth=inner.width*Mathf.Clamp01(trail);RoundedFill(new Rect(inner.x,inner.y,oldWidth,inner.height),Color.white,Math.Min(inner.height,oldWidth)/2);}
             float width=inner.width*Mathf.Clamp01(ratio);if(width>0)RoundedFill(new Rect(inner.x,inner.y,width,inner.height),color,Math.Min(inner.height,width)/2);}
-        void Bar(Rect rect,float ratio,Color color){Fill(rect,Ink);Fill(new Rect(rect.x+2,rect.y+2,(rect.width-4)*Mathf.Clamp01(ratio),rect.height-4),color);}
+        void Bar(Rect rect,float ratio,float trail,Color color){Fill(rect,Ink);
+            if(trail>ratio)Fill(new Rect(rect.x+2,rect.y+2,(rect.width-4)*trail,rect.height-4),Color.white);
+            Fill(new Rect(rect.x+2,rect.y+2,(rect.width-4)*Mathf.Clamp01(ratio),rect.height-4),color);}
         void DrawBox(Box box,Color color){Vector3 a=view.WorldToViewportPoint(new Vector3((float)box.x/100,((float)box.y-95)/100,0)),b=view.WorldToViewportPoint(new Vector3((float)(box.x+box.w)/100,((float)(box.y+box.h)-95)/100,0));Rect r=new Rect(a.x*1280,(1-b.y)*720,(b.x-a.x)*1280,(b.y-a.y)*720);Fill(new Rect(r.x,r.y,r.width,1),color);Fill(new Rect(r.x,r.yMax,r.width,1),color);Fill(new Rect(r.x,r.y,1,r.height),color);Fill(new Rect(r.xMax,r.y,1,r.height),color);}
     }
 }

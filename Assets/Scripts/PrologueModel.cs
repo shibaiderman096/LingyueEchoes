@@ -17,6 +17,20 @@ namespace LingyueEchoes
         // The first slot keeps the original keys, including saves made before the picker existed.
         public static string SaveKey(string key,int slot)=>slot==1?key:key+".slot"+slot;
     }
+    public struct StatusTrail
+    {
+        const float Hold=.22f, DrainPerSecond=1.1f;
+        float value,hold;
+        public float Width {get;private set;}
+        public void Reset(float ratio){value=Width=ratio;hold=0;}
+        public void Update(float ratio,float dt){
+            if(ratio<value&&Width<=value)hold=Hold;
+            value=ratio;
+            if(Width<=ratio){Width=ratio;hold=0;return;}
+            float held=Math.Min(hold,dt);hold-=held;
+            Width=Math.Max(ratio,Width-DrainPerSecond*(dt-held));
+        }
+    }
     [Serializable] public class DialogueLine {public string speaker,text,cue;}
     [Serializable] public class DialogueScript {public string id;public DialogueLine[] lines;}
     [Serializable] public class Zone {public string id,name;public double min,max;}

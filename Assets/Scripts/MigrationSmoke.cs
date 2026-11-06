@@ -131,12 +131,14 @@ namespace LingyueEchoes
                     case 9:case 13:
                         if(game.stage=="GUARDIAN_FIGHT"){
                             c.ai=false;
+                            p.hp=Math.Min(p.hp,p.maxHp*.4);
                             double distance=b.x-p.x;game.scriptedAxis=Math.Abs(distance)>125?Math.Sign(distance):0;
                             if(Math.Abs(distance)<=125&&(p.state=="idle"||p.state=="run")){game.Act("charge");game.Act("stun");game.Act("attack");}
                             return;
                         }
                         game.scriptedAxis=0;
                         Require(c.BossDefeated&&!c.enemyActive&&b.hp>0&&b.state!="dead"&&game.transform.Find("World/Guardian").gameObject.activeInHierarchy,"The defeated guardian survives and remains visible.");
+                        Require(p.hp==p.maxHp,"Both first victory and rematch restore the player's health.");
                         if(game.stage=="GUARDIAN_DEFEAT"){
                             if(guardianDefeatStartFrame<0)guardianDefeatStartFrame=c.frame;
                             game.Interact();
