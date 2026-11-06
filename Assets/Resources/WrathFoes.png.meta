@@ -1,0 +1,5045 @@
+fileFormatVersion: 2
+guid: 13e0f1c1a256e024fad9a0dbfebe599f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2155633960767952304
+    second: WrathFoes_0
+  - first:
+      213: -2138543962474736288
+    second: WrathFoes_1
+  - first:
+      213: -784113903810154596
+    second: WrathFoes_2
+  - first:
+      213: -5382259285415404956
+    second: WrathFoes_3
+  - first:
+      213: -794370146600162628
+    second: WrathFoes_4
+  - first:
+      213: -2287716268528027272
+    second: WrathFoes_5
+  - first:
+      213: -8558112722899394460
+    second: WrathFoes_6
+  - first:
+      213: 1289554734055938071
+    second: WrathFoes_7
+  - first:
+      213: 6977114944534778070
+    second: WrathFoes_8
+  - first:
+      213: -7818179484927229222
+    second: WrathFoes_9
+  - first:
+      213: 1381522632162032110
+    second: WrathFoes_10
+  - first:
+      213: 2932806763645214063
+    second: WrathFoes_11
+  - first:
+      213: 1737570456807783140
+    second: WrathFoes_12
+  - first:
+      213: -1349230959805217384
+    second: WrathFoes_13
+  - first:
+      213: 3110603086792562997
+    second: WrathFoes_14
+  - first:
+      213: 1816835639924549737
+    second: WrathFoes_15
+  - first:
+      213: 2743898861039286119
+    second: WrathFoes_16
+  - first:
+      213: -1484521463091769056
+    second: WrathFoes_17
+  - first:
+      213: -1113379092749836666
+    second: WrathFoes_18
+  - first:
+      213: -7202104421323736979
+    second: WrathFoes_19
+  - first:
+      213: -431420684701314290
+    second: WrathFoes_20
+  - first:
+      213: 318916449480160141
+    second: WrathFoes_21
+  - first:
+      213: -3172284534952968412
+    second: WrathFoes_22
+  - first:
+      213: 1124856391998540086
+    second: WrathFoes_23
+  - first:
+      213: 8425367374017162184
+    second: WrathFoes_24
+  - first:
+      213: 1424480997939607330
+    second: WrathFoes_25
+  - first:
+      213: 1209001856509068949
+    second: WrathFoes_26
+  - first:
+      213: -8484479085514841167
+    second: WrathFoes_27
+  - first:
+      213: -5135026409013428806
+    second: WrathFoes_28
+  - first:
+      213: -5563063579104520579
+    second: WrathFoes_29
+  - first:
+      213: -8061478379750855902
+    second: WrathFoes_30
+  - first:
+      213: -956212386491192782
+    second: WrathFoes_31
+  - first:
+      213: 1726351654383263086
+    second: WrathFoes_32
+  - first:
+      213: -2695789470212936982
+    second: WrathFoes_33
+  - first:
+      213: -7115149470591781091
+    second: WrathFoes_34
+  - first:
+      213: -7425767174666361908
+    second: WrathFoes_35
+  - first:
+      213: -4125280250782459449
+    second: WrathFoes_36
+  - first:
+      213: 3615812046270661957
+    second: WrathFoes_37
+  - first:
+      213: -3460506671226232800
+    second: WrathFoes_38
+  - first:
+      213: 433004960435064290
+    second: WrathFoes_39
+  - first:
+      213: 6599092978398641047
+    second: WrathFoes_40
+  - first:
+      213: -4931448281088334703
+    second: WrathFoes_41
+  - first:
+      213: -3452638515283687202
+    second: WrathFoes_42
+  - first:
+      213: -7798546899045108612
+    second: WrathFoes_43
+  - first:
+      213: 2520333473109626227
+    second: WrathFoes_44
+  - first:
+      213: 6012484841665937092
+    second: WrathFoes_45
+  - first:
+      213: -1853820133735041768
+    second: WrathFoes_46
+  - first:
+      213: 6512777106158769042
+    second: WrathFoes_47
+  - first:
+      213: 5916385393141676427
+    second: WrathFoes_48
+  - first:
+      213: -216828246018276811
+    second: WrathFoes_49
+  - first:
+      213: -1225749827351254536
+    second: WrathFoes_50
+  - first:
+      213: -3310967251198574532
+    second: WrathFoes_51
+  - first:
+      213: 6902161862200650874
+    second: WrathFoes_52
+  - first:
+      213: 7244739040082790291
+    second: WrathFoes_53
+  - first:
+      213: 4075378200983100052
+    second: WrathFoes_54
+  - first:
+      213: 4720782950158792110
+    second: WrathFoes_55
+  - first:
+      213: -2263742212610846729
+    second: WrathFoes_56
+  - first:
+      213: 9045063822936912657
+    second: WrathFoes_57
+  - first:
+      213: -554512343349081013
+    second: WrathFoes_58
+  - first:
+      213: 6226670335024585186
+    second: WrathFoes_59
+  - first:
+      213: 8696806422894089585
+    second: WrathFoes_60
+  - first:
+      213: 1565757087399967350
+    second: WrathFoes_61
+  - first:
+      213: -7541136130069193689
+    second: WrathFoes_62
+  - first:
+      213: -2298698737964465357
+    second: WrathFoes_63
+  - first:
+      213: -41983966033258759
+    second: WrathFoes_64
+  - first:
+      213: 8013432995874167450
+    second: WrathFoes_65
+  - first:
+      213: -6854302792524549165
+    second: WrathFoes_66
+  - first:
+      213: 3331602725627302210
+    second: WrathFoes_67
+  - first:
+      213: -4707227885589174205
+    second: WrathFoes_68
+  - first:
+      213: 7008435285315681796
+    second: WrathFoes_69
+  - first:
+      213: -4888395236578854001
+    second: WrathFoes_70
+  - first:
+      213: -126275329638298722
+    second: WrathFoes_71
+  - first:
+      213: -7108864695419114966
+    second: WrathFoes_72
+  - first:
+      213: -6205491960939508351
+    second: WrathFoes_73
+  - first:
+      213: -3444742638294496611
+    second: WrathFoes_74
+  - first:
+      213: 8226428472271456315
+    second: WrathFoes_75
+  - first:
+      213: 953155310203495242
+    second: WrathFoes_76
+  - first:
+      213: -6440179354143896367
+    second: WrathFoes_77
+  - first:
+      213: 6728864117303847680
+    second: WrathFoes_78
+  - first:
+      213: -7360114123938560768
+    second: WrathFoes_79
+  - first:
+      213: 3363808240398632339
+    second: WrathFoes_80
+  - first:
+      213: 5414969719922432867
+    second: WrathFoes_81
+  - first:
+      213: 4266640695495668661
+    second: WrathFoes_82
+  - first:
+      213: -3919564252484838574
+    second: WrathFoes_83
+  - first:
+      213: 3490647426011526084
+    second: WrathFoes_84
+  - first:
+      213: -5698251045893611456
+    second: WrathFoes_85
+  - first:
+      213: -2096970749764441714
+    second: WrathFoes_86
+  - first:
+      213: 3280649678871102877
+    second: WrathFoes_87
+  - first:
+      213: 1459771651565925672
+    second: WrathFoes_88
+  - first:
+      213: 7607144160818821190
+    second: WrathFoes_89
+  - first:
+      213: -485516083693256561
+    second: WrathFoes_90
+  - first:
+      213: -1518617505872493599
+    second: WrathFoes_91
+  - first:
+      213: -4425199861273049250
+    second: WrathFoes_92
+  - first:
+      213: 8627727547862883930
+    second: WrathFoes_93
+  - first:
+      213: -414910280038215124
+    second: WrathFoes_94
+  - first:
+      213: 4224363406686746153
+    second: WrathFoes_95
+  - first:
+      213: 1669546637934977157
+    second: WrathFoes_96
+  - first:
+      213: 7892966965590638854
+    second: WrathFoes_97
+  - first:
+      213: -5192329477878503634
+    second: WrathFoes_98
+  - first:
+      213: -8648187300197364830
+    second: WrathFoes_99
+  - first:
+      213: 5760800980071426789
+    second: WrathFoes_100
+  - first:
+      213: 118581095526435117
+    second: WrathFoes_101
+  - first:
+      213: -1291151806310484541
+    second: WrathFoes_102
+  - first:
+      213: -7910589768172510910
+    second: WrathFoes_103
+  - first:
+      213: 8277151986213829018
+    second: WrathFoes_104
+  - first:
+      213: -8029865593660368147
+    second: WrathFoes_105
+  - first:
+      213: -8838525161277254168
+    second: WrathFoes_106
+  - first:
+      213: -7678333180382757465
+    second: WrathFoes_107
+  - first:
+      213: -8534270373167186624
+    second: WrathFoes_108
+  - first:
+      213: -4099852724508437318
+    second: WrathFoes_109
+  - first:
+      213: 6240213295705237143
+    second: WrathFoes_110
+  - first:
+      213: 7994019534194575612
+    second: WrathFoes_111
+  - first:
+      213: 258806633353269278
+    second: WrathFoes_112
+  - first:
+      213: -3479643328833458629
+    second: WrathFoes_113
+  - first:
+      213: -6310431901478025486
+    second: WrathFoes_114
+  - first:
+      213: 9189890764506786480
+    second: WrathFoes_115
+  - first:
+      213: -6696017665735865477
+    second: WrathFoes_116
+  - first:
+      213: 7953545844790443154
+    second: WrathFoes_117
+  - first:
+      213: 6614135577014329292
+    second: WrathFoes_118
+  - first:
+      213: 5652096282061657645
+    second: WrathFoes_119
+  - first:
+      213: -2490871897089700218
+    second: WrathFoes_120
+  - first:
+      213: 5278080503098245321
+    second: WrathFoes_121
+  - first:
+      213: 5072418639255619382
+    second: WrathFoes_122
+  - first:
+      213: 6584134292434288695
+    second: WrathFoes_123
+  - first:
+      213: 7354351689778335876
+    second: WrathFoes_124
+  - first:
+      213: -8544093985773185739
+    second: WrathFoes_125
+  - first:
+      213: -2022959892404436121
+    second: WrathFoes_126
+  - first:
+      213: -6743454410275330120
+    second: WrathFoes_127
+  - first:
+      213: -4221669490187265784
+    second: WrathFoes_128
+  - first:
+      213: 5510254113272109851
+    second: WrathFoes_129
+  - first:
+      213: -1423785049970339319
+    second: WrathFoes_130
+  - first:
+      213: -8773229976535596895
+    second: WrathFoes_131
+  - first:
+      213: -2928162689798310665
+    second: WrathFoes_132
+  - first:
+      213: 5879225905420810980
+    second: WrathFoes_133
+  - first:
+      213: 7756442060624641039
+    second: WrathFoes_134
+  - first:
+      213: -6828794791924219302
+    second: WrathFoes_135
+  - first:
+      213: -7954299225859313478
+    second: WrathFoes_136
+  - first:
+      213: 6286506464086779555
+    second: WrathFoes_137
+  - first:
+      213: 3658648811811612907
+    second: WrathFoes_138
+  - first:
+      213: 1759925105729852718
+    second: WrathFoes_139
+  - first:
+      213: -3116036242992410975
+    second: WrathFoes_140
+  - first:
+      213: 7719972265652952725
+    second: WrathFoes_141
+  - first:
+      213: -8744377064353598659
+    second: WrathFoes_142
+  - first:
+      213: -1336414636715565541
+    second: WrathFoes_143
+  - first:
+      213: -2056590006944131593
+    second: WrathFoes_144
+  - first:
+      213: -6574600510153760120
+    second: WrathFoes_145
+  - first:
+      213: -5369044241219150598
+    second: WrathFoes_146
+  - first:
+      213: -317981762804206295
+    second: WrathFoes_147
+  - first:
+      213: -1196861235961236855
+    second: WrathFoes_148
+  - first:
+      213: -2949855555109563362
+    second: WrathFoes_149
+  - first:
+      213: -5186486393614488269
+    second: WrathFoes_150
+  - first:
+      213: -8588104273646755531
+    second: WrathFoes_151
+  - first:
+      213: 4930186381601469010
+    second: WrathFoes_152
+  - first:
+      213: 9054717566023603918
+    second: WrathFoes_153
+  - first:
+      213: 8022686238386344430
+    second: WrathFoes_154
+  - first:
+      213: 8560443417863435680
+    second: WrathFoes_155
+  - first:
+      213: -7074545316012526030
+    second: WrathFoes_156
+  - first:
+      213: 6557845409734299319
+    second: WrathFoes_157
+  - first:
+      213: -4533336604298791782
+    second: WrathFoes_158
+  - first:
+      213: 5355021849165606341
+    second: WrathFoes_159
+  - first:
+      213: -888874072041475213
+    second: WrathFoes_160
+  - first:
+      213: -6669124577111053244
+    second: WrathFoes_161
+  - first:
+      213: -8981103712471108252
+    second: WrathFoes_162
+  - first:
+      213: 7416851808364686003
+    second: WrathFoes_163
+  - first:
+      213: -921226987270521023
+    second: WrathFoes_164
+  - first:
+      213: 1675851067205025308
+    second: WrathFoes_165
+  - first:
+      213: -467551122684083903
+    second: WrathFoes_166
+  - first:
+      213: -7271851395642953455
+    second: WrathFoes_167
+  - first:
+      213: -4944687445047102476
+    second: WrathFoes_168
+  - first:
+      213: 3102069645520878200
+    second: WrathFoes_169
+  - first:
+      213: -7331638665488478356
+    second: WrathFoes_170
+  - first:
+      213: -8465669396600606253
+    second: WrathFoes_171
+  - first:
+      213: -1059282112244018873
+    second: WrathFoes_172
+  - first:
+      213: -3548160678745778064
+    second: WrathFoes_173
+  - first:
+      213: 8774890625375850286
+    second: WrathFoes_174
+  - first:
+      213: 746203730746136244
+    second: WrathFoes_175
+  - first:
+      213: 4336255601159968001
+    second: WrathFoes_176
+  - first:
+      213: 5016432165923591784
+    second: WrathFoes_177
+  - first:
+      213: 4659924894063149417
+    second: WrathFoes_178
+  - first:
+      213: 6898749633883897237
+    second: WrathFoes_179
+  - first:
+      213: 2172325945417828488
+    second: WrathFoes_180
+  - first:
+      213: 2674363197016976479
+    second: WrathFoes_181
+  - first:
+      213: 7679351176429954151
+    second: WrathFoes_182
+  - first:
+      213: 1669082061735858551
+    second: WrathFoes_183
+  - first:
+      213: -5292274702057502525
+    second: WrathFoes_184
+  - first:
+      213: 8167971300743453192
+    second: WrathFoes_185
+  - first:
+      213: -4768847179832241882
+    second: WrathFoes_186
+  - first:
+      213: 3952131645001468894
+    second: WrathFoes_187
+  - first:
+      213: -8012925931144488892
+    second: WrathFoes_188
+  - first:
+      213: 4460755729788844796
+    second: WrathFoes_189
+  - first:
+      213: 4185348536383454116
+    second: WrathFoes_190
+  - first:
+      213: 2451857567745682422
+    second: WrathFoes_191
+  - first:
+      213: -8676627125219194231
+    second: WrathFoes_192
+  - first:
+      213: 8206580705825390320
+    second: WrathFoes_193
+  - first:
+      213: -414601724662336792
+    second: WrathFoes_194
+  - first:
+      213: -1952433474909177694
+    second: WrathFoes_195
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 9
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: WrathFoes_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 797
+        width: 325
+        height: 439
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05a68ae6556a512e0800000000000000
+      internalID: -2155633960767952304
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_1
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 1223
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 065132cb89d5252e0800000000000000
+      internalID: -2138543962474736288
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_2
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 809
+        width: 175
+        height: 437
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9f63f31f844e15f0800000000000000
+      internalID: -784113903810154596
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_3
+      rect:
+        serializedVersion: 2
+        x: 607
+        y: 1219
+        width: 23
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46a54c342bf5e45b0800000000000000
+      internalID: -5382259285415404956
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_4
+      rect:
+        serializedVersion: 2
+        x: 633
+        y: 1227
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbae8b77f84d9f4f0800000000000000
+      internalID: -794370146600162628
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_5
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 1203
+        width: 23
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8793183bc266040e0800000000000000
+      internalID: -2287716268528027272
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_6
+      rect:
+        serializedVersion: 2
+        x: 673
+        y: 1212
+        width: 27
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 460a4d342d97b3980800000000000000
+      internalID: -8558112722899394460
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_7
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 732
+        width: 498
+        height: 513
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 718d3d1c23b65e110800000000000000
+      internalID: 1289554734055938071
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_8
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 1173
+        width: 84
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d090126311b3d060800000000000000
+      internalID: 6977114944534778070
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_9
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 811
+        width: 285
+        height: 409
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad28aa25e2f308390800000000000000
+      internalID: -7818179484927229222
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_10
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 1213
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee93e2ba3872c2310800000000000000
+      internalID: 1381522632162032110
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_11
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 1213
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6d9fed763c63b820800000000000000
+      internalID: 2932806763645214063
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_12
+      rect:
+        serializedVersion: 2
+        x: 739
+        y: 1207
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eabd3adf171d1810800000000000000
+      internalID: 1737570456807783140
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_13
+      rect:
+        serializedVersion: 2
+        x: 762
+        y: 1205
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 895c9d03791964de0800000000000000
+      internalID: -1349230959805217384
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_14
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 1185
+        width: 20
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5391189d6051b2b20800000000000000
+      internalID: 3110603086792562997
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_15
+      rect:
+        serializedVersion: 2
+        x: 189
+        y: 1191
+        width: 19
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 968e8f47362b63910800000000000000
+      internalID: 1816835639924549737
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_16
+      rect:
+        serializedVersion: 2
+        x: 667
+        y: 1116
+        width: 88
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76778dfe979441620800000000000000
+      internalID: 2743898861039286119
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_17
+      rect:
+        serializedVersion: 2
+        x: 741
+        y: 1191
+        width: 26
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 021d8fa389be56be0800000000000000
+      internalID: -1484521463091769056
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_18
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 1139
+        width: 70
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e9c443d9b7c80f0800000000000000
+      internalID: -1113379092749836666
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_19
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 1189
+        width: 11
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d687abbef2cfc0c90800000000000000
+      internalID: -7202104421323736979
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_20
+      rect:
+        serializedVersion: 2
+        x: 1053
+        y: 1199
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e035f9b4c29430af0800000000000000
+      internalID: -431420684701314290
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_21
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 1161
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d833b4432d40d6400800000000000000
+      internalID: 318916449480160141
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_22
+      rect:
+        serializedVersion: 2
+        x: 316
+        y: 1169
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42fb9afd508c9f3d0800000000000000
+      internalID: -3172284534952968412
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_23
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 1132
+        width: 31
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6398664cdea4c9f00800000000000000
+      internalID: 1124856391998540086
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_24
+      rect:
+        serializedVersion: 2
+        x: 1069
+        y: 1171
+        width: 7
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cb6576bcfaece470800000000000000
+      internalID: 8425367374017162184
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_25
+      rect:
+        serializedVersion: 2
+        x: 1075
+        y: 1162
+        width: 41
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 227fb7f9be5c4c310800000000000000
+      internalID: 1424480997939607330
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_26
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 1150
+        width: 58
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 596c20e68cc37c010800000000000000
+      internalID: 1209001856509068949
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_27
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 1143
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b328a37933114a80800000000000000
+      internalID: -8484479085514841167
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_28
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 1146
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abd318200b8bcb8b0800000000000000
+      internalID: -5135026409013428806
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_29
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 1128
+        width: 19
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d76df8036270cc2b0800000000000000
+      internalID: -5563063579104520579
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_30
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 1155
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22b657a0020ef1090800000000000000
+      internalID: -8061478379750855902
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_31
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 1135
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23a2d5596e9dab2f0800000000000000
+      internalID: -956212386491192782
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_32
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 1124
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6d1cecdeab35f710800000000000000
+      internalID: 1726351654383263086
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_33
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 1120
+        width: 20
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aea28be72c1a69ad0800000000000000
+      internalID: -2695789470212936982
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_34
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 1120
+        width: 23
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1771911149e14d90800000000000000
+      internalID: -7115149470591781091
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_35
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 1124
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc36149191062f890800000000000000
+      internalID: -7425767174666361908
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_36
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 1100
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c95d25f77f00c6c0800000000000000
+      internalID: -4125280250782459449
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_37
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 1098
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5458a8016e1fd2230800000000000000
+      internalID: 3615812046270661957
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_38
+      rect:
+        serializedVersion: 2
+        x: 747
+        y: 1078
+        width: 40
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 020e0be548fc9ffc0800000000000000
+      internalID: -3460506671226232800
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_39
+      rect:
+        serializedVersion: 2
+        x: 707
+        y: 1047
+        width: 52
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2edc6b4a7b7520600800000000000000
+      internalID: 433004960435064290
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_40
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 1090
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79bb931b910b49b50800000000000000
+      internalID: 6599092978398641047
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_41
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 1060
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 194e4819ae9ff8bb0800000000000000
+      internalID: -4931448281088334703
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_42
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 1005
+        width: 92
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed80fae2093c510d0800000000000000
+      internalID: -3452638515283687202
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_43
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 1048
+        width: 7
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c74313ee9eef5c390800000000000000
+      internalID: -7798546899045108612
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_44
+      rect:
+        serializedVersion: 2
+        x: 748
+        y: 1058
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37dc934c0f50af220800000000000000
+      internalID: 2520333473109626227
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_45
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 1018
+        width: 39
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ce3be4ab13a07350800000000000000
+      internalID: 6012484841665937092
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_46
+      rect:
+        serializedVersion: 2
+        x: 758
+        y: 1050
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 815714b0968e546e0800000000000000
+      internalID: -1853820133735041768
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_47
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 1030
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 293d3e99548026a50800000000000000
+      internalID: 6512777106158769042
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_48
+      rect:
+        serializedVersion: 2
+        x: 730
+        y: 1028
+        width: 25
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b89f4803b293b1250800000000000000
+      internalID: 5916385393141676427
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_49
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 985
+        width: 11
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5324fcaebdbadfcf0800000000000000
+      internalID: -216828246018276811
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_50
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 1004
+        width: 39
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f96b3db6034dfee0800000000000000
+      internalID: -1225749827351254536
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_51
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 974
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c308b59c3d41d02d0800000000000000
+      internalID: -3310967251198574532
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_52
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 957
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7ce7baf4a769cf50800000000000000
+      internalID: 6902161862200650874
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_53
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 950
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3970a8ec5cb7a8460800000000000000
+      internalID: 7244739040082790291
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_54
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 923
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49ad7faa1e6ae8830800000000000000
+      internalID: 4075378200983100052
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_55
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 923
+        width: 28
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea57fe5d417938140800000000000000
+      internalID: 4720782950158792110
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_56
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 923
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ff064293729590e0800000000000000
+      internalID: -2263742212610846729
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_57
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 923
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11334e8cf95868d70800000000000000
+      internalID: 9045063822936912657
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_58
+      rect:
+        serializedVersion: 2
+        x: 772
+        y: 888
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4ccb1f26f9fd48f0800000000000000
+      internalID: -554512343349081013
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_59
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 847
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e95a9ceda3996650800000000000000
+      internalID: 6226670335024585186
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_60
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 850
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17510fc2d5341b870800000000000000
+      internalID: 8696806422894089585
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_61
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 858
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67a760776cfaab510800000000000000
+      internalID: 1565757087399967350
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_62
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 858
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72c9c54f4a0885790800000000000000
+      internalID: -7541136130069193689
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_63
+      rect:
+        serializedVersion: 2
+        x: 1119
+        y: 841
+        width: 30
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3334df54da16910e0800000000000000
+      internalID: -2298698737964465357
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_64
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 823
+        width: 21
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f6535a2ec7da6ff0800000000000000
+      internalID: -41983966033258759
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_65
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 816
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9a597e4ade653f60800000000000000
+      internalID: 8013432995874167450
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_66
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 825
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d33b940def90e0a0800000000000000
+      internalID: -6854302792524549165
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_67
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 819
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2411db1070b3c3e20800000000000000
+      internalID: 3331602725627302210
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_68
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 823
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 348e4a29d219caeb0800000000000000
+      internalID: -4707227885589174205
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_69
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 811
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40efd8c72c6f24160800000000000000
+      internalID: 7008435285315681796
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_70
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 825
+        width: 18
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8b7102ae6ee82cb0800000000000000
+      internalID: -4888395236578854001
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_71
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 826
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9b8309b1416f3ef0800000000000000
+      internalID: -126275329638298722
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_72
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 817
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2a6a31593d385d90800000000000000
+      internalID: -7108864695419114966
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_73
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 833
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18d88ab80f9a1e9a0800000000000000
+      internalID: -6205491960939508351
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_74
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 817
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9a80dd42d0d130d0800000000000000
+      internalID: -3444742638294496611
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_75
+      rect:
+        serializedVersion: 2
+        x: 744
+        y: 819
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3846eb2c152a2270800000000000000
+      internalID: 8226428472271456315
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_76
+      rect:
+        serializedVersion: 2
+        x: 834
+        y: 829
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a43e47064b94a3d00800000000000000
+      internalID: 953155310203495242
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_77
+      rect:
+        serializedVersion: 2
+        x: 952
+        y: 827
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dcc27abff2ef96a0800000000000000
+      internalID: -6440179354143896367
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_78
+      rect:
+        serializedVersion: 2
+        x: 985
+        y: 801
+        width: 29
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00ba4cd734ab16d50800000000000000
+      internalID: 6728864117303847680
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_79
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 795
+        width: 54
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0058e48233f9bd990800000000000000
+      internalID: -7360114123938560768
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_80
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 762
+        width: 46
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3950e7db5c5aeae20800000000000000
+      internalID: 3363808240398632339
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_81
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 469
+        width: 317
+        height: 344
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36b19714546d52b40800000000000000
+      internalID: 5414969719922432867
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_82
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 810
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b3be3f5b17263b30800000000000000
+      internalID: 4266640695495668661
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_83
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 791
+        width: 43
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25b52504419ea99c0800000000000000
+      internalID: -3919564252484838574
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_84
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 791
+        width: 13
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c37c87f655417030800000000000000
+      internalID: 3490647426011526084
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_85
+      rect:
+        serializedVersion: 2
+        x: 932
+        y: 813
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04063884ddebbe0b0800000000000000
+      internalID: -5698251045893611456
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_86
+      rect:
+        serializedVersion: 2
+        x: 1111
+        y: 803
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e89e7eb963016e2e0800000000000000
+      internalID: -2096970749764441714
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_87
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 310
+        width: 417
+        height: 493
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d958c955085378d20800000000000000
+      internalID: 3280649678871102877
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_88
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 797
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 825b5c83596224410800000000000000
+      internalID: 1459771651565925672
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_89
+      rect:
+        serializedVersion: 2
+        x: 665
+        y: 672
+        width: 126
+        height: 134
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 648fac45f41029960800000000000000
+      internalID: 7607144160818821190
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_90
+      rect:
+        serializedVersion: 2
+        x: 1059
+        y: 712
+        width: 104
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8089bab1b91349f0800000000000000
+      internalID: -485516083693256561
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_91
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 789
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e3c7c4ac69cceae0800000000000000
+      internalID: -1518617505872493599
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_92
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 763
+        width: 19
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5746b00c288692c0800000000000000
+      internalID: -4425199861273049250
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_93
+      rect:
+        serializedVersion: 2
+        x: 1186
+        y: 781
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5e183d3e78dbb770800000000000000
+      internalID: 8627727547862883930
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_94
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 771
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c221aa07c41fd3af0800000000000000
+      internalID: -414910280038215124
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_95
+      rect:
+        serializedVersion: 2
+        x: 977
+        y: 779
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 926f8b10324ff9a30800000000000000
+      internalID: 4224363406686746153
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_96
+      rect:
+        serializedVersion: 2
+        x: 1188
+        y: 777
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 580ef0252db6b2710800000000000000
+      internalID: 1669546637934977157
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_97
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 750
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6014cefe2a3798d60800000000000000
+      internalID: 7892966965590638854
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_98
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 742
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e27234a99d321f7b0800000000000000
+      internalID: -5192329477878503634
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_99
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 743
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ab01b478777bf780800000000000000
+      internalID: -8648187300197364830
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_100
+      rect:
+        serializedVersion: 2
+        x: 963
+        y: 746
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ea21e628f972ff40800000000000000
+      internalID: 5760800980071426789
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_101
+      rect:
+        serializedVersion: 2
+        x: 969
+        y: 742
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d290eebc0e845a100800000000000000
+      internalID: 118581095526435117
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_102
+      rect:
+        serializedVersion: 2
+        x: 977
+        y: 727
+        width: 27
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c572c1e548e41ee0800000000000000
+      internalID: -1291151806310484541
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_103
+      rect:
+        serializedVersion: 2
+        x: 1003
+        y: 746
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 241ec389480f73290800000000000000
+      internalID: -7910589768172510910
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_104
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 751
+        width: 17
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a99b13290e95ed270800000000000000
+      internalID: 8277151986213829018
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_105
+      rect:
+        serializedVersion: 2
+        x: 1162
+        y: 741
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dea1ebf59cf209090800000000000000
+      internalID: -8029865593660368147
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_106
+      rect:
+        serializedVersion: 2
+        x: 1184
+        y: 746
+        width: 33
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e597bfb130475580800000000000000
+      internalID: -8838525161277254168
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_107
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 343
+        width: 525
+        height: 403
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7adb03c67a4117590800000000000000
+      internalID: -7678333180382757465
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_108
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 742
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04dba36ef4e209980800000000000000
+      internalID: -8534270373167186624
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_109
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 700
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab4d1444ba56a17c0800000000000000
+      internalID: -4099852724508437318
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_110
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 608
+        width: 11
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7962e2d2ee0b99650800000000000000
+      internalID: 6240213295705237143
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_111
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 568
+        width: 23
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf88337896670fe60800000000000000
+      internalID: 7994019534194575612
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_112
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 561
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1059860347779300800000000000000
+      internalID: 258806633353269278
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_113
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 489
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3ee2df04d2d5bfc0800000000000000
+      internalID: -3479643328833458629
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_114
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 487
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f60c15ae97dc68a0800000000000000
+      internalID: -6310431901478025486
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_115
+      rect:
+        serializedVersion: 2
+        x: 1109
+        y: 489
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bae11fc5fc098f70800000000000000
+      internalID: 9189890764506786480
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_116
+      rect:
+        serializedVersion: 2
+        x: 1188
+        y: 489
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7bc218f867f213a0800000000000000
+      internalID: -6696017665735865477
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_117
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 455
+        width: 10
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29cb48f5ecba06e60800000000000000
+      internalID: 7953545844790443154
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_118
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 0
+        width: 377
+        height: 474
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccf563c93412acb50800000000000000
+      internalID: 6614135577014329292
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_119
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 473
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2657985f97407e40800000000000000
+      internalID: 5652096282061657645
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_120
+      rect:
+        serializedVersion: 2
+        x: 1208
+        y: 435
+        width: 27
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e07f0f435ae6dd0800000000000000
+      internalID: -2490871897089700218
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_121
+      rect:
+        serializedVersion: 2
+        x: 918
+        y: 455
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c0061bc0428f3940800000000000000
+      internalID: 5278080503098245321
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_122
+      rect:
+        serializedVersion: 2
+        x: 1163
+        y: 449
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 637c6e8a0e9d46640800000000000000
+      internalID: 5072418639255619382
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_123
+      rect:
+        serializedVersion: 2
+        x: 1246
+        y: 449
+        width: 8
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7308306314b8f5b50800000000000000
+      internalID: 6584134292434288695
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_124
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 434
+        width: 21
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 480188695e7ef0660800000000000000
+      internalID: 7354351689778335876
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_125
+      rect:
+        serializedVersion: 2
+        x: 922
+        y: 444
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 535107ad9c74d6980800000000000000
+      internalID: -8544093985773185739
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_126
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 425
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7630f5a22b00de3e0800000000000000
+      internalID: -2022959892404436121
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_127
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 429
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b76f7431ff6a62a0800000000000000
+      internalID: -6743454410275330120
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_128
+      rect:
+        serializedVersion: 2
+        x: 920
+        y: 419
+        width: 14
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 809984e47fd9965c0800000000000000
+      internalID: -4221669490187265784
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_129
+      rect:
+        serializedVersion: 2
+        x: 1139
+        y: 433
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1b18b3ebea587c40800000000000000
+      internalID: 5510254113272109851
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_130
+      rect:
+        serializedVersion: 2
+        x: 1143
+        y: 435
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90291046a03bd3ce0800000000000000
+      internalID: -1423785049970339319
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_131
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 0
+        width: 369
+        height: 426
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a089c3a1d93f3680800000000000000
+      internalID: -8773229976535596895
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_132
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 416
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f4f4063c831d57d0800000000000000
+      internalID: -2928162689798310665
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_133
+      rect:
+        serializedVersion: 2
+        x: 752
+        y: 395
+        width: 19
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eab1eebfc4379150800000000000000
+      internalID: 5879225905420810980
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_134
+      rect:
+        serializedVersion: 2
+        x: 1131
+        y: 416
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0c3e6075fa64ab60800000000000000
+      internalID: 7756442060624641039
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_135
+      rect:
+        serializedVersion: 2
+        x: 316
+        y: 387
+        width: 13
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a52c157315f3b31a0800000000000000
+      internalID: -6828794791924219302
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_136
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 393
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab0bd7d6ff6ac9190800000000000000
+      internalID: -7954299225859313478
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_137
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 397
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a6e61e52582e3750800000000000000
+      internalID: 6286506464086779555
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_138
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 375
+        width: 38
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be8afe1c5b126c230800000000000000
+      internalID: 3658648811811612907
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_139
+      rect:
+        serializedVersion: 2
+        x: 1170
+        y: 385
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e25d1562f828c6810800000000000000
+      internalID: 1759925105729852718
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_140
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 375
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1aec135eb8d91c4d0800000000000000
+      internalID: -3116036242992410975
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_141
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 369
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59e9c1a9fd9d22b60800000000000000
+      internalID: 7719972265652952725
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_142
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 372
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d337121c36bb5a680800000000000000
+      internalID: -8744377064353598659
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_143
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 369
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1e9fe1f7f9147de0800000000000000
+      internalID: -1336414636715565541
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_144
+      rect:
+        serializedVersion: 2
+        x: 965
+        y: 379
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f51a73f8468573e0800000000000000
+      internalID: -2056590006944131593
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_145
+      rect:
+        serializedVersion: 2
+        x: 1051
+        y: 347
+        width: 31
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 882ee247ba352c4a0800000000000000
+      internalID: -6574600510153760120
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_146
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 355
+        width: 21
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afc96c285b25d75b0800000000000000
+      internalID: -5369044241219150598
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_147
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 355
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 925b00f754d469bf0800000000000000
+      internalID: -317981762804206295
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_148
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 337
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98278111c05e36fe0800000000000000
+      internalID: -1196861235961236855
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_149
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 360
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e145bfa60020017d0800000000000000
+      internalID: -2949855555109563362
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_150
+      rect:
+        serializedVersion: 2
+        x: 754
+        y: 0
+        width: 487
+        height: 366
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33d263caa16e508b0800000000000000
+      internalID: -5186486393614488269
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_151
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 341
+        width: 34
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53165433aace0d880800000000000000
+      internalID: -8588104273646755531
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_152
+      rect:
+        serializedVersion: 2
+        x: 1021
+        y: 357
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 252f2df846a8b6440800000000000000
+      internalID: 4930186381601469010
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_153
+      rect:
+        serializedVersion: 2
+        x: 1027
+        y: 353
+        width: 21
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec6935007a1d8ad70800000000000000
+      internalID: 9054717566023603918
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_154
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 351
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee1de67b0ae465f60800000000000000
+      internalID: 8022686238386344430
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_155
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 359
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a5b491feedccc670800000000000000
+      internalID: 8560443417863435680
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_156
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 352
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2367ba3848a22dd90800000000000000
+      internalID: -7074545316012526030
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_157
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 326
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7be832bb7a5220b50800000000000000
+      internalID: 6557845409734299319
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_158
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 176
+        width: 120
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a94be75806a5611c0800000000000000
+      internalID: -4533336604298791782
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_159
+      rect:
+        serializedVersion: 2
+        x: 358
+        y: 309
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cda8fbeffbd05a40800000000000000
+      internalID: 5355021849165606341
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_160
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 280
+        width: 72
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 373b9edadb51aa3f0800000000000000
+      internalID: -888874072041475213
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_161
+      rect:
+        serializedVersion: 2
+        x: 717
+        y: 259
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44ce77a18828273a0800000000000000
+      internalID: -6669124577111053244
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_162
+      rect:
+        serializedVersion: 2
+        x: 723
+        y: 258
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 465b737e1c5bc5380800000000000000
+      internalID: -8981103712471108252
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_163
+      rect:
+        serializedVersion: 2
+        x: 730
+        y: 260
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ba6a4d6c63fde660800000000000000
+      internalID: 7416851808364686003
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_164
+      rect:
+        serializedVersion: 2
+        x: 744
+        y: 242
+        width: 23
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14fbc3a9fe42733f0800000000000000
+      internalID: -921226987270521023
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_165
+      rect:
+        serializedVersion: 2
+        x: 747
+        y: 232
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1ef635aaa1d14710800000000000000
+      internalID: 1675851067205025308
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_166
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 216
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 141841a2bbce289f0800000000000000
+      internalID: -467551122684083903
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_167
+      rect:
+        serializedVersion: 2
+        x: 723
+        y: 216
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 111f54ffea1351b90800000000000000
+      internalID: -7271851395642953455
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_168
+      rect:
+        serializedVersion: 2
+        x: 772
+        y: 192
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f332a087f0f06bb0800000000000000
+      internalID: -4944687445047102476
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_169
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 118
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87a3bc938e3cc0b20800000000000000
+      internalID: 3102069645520878200
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_170
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 103
+        width: 9
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6f4a0a7a79c04a90800000000000000
+      internalID: -7331638665488478356
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_171
+      rect:
+        serializedVersion: 2
+        x: 762
+        y: 104
+        width: 9
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d1b9bd6986e38a80800000000000000
+      internalID: -8465669396600606253
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_172
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 103
+        width: 9
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74115cef78cac41f0800000000000000
+      internalID: -1059282112244018873
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_173
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 87
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 078595169a662cec0800000000000000
+      internalID: -3548160678745778064
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_174
+      rect:
+        serializedVersion: 2
+        x: 766
+        y: 77
+        width: 25
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2fce6c488ca6c970800000000000000
+      internalID: 8774890625375850286
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_175
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 69
+        width: 11
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b6d13de65c0b5a00800000000000000
+      internalID: 746203730746136244
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_176
+      rect:
+        serializedVersion: 2
+        x: 1003
+        y: 65
+        width: 9
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 105107aae797d2c30800000000000000
+      internalID: 4336255601159968001
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_177
+      rect:
+        serializedVersion: 2
+        x: 1131
+        y: 47
+        width: 54
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86618b90a72fd9540800000000000000
+      internalID: 5016432165923591784
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_178
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 61
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96142a670016ba040800000000000000
+      internalID: 4659924894063149417
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_179
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 49
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59d710aad384dbf50800000000000000
+      internalID: 6898749633883897237
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_180
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 71
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8888ef810f6a52e10800000000000000
+      internalID: 2172325945417828488
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_181
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 69
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5c2396882f3d1520800000000000000
+      internalID: 2674363197016976479
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_182
+      rect:
+        serializedVersion: 2
+        x: 603
+        y: 55
+        width: 19
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 764e5904539829a60800000000000000
+      internalID: 7679351176429954151
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_183
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 49
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7711ebeba45c92710800000000000000
+      internalID: 1669082061735858551
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_184
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 63
+        width: 7
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c8831ab2301e86b0800000000000000
+      internalID: -5292274702057502525
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_185
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 38
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80a166c4f967a5170800000000000000
+      internalID: 8167971300743453192
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_186
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 39
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 621d9f1a1c6a1ddb0800000000000000
+      internalID: -4768847179832241882
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_187
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 37
+        width: 33
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edb84e5bacac8d630800000000000000
+      internalID: 3952131645001468894
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_188
+      rect:
+        serializedVersion: 2
+        x: 613
+        y: 32
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 448dd96e15e5cc090800000000000000
+      internalID: -8012925931144488892
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_189
+      rect:
+        serializedVersion: 2
+        x: 884
+        y: 37
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfa3adfb3b9c7ed30800000000000000
+      internalID: 4460755729788844796
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_190
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 37
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ab3654a158551a30800000000000000
+      internalID: 4185348536383454116
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_191
+      rect:
+        serializedVersion: 2
+        x: 914
+        y: 31
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fba555a77fb60220800000000000000
+      internalID: 2451857567745682422
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_192
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 35
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a8ac0b99d669780800000000000000
+      internalID: -8676627125219194231
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_193
+      rect:
+        serializedVersion: 2
+        x: 1011
+        y: 39
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0fefb4feba1a3e170800000000000000
+      internalID: 8206580705825390320
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_194
+      rect:
+        serializedVersion: 2
+        x: 159
+        y: 23
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e2bc369de90f3af0800000000000000
+      internalID: -414601724662336792
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WrathFoes_195
+      rect:
+        serializedVersion: 2
+        x: 755
+        y: 12
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a8f478591097e4e0800000000000000
+      internalID: -1952433474909177694
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    outline: []
+    customData:
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices:
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName:
+  pSDRemoveMatte: 0
+  userData:
+  assetBundleName:
+  assetBundleVariant:

@@ -9,6 +9,8 @@ public static class WrathSceneSetup
 {
     public const string ScenePath="Assets/Scenes/Chapter01_Wrath.unity";
     const string PalettePath="Assets/Scenes/WrathPlaceholderSprites.asset";
+    const string ArtPath="Assets/Art/Wrath/";
+    static readonly string[] BackgroundNames={"Outskirts","Bridge","Street","Manor"};
     static Sprite block,moon,ridge,ruin,roof,flame;
     static Color C(int r,int g,int b,int a=255)=>new Color32((byte)r,(byte)g,(byte)b,(byte)a);
 
@@ -119,10 +121,65 @@ public static class WrathSceneSetup
         chapter.weaponGlow.enabled=chapter.armorGlow.enabled=false;
         chapter.generalArmor=placeholder.gameObject;
 
+        if(AssetDatabase.LoadAssetAtPath<Sprite>(ArtPath+"Outskirts.png"))InstallArt(chapter);
         EditorSceneManager.SaveScene(scene,ScenePath);
         AssetDatabase.SaveAssets();
         Debug.Log("WRATH_SCENE_CREATED: "+ScenePath);
     }
+    public static void ApplyArt(){
+        var scene=EditorSceneManager.OpenScene(ScenePath);
+        var chapter=scene.GetRootGameObjects().Select(go=>go.GetComponent<WrathChapter>()).First(c=>c);
+        LoadPalette();
+        InstallArt(chapter);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("WRATH_ART_SCENE_SAVED");
+    }
+    static void InstallArt(WrathChapter chapter){
+        var old=chapter.world.Find("Chapter art · backgrounds");
+        if(old)UnityEngine.Object.DestroyImmediate(old.gameObject);
+        var painted=Group(chapter.world,"Chapter art · backgrounds");
+        chapter.scenery=new SpriteRenderer[BackgroundNames.Length];
+        for(int i=0;i<BackgroundNames.Length;i++){
+            string name=BackgroundNames[i];
+            var plate=LoadArt(name);
+            var renderer=Piece(painted,WrathRoute.Areas[i],plate,5.2f,.12f,16.2f,9.1f,-20+i,C(224,214,227));
+            renderer.enabled=i==0;
+            chapter.scenery[i]=renderer;
+        }
+        chapter.backdrop.gameObject.SetActive(false);
+        chapter.world.Find("Middle · gates, bridge arches and burnt streets").gameObject.SetActive(false);
+        var road=LoadArt("Causeway");
+        old=chapter.world.Find("Chapter art · causeway");
+        if(old)UnityEngine.Object.DestroyImmediate(old.gameObject);
+        var walkway=Group(chapter.world,"Chapter art · causeway");
+        const float segment=9.60f,height=2.88f;
+        for(int i=0;i<7;i++){
+            var tile=Piece(walkway,$"Causeway {i+1}",road,-6.8f+(i+.5f)*segment,-.95f-height*.5f,segment+.01f,height,2,Color.white);
+            tile.flipX=i%2==1;
+        }
+        chapter.world.Find("Route · safe walkway and stonework").gameObject.SetActive(false);
+        var bridge=chapter.world.Find("Bridge · simulation footholds");
+        for(int i=0;i<chapter.bridgeStones.Length;i++){
+            var slab=chapter.bridgeStones[i];
+            var expected=WrathRoute.Bridge()[i];
+            slab.sprite=LoadArt("Foothold"+(i+1));
+            slab.transform.localScale=new Vector3((float)expected.w/100*slab.sprite.pixelsPerUnit/slab.sprite.rect.width,
+                (float)expected.h/100*slab.sprite.pixelsPerUnit/slab.sprite.rect.height,1);
+            slab.color=Color.white;
+            bridge.Find("Bridge lip "+(i+1)).gameObject.SetActive(false);
+            bridge.Find("Bridge split "+(i+1)).gameObject.SetActive(false);
+        }
+        foreach(var prop in chapter.world.Find("Props").GetComponentsInChildren<SpriteRenderer>(true))
+            if(prop.name.StartsWith("Heat halo ")||prop.name.StartsWith("Low fire ")||prop.name.StartsWith("Hot core "))prop.gameObject.SetActive(false);
+        old=chapter.world.Find("Delayed fire · contrast mark");
+        if(old)UnityEngine.Object.DestroyImmediate(old.gameObject);
+        var warning=Group(chapter.world,"Delayed fire · contrast mark");
+        chapter.fireShadow=Piece(warning,"Fire warning · dark base",block,0,-.89f,1.36f,.13f,17,C(63,18,31));
+        chapter.fireWarning=Piece(warning,"Fire warning · bright line",block,0,-.88f,1.36f,.045f,18,C(255,203,126));
+        chapter.fireShadow.enabled=chapter.fireWarning.enabled=false;
+    }
+    static Sprite LoadArt(string name)=>AssetDatabase.LoadAssetAtPath<Sprite>(ArtPath+name+".png")??throw new InvalidOperationException("Missing chapter sprite: "+name);
     static Transform Group(Transform parent,string name)
     {
         var t=new GameObject(name).transform;t.SetParent(parent,false);return t;

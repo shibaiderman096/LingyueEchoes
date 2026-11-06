@@ -214,7 +214,7 @@ namespace LingyueEchoes
                 :0;
             if(speech.Cue=="weaponAsh"||wrathWeaponAsh>0)
                 wrathWeaponAsh=Mathf.Min(1,wrathWeaponAsh+dt*1.7f);
-            wrath.Animate(sim,cameraX,general,heat,wrathWeaponAsh);
+            wrath.Animate(sim,view,general,heat,wrathWeaponAsh);
         }
         bool ChapterStageGUI()
         {

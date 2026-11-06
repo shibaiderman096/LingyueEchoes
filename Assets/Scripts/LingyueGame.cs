@@ -333,10 +333,10 @@ namespace LingyueEchoes
         void DrawActors(double? idleDelta){
             var p=sim.player;var b=sim.boss;
             if(wrath){
-                guardian.GeneralArt=wrath.UseGeneralArt(ChapterBoss||ChapterDialogue&&speech.Id!="wrathEnter");
-                guardian.Tint=wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
+                guardian.ChapterArt=wrath.UseActorArt(ChapterBoss||ChapterDialogue&&speech.Id!="wrathEnter",wrathActive);
+                guardian.Tint=guardian.ChapterArt!=null?(sim.phase==2?new Color(1,.82f,.72f):Color.white):
+                    wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
                     wrathActive==1?new Color(.84f,.52f,.35f):wrathActive==3?new Color(.65f,.52f,.61f):
-                    guardian.GeneralArt!=null?(sim.phase==2?new Color(1,.77f,.64f):Color.white):
                     sim.phase==2?new Color(1,.43f,.30f):new Color(.91f,.61f,.54f);
                 guardian.Size=wrathActive==1?.9f:wrathActive==3?1.13f:ChapterBoss?1.22f:1;
             }

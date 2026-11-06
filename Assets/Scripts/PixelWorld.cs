@@ -81,7 +81,7 @@ namespace LingyueEchoes
         readonly GameObject go;readonly SpriteRenderer renderer;readonly bool hero;string previous="";int started,previousFrame=-1,attackId=-1;Fighter actor;
         public Color Tint=Color.white;
         public float Size=1;
-        public WrathGeneralArt GeneralArt;
+        public IWrathPoseSource ChapterArt;
         double idleSeconds;
         public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
         public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1,double? poseSeconds=null,double? idleDelta=null){
@@ -118,9 +118,9 @@ namespace LingyueEchoes
             else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
             int sampleAge=hero&&(clip=="heal"||clip=="dodge"||clip=="parry"||clip=="hurt")?Math.Max(0,a.age-1):a.age;
             double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:sampleAge)/60d+1e-7);
-            if(GeneralArt!=null){
+            if(ChapterArt!=null){
                 var animator=go.GetComponent<Animator>();if(animator)animator.enabled=false;
-                renderer.sprite=GeneralArt.Pose(a,pose,poseCell,poseSeconds);
+                renderer.sprite=ChapterArt.Pose(a,pose,poseCell,poseSeconds);
             }else{
                 var animator=go.GetComponent<Animator>();if(animator&&!animator.enabled)animator.enabled=true;
                 PixelWorld.Sample(go,folder,clip,seconds,cell);
