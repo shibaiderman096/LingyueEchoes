@@ -20,6 +20,7 @@ namespace LingyueEchoes
         public const double playerMaxHp=120, speed=5, jump=13, gravity=.6, dodgeSpeed=9, successSlowRate=.25, finisherReach=195, finisherBase=45,
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
+        public const double plungeMinHeight=72, plungeFallSpeed=18, plungeDrift=3.5;
         public static readonly Move[] Player={
             M("横斩",8,4,18,100,90,18,12,true,chainAt:14), M("踏步突刺",10,6,20,115,70,22,15,true,5,chainAt:18),
             M("回旋斩",12,8,28,140,110,35,26,true,chainAt:29), M("蓄力下斩",27,5,30,115,125,42,30,true)};
@@ -28,6 +29,7 @@ namespace LingyueEchoes
             M("突刺",36,10,32,150,85,24,30,true,10), M("震地",48,8,40,260,35,28,38,false,low:true),
             M("跃击",42,6,36,180,170,26,32,true,7), M("赤月回旋",54,34,45,210,140,22,30,false,pulses:new[]{0,28})};
         public static readonly Move Execute=M("回响处决",6,4,20,130,110,45,40,false);
+        public static readonly Move PlungeImpact=new Move{name="下落斩",active=3,recovery=17,chainAt=11,reach=84,height=82,damage=28,posture=20};
         public static Move Finisher => new Move {name="铃月终结",wind=30,active=5,recovery=40,reach=finisherReach,height=170};
         static Move M(string n,int w,int a,int r,double reach,double height,double damage,double posture,bool parry,double speed=0,bool low=false,int[] pulses=null,int chainAt=0)
             => new Move{name=n,wind=w,active=a,recovery=r,chainAt=chainAt,reach=Math.Floor(reach*1.35+.5),height=Math.Floor(height*1.35+.5),damage=damage,posture=posture,parry=parry,speed=speed,low=low,pulses=pulses};
@@ -98,7 +100,8 @@ namespace LingyueEchoes
         }
         public void Press(string action){
             var m=player.move;
-            if(action=="attack"&&player.state=="attack"&&m!=null&&m.chainAt>0&&player.age>=m.wind-Rules.comboBufferLead&&player.age<m.chainAt){
+            int bufferFrom=player.state=="plungeLand"&&m!=null?m.active:m?.wind-Rules.comboBufferLead??0;
+            if(action=="attack"&&CanLinkCombo(player)&&player.age>=bufferFrom&&player.age<m.chainAt){
                 comboBuffered=true;return;
             }
             queue.Add(new Command{action=action,until=frame+Rules.buffer});if(queue.Count>16)queue.RemoveAt(0);
@@ -127,6 +130,16 @@ namespace LingyueEchoes
         bool Spend(Fighter a,double cost){if(a.stamina<cost)return false;a.stamina-=cost;return true;}
         void GainEcho(Fighter a,double amount){if(amount<=0)return;a.echo+=amount;while(a.echo>=100&&a.energy<3){a.echo-=100;a.energy++;}if(a.energy>=3)a.echo=Math.Min(a.echo,99);}
         static bool Free(string s)=>s=="idle"||s=="run"||s=="air";
+        static bool CanLinkCombo(Fighter p)=>(p.state=="attack"||p.state=="plungeLand")&&p.move!=null&&p.move.chainAt>0;
+        public bool CanPlunge {
+            get {
+                var p=player;
+                if(!Free(p.state)||p.y<Rules.plungeMinHeight||p.vy==0&&p.state!="air")return false;
+                double radius=BodyWidth(p)/2;
+                return !terrain.Any(s=>!s.noFoothold&&p.x+radius>s.x&&p.x-radius<s.x+s.w&&
+                    p.y>=s.y+s.h&&p.y-(s.y+s.h)<Rules.plungeMinHeight);
+            }
+        }
         public void Step()
         {
             tick++;if(hitstop>0){hitstop--;return;}frame++;hits.Clear();if(executeWindow>0)executeWindow--;queue.RemoveAll(q=>q.until<frame);
@@ -138,6 +151,8 @@ namespace LingyueEchoes
             foreach(var a in new[]{p,b}){
                 if(a.invuln>0)a.invuln--;
                 if(a.id==2&&a.move?.name=="跃击"){if(a.age==a.move.wind-24)a.vy=7.2;if(a.age>=a.move.wind-24&&a.age<a.move.wind)a.x+=a.face*5;}
+                bool plunging=a.id==1&&a.state=="plunge";
+                if(plunging){a.vy=-Rules.plungeFallSpeed;a.x+=a.face*Rules.plungeDrift;}
                 double oldY=a.y;bool airborne=a.vy!=0;a.y+=a.vy;a.vy-=Rules.gravity;
                 if(a.id==1&&a.state=="run"&&a.age%20==0)Sound("step");if(a.state=="dodge")a.x+=a.face*Rules.dodgeSpeed;
                 var move=a.move;
@@ -155,7 +170,9 @@ namespace LingyueEchoes
                             a.y=Math.Max(a.y,slab.y+slope);
                         }else if(!slab.noFoothold&&oldY>=top)floor=Math.Max(floor,top);
                     }}
-                if(a.y<=floor){a.y=floor;a.vy=0;if(airborne&&a.id==1)Sound("land");}
+                if(a.y<=floor){a.y=floor;a.vy=0;
+                    if(plunging)StartAttack(a,Rules.PlungeImpact,"plungeLand");
+                    else if(airborne&&a.id==1)Sound("land");}
                 if(stepping&&a.id==2)a.x+=a.face*move.speed;
                 a.x=Math.Max(boundsMin,Math.Min(boundsMax,a.x));
             }
@@ -186,12 +203,14 @@ namespace LingyueEchoes
             if(t<0||t>=m.active)return;
             int pulse=m.pulses==null?0:Array.FindIndex(m.pulses,s=>t>=s&&t<s+4);
             if(pulse<0)return;
-            bool execute=a.id==1&&a.state=="execute";
+            bool execute=a.id==1&&a.state=="execute",plunge=a.id==1&&a.state=="plungeLand";
             bool spin=normal&&a.combo==2;
             // The target was in reach at startup; resolve the lock at its current position on contact.
-            var area=execute?Hurtbox(boss):spin?new Box(a.x-m.reach,a.y,m.reach*2,m.height):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
+            var area=execute?Hurtbox(boss):plunge?new Box(a.x+a.face*20-m.reach,a.y,m.reach*2,m.height):
+                spin?new Box(a.x-m.reach,a.y,m.reach*2,m.height):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
             hits.Add(new Hitbox{x=area.x,y=area.y,w=area.w,h=area.h,owner=a.id,attackId=a.attackId,pulse=pulse,move=m});
             if(t==(m.pulses==null?0:m.pulses[pulse])){
+                if(plunge){Visual("plunge_impact",a.x+a.face*20,a.y+10,a);Sound("plunge");return;}
                 double x=normal?(a.combo==0?63:a.combo==1?88:a.combo==2?0:72):m.reach*.45;
                 double y=normal?(a.combo==0?64:a.combo==1?63:a.combo==2?52:79):m.height*.5;
                 Visual("slash",a.x+a.face*x,a.y+y,a);
@@ -200,17 +219,21 @@ namespace LingyueEchoes
         }
         static Tuple<double,double> WeaponPoint(string n){switch(n){case "横斩":return Tuple.Create(35d,62d);case "双连斩":return Tuple.Create(30d,100d);case "突刺":return Tuple.Create(40d,65d);case "震地":return Tuple.Create(-15d,146d);case "跃击":return Tuple.Create(-10d,145d);case "赤月回旋":return Tuple.Create(-35d,75d);default:return Tuple.Create(35d,75d);}}
         void ControlPlayer(){var p=player;bool free=Free(p.state),recovering=(p.move!=null&&(p.state=="attack"||p.state=="finisher"||p.state=="execute")&&p.age>=p.move.wind+p.move.active)||(p.state=="parry"&&p.age>=Rules.parry);
-            bool canChain=p.state=="attack"&&p.move!=null&&p.move.chainAt>0&&p.age>=p.move.chainAt;
+            bool canChain=CanLinkCombo(p)&&p.age>=p.move.chainAt;
+            recovering|=p.state=="plungeLand"&&canChain;
             bool canAct=free||recovering||p.state=="parry"||p.state=="dodge";
-            if(CanFinish&&canAct&&ConsumeAttack(canChain)){double charge=p.energy+p.echo/100;p.energy=0;p.echo=0;executeWindow=0;p.face=boss.x>=p.x?1:-1;var m=Rules.Finisher;m.damage=Math.Floor(45+75*charge+.5);StartAttack(p,m,"finisher");Log("铃月终结 · 消耗全部回响");}
-            else if(CanExecute&&canAct&&ConsumeAttack(canChain)){executeWindow=0;StartAttack(p,Rules.Execute,"execute");Log("回响处决");}
+            bool canPlunge=CanPlunge;
+            bool normalOnly=canPlunge||p.state=="plungeLand";
+            if(!normalOnly&&CanFinish&&canAct&&ConsumeAttack(canChain)){double charge=p.energy+p.echo/100;p.energy=0;p.echo=0;executeWindow=0;p.face=boss.x>=p.x?1:-1;var m=Rules.Finisher;m.damage=Math.Floor(45+75*charge+.5);StartAttack(p,m,"finisher");Log("铃月终结 · 消耗全部回响");}
+            else if(!normalOnly&&CanExecute&&canAct&&ConsumeAttack(canChain)){executeWindow=0;StartAttack(p,Rules.Execute,"execute");Log("回响处决");}
             else if(free||recovering){if(Consume("dodge")){if(Spend(p,45)){if(axis!=0)p.face=Math.Sign(axis);Enter(p,"dodge");}else Log("气力不足 · 无法闪避");}
                 else if(free){if(Consume("parry")){if(Spend(p,20))Enter(p,"parry");else Log("气力不足 · 无法格挡");}
-                    else if(Consume("attack")){p.combo=0;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[0]);}
+                    else if(Consume("attack")){p.combo=0;if(axis!=0)p.face=Math.Sign(axis);
+                        if(canPlunge)Enter(p,"plunge");else StartAttack(p,Rules.Player[0]);}
                     else if(p.vy==0&&Consume("jump")){if(Spend(p,30)){p.vy=13;Enter(p,"air");Sound("jump");}else Log("气力不足 · 无法跳跃");}
                     else if(p.y==0&&p.vy==0&&Consume("heal")&&HealUnlocked&&p.hp<p.maxHp&&p.energy>=Rules.healCost){
                         if(axis!=0)p.face=Math.Sign(axis);Enter(p,"heal");}}
-                else if(canChain&&ConsumeAttack(true)){p.combo++;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
+                else if(canChain&&ConsumeAttack(true)){p.combo=p.state=="plungeLand"?2:p.combo+1;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
         void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;
             if(p.hp<=0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}b.face=p.x>=b.x?1:-1;
@@ -224,14 +247,16 @@ namespace LingyueEchoes
                         if(perfect){t.stamina=PlayerMaxStamina;Visual("perfectDodge",t.x,t.y+42,t);Sound("perfect_dodge");Success("perfectDodge");executeWindow=30;Log("极限闪避 · 回响充满 · 气力回满");}else Log("闪避成功 · 回复回响");}}return;}
             if(t.id==1&&t.state=="parry"&&t.age<Rules.parry&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<Rules.parryPerfect;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,t);Sound("parry");attacker.posture+=32;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
                 if(perfect){t.stamina=PlayerMaxStamina;executeWindow=30;Success("perfectParry");Log("完美弹刀 · 气力回满");}else Log("弹刀成功");if(attacker.posture>=100){Enter(attacker,"broken");Log("Boss 架势崩解");}Enter(t,t.y>0?"air":"idle");return;}
-            bool finisher=attacker.state=="finisher",small=attacker.state=="execute";double dealt=h.move.damage*(t.state=="broken"&&!finisher?1.5:1);
+            bool finisher=attacker.state=="finisher",small=attacker.state=="execute";
+            bool heavySlash=attacker.id==1&&attacker.state=="attack"&&attacker.combo==3;
+            double dealt=h.move.damage*(t.state=="broken"&&!finisher?1.5:1);
             if(small)attacker.energy-=Rules.executeCost;
             if(!(t.id==1&&(god||nonlethal)))t.hp=Math.Max(nonlethal?1:0,t.hp-dealt);
             if(attacker.id==1&&!finisher)GainEcho(attacker,dealt*.9);Visual("impact",t.x,t.y+Hurtbox(t).h*.55,attacker);Sound(t.id==1?"hit_player":"hit_boss");t.invuln=10;
             if(t.id==2)t.posture=finisher?0:t.posture+h.move.posture;
             if(t.hp==0&&t.id==2&&bossYields){
                 t.hp=1;BossDefeated=true;enemyActive=ai=false;Enter(t,"broken");
-            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small){t.posture=Math.Min(100,t.posture);Enter(t,"stagger");}else if(t.id==2&&t.posture>=100){t.posture=100;Enter(t,"broken");}else if(t.id==2&&finisher)Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
+            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small){t.posture=Math.Min(100,t.posture);Enter(t,"stagger");}else if(t.id==2&&t.posture>=100){t.posture=100;Enter(t,"broken");}else if(t.id==2&&(finisher||heavySlash))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
             hitstop=small||finisher?8:3;Log((t.id==1?"玩家":"Boss")+" 受击 "+h.move.damage);
         }
     }

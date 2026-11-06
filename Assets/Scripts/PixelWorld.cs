@@ -82,7 +82,8 @@ namespace LingyueEchoes
         double idleSeconds;
         public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
         public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1,double? poseSeconds=null,double? idleDelta=null){
-            string clip=hero?(a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
+            bool plunge=hero&&pose==null&&!victory&&(a.state=="plunge"||a.state=="plungeLand");
+            string clip=hero?(plunge?"attack4":a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
             if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";var definition=PixelWorld.Definition(folder,clip);
             if(definition==null){clip="idle";definition=PixelWorld.Definition(folder,clip);}
             if(clip!=previous||frame<previousFrame||actor!=a||(!hero&&attackId!=a.attackId)){
@@ -96,6 +97,11 @@ namespace LingyueEchoes
                     int contact=definition.contactPose;
                     cell=poseCell<=4?poseCell*contact/4:contact+(poseCell-4)*(definition.frames.Length-1-contact)/3;
                 }
+            }
+            else if(plunge){
+                int tick=Math.Max(0,a.age-1),contact=definition.contactPose;
+                cell=a.state=="plunge"?Mathf.Clamp(contact-3+tick/2,0,contact-1):
+                    Mathf.Min(definition.frames.Length-1,contact+tick*(definition.frames.Length-1-contact)/(Rules.PlungeImpact.active+Rules.PlungeImpact.recovery-1));
             }
             else if(a.move!=null&&definition.contactPose>0)cell=DrawnAttackCell(definition,a.move,a.age);
             else if(!hero&&a.move!=null){var m=a.move;int age=Math.Max(0,a.age-1),contact=clip=="double"||clip=="spin"?3:4;
@@ -146,12 +152,14 @@ namespace LingyueEchoes
         public PixelEffects(Transform parent){for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
         public void Clear(){foreach(var e in pool){e.cue=null;e.go.SetActive(false);}cursor=next=0;model=null;}
         public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
-            foreach(var e in pool){var cue=e.cue;if(cue==null)continue;string clip=cue.IsPlayerCombo?"cut_fx"+(cue.combo+1):cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
+            foreach(var e in pool){var cue=e.cue;if(cue==null)continue;bool plunge=cue.kind=="plunge_impact";string clip=plunge?"cut_fx4":cue.IsPlayerCombo?"cut_fx"+(cue.combo+1):cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
                 var d=PixelWorld.Definition("pixel8",clip);if(d==null){e.cue=null;e.go.SetActive(false);continue;}
                 int source=(int)Math.Round(d.duration*60),life=cue.kind=="charge"?Math.Min(12,source):source,age=sim.frame-cue.frame;
                 if(age>=life||!cue.TryGetAnchor(cue.owner==1?sim.player:sim.boss,out double x,out double y)){e.cue=null;e.go.SetActive(false);continue;}
-                e.go.SetActive(age>=0);float size=cue.kind=="charge"?(cue.owner==1?.48f:.22f):cue.IsPlayerCombo?1.5f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:cue.kind=="heal_fx"?1.5f:1.8f;
-                e.go.transform.localPosition=new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100,0);e.go.transform.localScale=new Vector3(cue.face*size,size,1);
+                e.go.SetActive(age>=0);float size=plunge?1.26f:cue.kind=="charge"?(cue.owner==1?.48f:.22f):cue.IsPlayerCombo?1.5f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:cue.kind=="heal_fx"?1.5f:1.8f;
+                // The reused slash has a center pivot; raise it so its lower edge meets the floor.
+                float lift=plunge?.40f:0;
+                e.go.transform.localPosition=new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100+lift,0);e.go.transform.localScale=new Vector3(cue.face*size,plunge?size*.72f:size,1);
                 e.renderer.color=cue.owner==2&&(cue.kind=="charge"||cue.kind=="slash")?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):cue.kind=="charge"?new Color(1,.78f,.49f):Color.white;
                 PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1));}
         }

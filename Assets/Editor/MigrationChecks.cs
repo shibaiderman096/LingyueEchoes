@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckPlayerCombo();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckPlayerCombo();CheckPlungeCombo();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -141,6 +141,49 @@ public static class MigrationChecks
         edge.Step();Assert(slash.TryGetAnchor(edge.boss,out double x,out double y)&&edge.boss.y!=slash.originY&&Math.Abs(y-slash.y-edge.boss.y+slash.originY)<1e-7&&x==slash.x,"The slash follows the moving attack pose");
         edge.boss.face=-1;Assert(!slash.TryGetAnchor(edge.boss,out _,out _),"An old slash is hidden when the actor turns");
         Assert(new VisualCue{kind="slash",owner=1,combo=1,face=-1}.IsPlayerCombo&&!new VisualCue{kind="slash",owner=1,power=true}.IsPlayerCombo,"Normal combo uses authored arcs; executions retain the shared effect");
+    }
+    static void CheckPlungeCombo(){
+        var c=new Combat{ai=false};var p=c.player;var b=c.boss;p.x=0;b.x=68;
+        c.Press("jump");
+        for(int i=0;i<10&&!c.CanPlunge;i++)c.Step();
+        Assert(c.CanPlunge,"A normal jump can reach plunge height");
+        p.energy=1;c.executeWindow=30;
+        c.Press("attack");c.Step();
+        Assert(p.state=="plunge"&&p.vy<0&&p.energy==1&&c.hits.Count==0&&b.hp==b.maxHp,
+            "High attack dives even in an execution window, without hitting in midair");
+        c.axis=-1;
+        for(int i=0;i<15&&p.state=="plunge";i++)c.Step();
+        Assert(p.state=="plungeLand"&&p.face==1&&p.y==0&&b.hp==b.maxHp-Rules.PlungeImpact.damage&&
+            c.visuals.Count(v=>v.kind=="plunge_impact")==1,"A plunge keeps its heading and hits once on landing");
+        while(p.age<4)c.Step();
+        c.axis=0;c.Press("attack");
+        for(int i=0;i<24&&p.state=="plungeLand";i++)c.Step();
+        Assert(p.state=="attack"&&p.combo==2&&p.move==Rules.Player[2]&&b.hp==b.maxHp-Rules.PlungeImpact.damage,
+            "Buffered follow-up starts 3A without a duplicate impact");
+        while(p.age<24)c.Step();
+        c.Press("attack");
+        for(int i=0;i<24&&p.combo==2;i++)c.Step();
+        Assert(p.state=="attack"&&p.combo==3&&p.move==Rules.Player[3],"3A chains into 4A");
+        while(p.age<Rules.Player[3].wind)c.Step();
+        c.DebugBoss(0);b.age=b.move.wind;double hp=p.hp;
+        c.Step();
+        Assert(b.state=="stagger"&&b.move==null&&p.hp==hp,"4A staggers the boss and cancels a same-frame swing");
+
+        var platform=new Combat{ai=false,enemyActive=false};
+        platform.terrain.Add(new Box(-500,0,500,80));
+        platform.player.y=150;platform.player.vy=-1;platform.player.state="air";
+        platform.Press("attack");platform.Step();
+        Assert(platform.player.state=="attack"&&platform.player.combo==0,"Low clearance above a platform keeps the ordinary attack");
+        platform.player.y=162;platform.player.state="air";platform.player.move=null;
+        platform.Press("attack");
+        for(int i=0;i<15&&platform.player.state!="plungeLand";i++)platform.Step();
+        Assert(platform.player.state=="plungeLand"&&platform.player.y==80,"Plunge lands on a real platform");
+        var rubble=new Combat{ai=false,enemyActive=false};
+        rubble.terrain.Add(new Box(-300,0,100,36,noFoothold:true));
+        rubble.player.y=126;rubble.player.vy=-3;rubble.player.state="air";
+        rubble.Press("attack");
+        for(int i=0;i<32&&rubble.player.state!="plungeLand";i++)rubble.Step();
+        Assert(rubble.player.state=="plungeLand"&&rubble.player.y==0,"Loose rubble does not trigger the landing attack above the floor");
     }
     static void CheckPlayerCombo(){
         var c=new Combat{ai=false,enemyActive=false};var p=c.player;p.x=0;
