@@ -5,12 +5,12 @@ namespace LingyueEchoes
     public sealed class InputDeviceTracker
     {
         public string Device {get;private set;}="keyboard";
-        float previousStick,previousDpad;
+        float previousStick,previousDpad,previousVertical;
         public void Select(string device){Device=device;}
-        public void Observe(bool keyboard,bool padButton,bool touch,float stick,float dpad)
+        public void Observe(bool keyboard,bool padButton,bool touch,float stick,float dpad,float vertical=0)
         {
-            bool moved=Moved(stick,previousStick)||Moved(dpad,previousDpad);
-            previousStick=stick;previousDpad=dpad;
+            bool moved=Moved(stick,previousStick)||Moved(dpad,previousDpad)||Moved(vertical,previousVertical);
+            previousStick=stick;previousDpad=dpad;previousVertical=vertical;
             if(padButton||moved)Device="pad";
             if(keyboard)Device="keyboard";
             if(touch)Device="touch";
@@ -44,7 +44,8 @@ namespace LingyueEchoes
         }
         static readonly string[] Actions={"move","jump","attack","parry","dodge","interact","heal","pause","settings","backpack"};
         public static string Summary(string device)=>Format("{move} 移动\n{jump} 跳跃 · {attack} 攻击\n{parry} 格挡 · {dodge} 闪避\n{interact} 交谈 · {settings} 游戏设置",device);
-        public static string MenuHint(string device)=>device=="keyboard"?"↑ / ↓ 选择 · ENTER 确认 · ESC 返回":device=="pad"?"左摇杆 ↑ / ↓ 选择 · A 确认 · B 返回":"轻触按钮选择";
+        public static string MenuHint(string device,bool canBack=true)=>device=="keyboard"?"↑ / ↓ 选择 · ENTER 确认"+(canBack?" · ESC 返回":""):device=="pad"?"左摇杆 ↑ / ↓ 选择 · A 确认"+(canBack?" · B 返回":""):"轻触按钮选择";
+        public static string SavePickerHint(string device,bool canDelete)=>device=="touch"?"轻触选中存档，再点一次进入":MenuHint(device)+(canDelete?(device=="pad"?" · X 删除":" · DEL 删除"):"");
         public static string StoryHint(string device)=>device=="keyboard"?"空格 / ENTER 继续":device=="pad"?"A 继续":"轻触屏幕继续";
         public static string DeathMenuHint(string device)=>device=="keyboard"?"↑ / ↓ 选择 · ENTER 确认":device=="pad"?"左摇杆 ↑ / ↓ 选择 · A 确认 · B 返回主界面":"轻触选项继续";
     }

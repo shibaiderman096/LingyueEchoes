@@ -33,11 +33,15 @@ namespace LingyueEchoes
             (new Rect(105,553,340,58),"声音与界面")
         };
         const string SavePicker="saves";
+        const KeyCode PadConfirm=KeyCode.JoystickButton0,PadBack=KeyCode.JoystickButton1,PadSaveDelete=KeyCode.JoystickButton2;
         static readonly Rect SaveBackButton=new Rect(520,476,240,49);
         static Rect SaveRow(int index)=>new Rect(375,192+index*88,530,72);
+        static readonly Rect[] MenuPanelButtons={new Rect(350,250,580,60),new Rect(350,335,580,60),new Rect(350,420,580,60),new Rect(530,565,220,55)};
+        static readonly Rect[] DeleteSaveButtons={new Rect(385,388,240,52),new Rect(655,388,240,52)};
+        static readonly Rect[] DeathButtons={new Rect(430,355,420,58),new Rect(430,435,420,58)};
+        static Rect GameSettingButton(int index)=>new Rect(938,166+index*55,282,45);
         static readonly string[] SaveDataKeys={PrologueLayout.CheckpointKey,PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.FirstVictoryStoryKey};
-        int menuChoice,menuDirection,saveChoice,deleteSaveSlot,deleteSaveDirection;
-        bool deleteSaveSelected;
+        int menuChoice,menuDirection,menuPanelChoice,saveChoice,deleteSaveSlot,deleteSaveDirection,deleteSaveChoice;
         Vector2 menuPointer;
         readonly InputDeviceTracker inputDevice=new InputDeviceTracker();string device=>inputDevice.Device;
         static readonly KeyCode[] keyboardKeys=Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(k=>k>=KeyCode.Backspace&&k<KeyCode.Mouse0).Distinct().ToArray();
@@ -48,6 +52,7 @@ namespace LingyueEchoes
         bool checkpointReached;
         public int SaveSlot {get;private set;}=1;
         internal bool SavePickerOpen=>stage=="MENU"&&modal==SavePicker;
+        bool CanDeleteSelectedSave=>SavePickerOpen&&deleteSaveSlot==0&&saveChoice>=0&&saveChoice<PrologueLayout.SaveSlots&&HasSaveData(saveChoice+1);
         static int SaveValue(string key,int slot)=>PlayerPrefs.GetInt(PrologueLayout.SaveKey(key,slot),0);
         static bool HasMoonGateSave(int slot)=>SaveValue(PrologueLayout.CheckpointKey,slot)==1;
         static bool StorySeen(int slot)=>SaveValue(PrologueLayout.FirstVictoryStoryKey,slot)==1;
@@ -58,7 +63,7 @@ namespace LingyueEchoes
         bool FirstVictoryStorySeen=>StorySeen(SaveSlot);
         internal static string SaveStatus(int slot)=>StorySeen(slot)?"序章已完成 · 从月门灯继续":HasMoonGateSave(slot)?"月门灯 · 继续游戏":HasSaveData(slot)?"旧存档 · 从序幕开始":"空档 · 从序幕开始";
         void WriteSave(string key,int value)=>PlayerPrefs.SetInt(PrologueLayout.SaveKey(key,SaveSlot),value);
-        string storyPhase="in";bool tutorialDialogue,phase2Spoken,deathAxisHeld;
+        string storyPhase="in";bool tutorialDialogue,phase2Spoken;int deathDirection;
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
         Texture2D keyart,hudPortrait,hudRing,firstTail,backpackArt;Font font;GUIStyle textStyle,buttonStyle;
@@ -127,9 +132,9 @@ namespace LingyueEchoes
                 pendingSaveSlot=SaveSlot;SceneManager.LoadScene("Prologue");
             }else BeginTrial();
         }
-        void RequestSaveDeletion(int slot){
-            if(!SavePickerOpen||deleteSaveSlot!=0||slot<1||slot>PrologueLayout.SaveSlots||!HasSaveData(slot))return;
-            saveChoice=slot-1;deleteSaveSlot=slot;deleteSaveSelected=false;
+        void RequestSaveDeletion(){
+            if(!CanDeleteSelectedSave)return;
+            deleteSaveSlot=saveChoice+1;deleteSaveChoice=0;
             deleteSaveDirection=SaveHorizontalDirection();UiSound("ui_confirm");
         }
         void ResolveSaveDeletion(bool remove){
@@ -231,7 +236,7 @@ namespace LingyueEchoes
         void EnterDeath(){
             // Only player commands stop. The fixed clock, pending enemy moves, gravity, effects and audio continue.
             mobileControls.Reset();sim.ClearCommands();clock.paused=false;clock.ClearAccumulation();
-            speech.Reset();tutorialDialogue=false;deathChoice=0;deathAxisHeld=false;deathFrame=sim.frame-Math.Max(0,sim.player.age-1);deathZoomTime=0;
+            speech.Reset();tutorialDialogue=false;deathChoice=deathDirection=0;deathFrame=sim.frame-Math.Max(0,sim.player.age-1);deathZoomTime=0;
             deathAnimationDuration=PixelWorld.Definition("pixel8","dead")?.duration??1.07f;
             deathCameraPosition=view.transform.position;deathCameraSize=view.orthographicSize;SetStage("DYING");}
         void UpdateDeath(float dt){sim.axis=0;clock.Advance(dt);SyncSounds();
@@ -346,14 +351,17 @@ namespace LingyueEchoes
             for(int i=0;i<20;i++)padButton|=Input.GetKeyDown(KeyCode.JoystickButton0+i);
             bool touch=Input.touchCount>0;
             bool mouse=!touch&&!hadTouch&&(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1)||Input.GetMouseButtonDown(2));
-            inputDevice.Observe(keyboard||mouse&&!previewTouchControls,padButton,touch||mouse&&previewTouchControls,Input.GetAxisRaw("PadX"),Input.GetAxisRaw("PadDpad"));
+            inputDevice.Observe(keyboard||mouse&&!previewTouchControls,padButton,touch||mouse&&previewTouchControls,Input.GetAxisRaw("PadX"),Input.GetAxisRaw("PadDpad"),Input.GetAxisRaw("PadY"));
             hadTouch=touch;
             if(Time.unscaledTime>=nextPadCheck){nextPadCheck=Time.unscaledTime+1;
                 if(device=="pad"&&!Input.GetJoystickNames().Any(n=>!string.IsNullOrWhiteSpace(n)))inputDevice.Select(Application.isMobilePlatform||previewTouchControls?"touch":"keyboard");}
             lastInputDevice=device;
         }
-        void ReadInput(){DetectInputDevice();bool padA=Input.GetKeyDown(KeyCode.JoystickButton0),padB=Input.GetKeyDown(KeyCode.JoystickButton1);bool confirm=Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.Space)||padA;
-            if(stage=="DYING"||stage=="GUARDIAN_DEFEAT")return;if(stage=="DEATH"){ReadDeathInput(confirm,padB);return;}
+        void ReadInput(){DetectInputDevice();bool padA=Input.GetKeyDown(PadConfirm),padB=Input.GetKeyDown(PadBack);bool confirm=Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.Space)||padA;
+            Vector2 pointer=Input.mousePosition;
+            Vector2? hover=pointer!=menuPointer&&!TouchControlsVisible?UiPoint(pointer):null;
+            menuPointer=pointer;
+            if(stage=="DYING"||stage=="GUARDIAN_DEFEAT")return;if(stage=="DEATH"){ReadDeathInput(confirm,padB,hover);return;}
             if(TailStory){
                 if(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5))speech.Confirm();
                 return;
@@ -362,13 +370,13 @@ namespace LingyueEchoes
             bool backpackKey=Input.GetKeyDown(KeyCode.B)||menu;
             if(backpackOpen){
                 if(backpackKey||padB||escape||viewKey)SetBackpack(false);
-                else ReadBackpackNavigation();
+                else ReadBackpackNavigation(hover);
                 return;
             }
-            if(gameSettings){ReadGameSettings(confirm,padB||escape||menu||viewKey);return;}
+            if(gameSettings){ReadGameSettings(confirm,padB||escape||menu||viewKey,hover);return;}
             if(BackpackAvailable&&backpackKey){SetBackpack(true);return;}
             if((BattleOn||stage=="GATE_DIALOGUE")&&(escape||viewKey||menu&&!BackpackUnlocked)){SetGameSettings(true);return;}
-            if(stage=="MENU"){ReadMenuInput(confirm,padB||escape);return;}
+            if(stage=="MENU"){ReadMenuInput(confirm,padB||escape,hover);return;}
             if(escape){Home();return;}
             if(stage=="STORY"){if(padB){Home();return;}if(confirm)AdvanceStory();return;}
             if(!BattleOn&&stage!="GATE_DIALOGUE")return;
@@ -385,43 +393,53 @@ namespace LingyueEchoes
             if(debug)for(int i=0;i<6;i++)if(Input.GetKeyDown(KeyCode.Alpha1+i))sim.DebugBoss(i);
             ReadTouchInput();
         }
-        void ReadMenuInput(bool confirm,bool back){
+        static bool MoveMenuFocus(ref int previous,out int direction){
             float vertical=Input.GetAxisRaw("Vertical");
-            int direction=vertical>.5f?-1:vertical<-.5f?1:0;
-            bool moveSelection=direction!=0&&direction!=menuDirection;
-            menuDirection=direction;
-            Vector2 pointer=Input.mousePosition;
-            bool moved=pointer!=menuPointer;
-            menuPointer=pointer;
+            direction=vertical>.5f?-1:vertical<-.5f?1:0;
+            bool moved=direction!=0&&direction!=previous;previous=direction;return moved;
+        }
+        static int HoveredOption(Rect[] options,Vector2 point,int fallback){
+            for(int i=0;i<options.Length;i++)if(options[i].Contains(point))return i;
+            return fallback;
+        }
+        void ReadMenuInput(bool confirm,bool back,Vector2? hover){
+            bool moveSelection=MoveMenuFocus(ref menuDirection,out int direction);
             if(modal!=""){
                 if(deleteSaveSlot!=0){
                     if(back){ResolveSaveDeletion(false);return;}
                     int horizontal=SaveHorizontalDirection();
-                    if(horizontal!=0&&horizontal!=deleteSaveDirection)deleteSaveSelected=horizontal>0;
-                    else if(moveSelection)deleteSaveSelected=!deleteSaveSelected;
+                    if(horizontal!=0&&horizontal!=deleteSaveDirection)deleteSaveChoice=horizontal>0?1:0;
+                    else if(moveSelection)deleteSaveChoice=1-deleteSaveChoice;
+                    else if(hover.HasValue)deleteSaveChoice=HoveredOption(DeleteSaveButtons,hover.Value,deleteSaveChoice);
                     deleteSaveDirection=horizontal;
-                    if(confirm)ResolveSaveDeletion(deleteSaveSelected);
+                    if(confirm)ResolveSaveDeletion(deleteSaveChoice==1);
                     return;
                 }
                 if(back){CloseMenuModal();return;}
-                if(!SavePickerOpen)return;
+                if(!SavePickerOpen){
+                    if(modal=="settings"){
+                        if(moveSelection)menuPanelChoice=(menuPanelChoice+direction+MenuPanelButtons.Length)%MenuPanelButtons.Length;
+                        else if(hover.HasValue)menuPanelChoice=HoveredOption(MenuPanelButtons,hover.Value,menuPanelChoice);
+                    }
+                    if(confirm)ActivateMenuPanelOption(menuPanelChoice);
+                    return;
+                }
                 int count=PrologueLayout.SaveSlots+1;
                 if(moveSelection)saveChoice=(saveChoice+direction+count)%count;
-                else if(moved&&!TouchControlsVisible){
-                    Vector2 point=UiPoint(pointer);
+                else if(hover.HasValue){
+                    Vector2 point=hover.Value;
                     if(SaveBackButton.Contains(point))saveChoice=PrologueLayout.SaveSlots;
                     else for(int i=0;i<PrologueLayout.SaveSlots;i++)if(SaveRow(i).Contains(point)){saveChoice=i;break;}
                 }
-                bool delete=Input.GetKeyDown(KeyCode.Delete)||Input.GetKeyDown(KeyCode.JoystickButton2);
-                if(delete&&saveChoice<PrologueLayout.SaveSlots)RequestSaveDeletion(saveChoice+1);
+                bool delete=Input.GetKeyDown(KeyCode.Delete)||Input.GetKeyDown(PadSaveDelete);
+                if(delete)RequestSaveDeletion();
                 else if(confirm)ActivateSaveChoice(saveChoice);
                 return;
             }
             if(back)return;
             if(moveSelection)menuChoice=(menuChoice+direction+MenuOptions.Length)%MenuOptions.Length;
-            else if(moved&&!TouchControlsVisible){
-                Vector2 point=UiPoint(pointer);
-                for(int i=0;i<MenuOptions.Length;i++)if(MenuOptions[i].bounds.Contains(point)){menuChoice=i;break;}
+            else if(hover.HasValue){
+                for(int i=0;i<MenuOptions.Length;i++)if(MenuOptions[i].bounds.Contains(hover.Value)){menuChoice=i;break;}
             }
             if(confirm)ActivateMenuOption(menuChoice);
         }
@@ -431,8 +449,17 @@ namespace LingyueEchoes
             menuChoice=option;
             switch(option){
                 case 0:StartTrial();break;
-                case 1:UiSound("ui_confirm");modal="controls";break;
-                case 2:UiSound("ui_confirm");modal="settings";break;
+                case 1:UiSound("ui_confirm");modal="controls";menuPanelChoice=MenuPanelButtons.Length-1;break;
+                case 2:UiSound("ui_confirm");modal="settings";menuPanelChoice=0;break;
+            }
+        }
+        void ActivateMenuPanelOption(int option){
+            menuPanelChoice=option;
+            if(option==MenuPanelButtons.Length-1){CloseMenuModal();return;}
+            switch(option){
+                case 0:motion=!motion;PlayerPrefs.SetString("lingyue.menuMotion",motion?"on":"off");PlayerPrefs.Save();break;
+                case 1:ToggleSound();break;
+                case 2:PreviewTouchControls=!previewTouchControls;PlayerPrefs.SetInt("lingyue.touchControls",previewTouchControls?1:0);PlayerPrefs.Save();break;
             }
         }
         void SetGameSettings(bool open){
@@ -446,19 +473,18 @@ namespace LingyueEchoes
             if(open){backpackGuideSeen=true;backpackSelection=backpackDirection=0;backpackTime=0;}
             UiSound(open?"ui_confirm":"ui_back");
         }
-        void ReadBackpackNavigation(){
+        void ReadBackpackNavigation(Vector2? hover){
             float horizontal=Input.GetAxisRaw("Horizontal"),vertical=Input.GetAxisRaw("Vertical"),dpad=Input.GetAxisRaw("PadDpad");
             float axis=Math.Abs(horizontal)>.5f?horizontal:Math.Abs(dpad)>.5f?dpad:-vertical;
             int direction=axis>.5f?1:axis<-.5f?-1:0;
             if(direction!=0&&direction!=backpackDirection)backpackSelection=(backpackSelection+direction+TailStarPoints)%TailStarPoints;
+            else if(hover.HasValue)for(int i=0;i<TailStarPoints;i++)if(TailStarNode(i).Contains(hover.Value)){backpackSelection=i;break;}
             backpackDirection=direction;
         }
-        void ReadGameSettings(bool confirm,bool back){
+        void ReadGameSettings(bool confirm,bool back,Vector2? hover){
             if(back){SetGameSettings(false);return;}
-            float vertical=Input.GetAxisRaw("Vertical");
-            int direction=vertical>.5f?-1:vertical<-.5f?1:0;
-            if(direction!=0&&direction!=settingsDirection)settingsChoice=(settingsChoice+direction+4)%4;
-            settingsDirection=direction;
+            if(MoveMenuFocus(ref settingsDirection,out int direction))settingsChoice=(settingsChoice+direction+4)%4;
+            else if(hover.HasValue)for(int i=0;i<4;i++)if(GameSettingButton(i).Contains(hover.Value)){settingsChoice=i;break;}
             if(confirm)ActivateGameSetting(settingsChoice);
         }
         void ActivateGameSetting(int option){
@@ -475,11 +501,9 @@ namespace LingyueEchoes
             if(muted)StopSounds();
             PlayerPrefs.Save();
         }
-        void ReadDeathInput(bool confirm,bool back){if(!DeathMenuReady)return;
-            float vertical=Input.GetAxisRaw("Vertical");bool axis=Math.Abs(vertical)>.5f;
-            if(Input.GetKeyDown(KeyCode.UpArrow)||Input.GetKeyDown(KeyCode.W)||axis&&!deathAxisHeld&&vertical>0)deathChoice=0;
-            if(Input.GetKeyDown(KeyCode.DownArrow)||Input.GetKeyDown(KeyCode.S)||axis&&!deathAxisHeld&&vertical<0)deathChoice=1;
-            deathAxisHeld=axis;
+        void ReadDeathInput(bool confirm,bool back,Vector2? hover){if(!DeathMenuReady)return;
+            if(MoveMenuFocus(ref deathDirection,out int direction))deathChoice=direction>0?1:0;
+            else if(hover.HasValue)deathChoice=HoveredOption(DeathButtons,hover.Value,deathChoice);
             if(back||Input.GetKeyDown(KeyCode.Escape)){Home();return;}
             if(confirm){if(deathChoice==0)Retry();else Home();}
         }
@@ -531,7 +555,26 @@ namespace LingyueEchoes
         void Fill(Rect rect,Color color){color.a*=guiOpacity;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=Color.white;}
         void Text(Rect rect,string value,int size=20,Color? color=null,TextAnchor align=TextAnchor.UpperLeft){Color tint=color??Ivory;tint.a*=guiOpacity;textStyle.fontSize=size;textStyle.normal.textColor=tint;textStyle.alignment=align;GUI.Label(rect,value,textStyle);}
         float TextHeight(string text,float width,int size){measureContent.text=text;textStyle.fontSize=size;return Mathf.Ceil(textStyle.CalcHeight(measureContent,width))+4;}
-        bool Button(Rect rect,string caption,bool primary=false,bool interactive=true){Fill(rect,primary?Ivory:Ink);Fill(new Rect(rect.x,rect.y,rect.width,1),new Color(Gold.r,Gold.g,Gold.b,.55f));Text(rect,caption,21,primary?Ink:Ivory,TextAnchor.MiddleCenter);return interactive&&GUI.Button(rect,GUIContent.none,GUIStyle.none);}
+        bool Button(Rect rect,string caption,bool selected=false,bool interactive=true,string key=null,bool hover=true){
+            bool hovered=hover&&GUI.enabled&&interactive&&device=="keyboard"&&rect.Contains(Event.current.mousePosition);
+            bool highlight=selected||hovered;
+            Fill(rect,highlight?Ivory:Ink);
+            Fill(new Rect(rect.x,rect.y,rect.width,1),highlight?Gold:new Color(Gold.r,Gold.g,Gold.b,.55f));
+            if(highlight)Fill(new Rect(rect.x,rect.y,4,rect.height),Gold);
+            var label=rect;
+            if(!string.IsNullOrEmpty(key)){
+                float width=key.Length>1?40:23;
+                var cap=new Rect(rect.xMax-width-8,rect.center.y-11,width,22);
+                RoundedFill(cap,highlight?Ink:new Color(.20f,.26f,.34f),4);
+                Text(cap,key,14,Ivory,TextAnchor.MiddleCenter);
+                label.xMin+=6;label.xMax=cap.x-4;
+            }
+            Text(label,caption,21,highlight?Ink:Ivory,TextAnchor.MiddleCenter);
+            return interactive&&GUI.Button(rect,GUIContent.none,GUIStyle.none);
+        }
+        string PadKey(string key)=>device=="pad"?key:null;
+        bool MenuButton(Rect rect,string caption,bool selected,bool interactive=true)=>
+            Button(rect,caption,selected,interactive,selected?PadKey("A"):null,false);
         void MenuGUI(){if(keyart)GUI.DrawTexture(new Rect(0,0,1280,720),keyart,ScaleMode.ScaleAndCrop);else Fill(new Rect(0,0,1280,720),Ink);
             for(int i=0;i<12;i++)Fill(new Rect(i*49,0,50,720),new Color(.04f,.08f,.15f,(142-i*10)/255f));
             Text(new Rect(105,97,450,35),"月下执铃 · 循响而行",18,Gold);Text(new Rect(100,140,520,95),"铃月回响",66);Text(new Rect(108,242,470,32),"L I N G Y U E   E C H O E S",16,Gold);
@@ -539,20 +582,24 @@ namespace LingyueEchoes
             GUI.enabled=modal=="";
             for(int i=0;i<MenuOptions.Length;i++){
                 var option=MenuOptions[i];
-                if(Button(option.bounds,option.label,menuChoice==i))ActivateMenuOption(i);
+                if(MenuButton(option.bounds,option.label,menuChoice==i,modal==""))ActivateMenuOption(i);
             }
             GUI.enabled=true;
-            Text(new Rect(105,690,550,24),ControlPrompts.MenuHint(device),14);
+            Text(new Rect(105,690,550,24),ControlPrompts.MenuHint(device,false),14);
             Fill(new Rect(1000,640,265,65),Ink);Text(new Rect(1015,650,245,60),$"{Rules.parry} 帧弹刀 · {Rules.parryPerfect} 帧完美\n固定 60Hz 战斗",16,Gold);
             if(motion)for(int i=0;i<14;i++){float t=Time.unscaledTime;Fill(new Rect(60+(i*173)%1160+Mathf.Sin(t*.5f+i*1.7f)*18,((i*97-t*(8+i%4*4))%720+720)%720,8,3),new Color(.95f,.73f,.8f,.5f));}
             if(SavePickerOpen){SavePickerGUI();return;}
             if(modal!=""){Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.87f));Fill(new Rect(240,70,800,580),Ink);Text(new Rect(285,100,700,45),modal=="controls"?"循响入门":"声音与界面",30,Gold);
                 if(modal=="controls")Text(new Rect(285,160,705,400),ControlPrompts.Summary(device)+$"\n\n弹刀前 {Rules.parryPerfect} 帧完美、共 {Rules.parry} 帧；闪避有效 {Rules.dodgeInvulnFrames} 帧，其中前 {Rules.perfectDodgeFrames} 帧完美。\n闪避 / 跳跃 / 格挡消耗 45 / 30 / 20 气力。\n成功闪避 / 格挡回复 34% 回响；完美成功回复 100% 并回满气力。\n小处决在有效范围内锁定目标，命中消耗 1 回响并使守灯人踉跄。大处决消耗全部回响。\n死亡后从菜单选择重试。",20);
-                else{Text(new Rect(285,170,700,55),"声音、动态和序章进度会保存到本机。",21);if(Button(new Rect(350,250,580,60),"樱花动态    "+(motion?"开启":"关闭"))){motion=!motion;PlayerPrefs.SetString("lingyue.menuMotion",motion?"on":"off");}
-                    if(Button(new Rect(350,335,580,60),"声音    "+(muted?"关闭":"开启")))ToggleSound();
-                    if(Button(new Rect(350,420,580,60),"触屏按键预览    "+(previewTouchControls?"开启":"关闭"))){PreviewTouchControls=!previewTouchControls;PlayerPrefs.SetInt("lingyue.touchControls",previewTouchControls?1:0);PlayerPrefs.Save();}
+                else{Text(new Rect(285,170,700,55),"声音、动态和序章进度会保存到本机。",21);
+                    for(int i=0;i<MenuPanelButtons.Length-1;i++){
+                        string label=i==0?"樱花动态    "+(motion?"开启":"关闭"):i==1?"声音    "+(muted?"关闭":"开启"):"触屏按键预览    "+(previewTouchControls?"开启":"关闭");
+                        if(MenuButton(MenuPanelButtons[i],label,menuPanelChoice==i))ActivateMenuPanelOption(i);
+                    }
                     Text(new Rect(285,500,700,50),"手机自动显示触屏按键 · 映射 Xbox 布局\n显示目标 60 FPS · 固定战斗 60Hz",17,Gold);}
-                if(Button(new Rect(530,565,220,55),"返回",true))CloseMenuModal();}
+                int backIndex=MenuPanelButtons.Length-1;
+                if(MenuButton(MenuPanelButtons[backIndex],"返回",menuPanelChoice==backIndex))CloseMenuModal();
+                if(device!="touch")Text(new Rect(355,620,570,26),ControlPrompts.MenuHint(device),14,Gold,TextAnchor.MiddleCenter);}
         }
         void SavePickerGUI(){
             Fill(new Rect(0,0,1280,720),new Color(.025f,.04f,.08f,.78f));
@@ -560,18 +607,27 @@ namespace LingyueEchoes
             RoundedFill(new Rect(333,95,614,499),Ink,10);
             Text(new Rect(375,118,530,50),"选择存档",32,Gold,TextAnchor.MiddleLeft);
             Fill(new Rect(375,175,530,1),new Color(Gold.r,Gold.g,Gold.b,.55f));
+            bool canDelete=CanDeleteSelectedSave;
             for(int i=0;i<PrologueLayout.SaveSlots;i++){
-                var row=SaveRow(i);bool selected=saveChoice==i,hasData=HasSaveData(i+1);
+                var row=SaveRow(i);bool selected=saveChoice==i,showDelete=selected&&canDelete;
                 Fill(row,selected?new Color(.22f,.28f,.37f):new Color(.12f,.18f,.27f));
                 Fill(new Rect(row.x,row.y,selected?6:3,row.height),selected?Gold:new Color(.23f,.30f,.40f));
+                if(selected)Fill(new Rect(row.x,row.y,row.width,1),Gold);
                 Text(new Rect(row.x+21,row.y,145,row.height),$"存档 {i+1:00}",23,Ivory,TextAnchor.MiddleLeft);
-                Text(new Rect(row.x+155,row.y,hasData?249:352,row.height),SaveStatus(i+1),18,Gold,TextAnchor.MiddleRight);
-                var play=hasData?new Rect(row.x,row.y,row.width-110,row.height):row;
-                if(GUI.Button(play,GUIContent.none,GUIStyle.none)){ActivateSaveChoice(i);return;}
-                if(hasData&&Button(new Rect(row.xMax-104,row.y+14,82,44),"删除")){RequestSaveDeletion(i+1);return;}
+                var play=new Rect(row.x,row.y,row.width-(showDelete?104:0),row.height);
+                Text(new Rect(row.x+155,row.y,play.width-173,row.height),SaveStatus(i+1),18,Gold,TextAnchor.MiddleRight);
+                if(GUI.Button(play,GUIContent.none,GUIStyle.none)){
+                    // Touch has no hover: select the row before letting the next tap open it.
+                    if(TouchControlsVisible&&!selected)saveChoice=i;
+                    else ActivateSaveChoice(i);
+                    return;
+                }
+                if(showDelete&&Button(new Rect(play.xMax,row.y,104,row.height),"删除",key:device=="pad"?"X":"×")){
+                    RequestSaveDeletion();return;
+                }
             }
-            if(Button(SaveBackButton,"返回",saveChoice==PrologueLayout.SaveSlots))ActivateSaveChoice(PrologueLayout.SaveSlots);
-            string hint=ControlPrompts.MenuHint(device)+(device=="pad"?" · X 删除":device=="keyboard"?" · DEL 删除":"");
+            if(MenuButton(SaveBackButton,"返回",saveChoice==PrologueLayout.SaveSlots))ActivateSaveChoice(PrologueLayout.SaveSlots);
+            string hint=ControlPrompts.SavePickerHint(device,canDelete);
             Text(new Rect(375,542,530,30),hint,16,Gold,TextAnchor.MiddleCenter);
         }
         void DeleteSaveGUI(){
@@ -579,20 +635,21 @@ namespace LingyueEchoes
             Text(new Rect(375,238,530,50),$"删除存档 {deleteSaveSlot:00}？",30,Gold,TextAnchor.MiddleLeft);
             Fill(new Rect(375,300,530,1),new Color(Gold.r,Gold.g,Gold.b,.55f));
             Text(new Rect(375,315,530,51),"该档的月门灯、狐尾和剧情进度将被清除，无法恢复。",20,Ivory,TextAnchor.MiddleLeft);
-            if(Button(new Rect(385,388,240,52),"取消",!deleteSaveSelected)){ResolveSaveDeletion(false);return;}
-            if(Button(new Rect(655,388,240,52),"确认删除",deleteSaveSelected)){ResolveSaveDeletion(true);return;}
+            if(MenuButton(DeleteSaveButtons[0],"取消",deleteSaveChoice==0)){ResolveSaveDeletion(false);return;}
+            if(MenuButton(DeleteSaveButtons[1],"确认删除",deleteSaveChoice==1)){ResolveSaveDeletion(true);return;}
             string hint=device=="pad"?"左摇杆 ← / → 选择 · A 确认 · B 取消":device=="keyboard"?"← / → 选择 · ENTER 确认 · ESC 取消":"";
             Text(new Rect(375,455,530,28),hint,16,Gold,TextAnchor.MiddleCenter);
         }
         void GameSettingsGUI(){
-            RoundedFill(new Rect(914,96,330,326),Ink,9);
+            RoundedFill(new Rect(914,96,330,342),Ink,9);
             Text(new Rect(934,106,290,37),"游戏设置",22,Gold,TextAnchor.MiddleLeft);
             Fill(new Rect(938,150,282,1),new Color(Gold.r,Gold.g,Gold.b,.6f));
             for(int i=0;i<4;i++){
                 string label=i==0?"按键提示  ·  "+(showKeyHints?"开启":"关闭")
                     :i==1?"声音  ·  "+(muted?"关闭":"开启"):i==2?"继续游戏":"返回主菜单";
-                if(Button(new Rect(938,166+i*55,282,45),label,settingsChoice==i))ActivateGameSetting(i);
+                if(MenuButton(GameSettingButton(i),label,settingsChoice==i))ActivateGameSetting(i);
             }
+            Text(new Rect(925,392,308,35),ControlPrompts.MenuHint(device),13,Gold,TextAnchor.MiddleCenter);
         }
         void BackpackEntryGUI(){
             if(!BackpackAvailable)return;
@@ -626,6 +683,7 @@ namespace LingyueEchoes
             float angle=index*Mathf.PI*2/TailStarPoints;
             return new Vector2(466+Mathf.Sin(angle)*190,392-Mathf.Cos(angle)*190);
         }
+        static Rect TailStarNode(int index){var point=TailStarPoint(index);return new Rect(point.x-30,point.y-30,60,60);}
         void StarLine(Vector2 from,Vector2 to,float thickness,Color tint){
             if(Event.current.type!=EventType.Repaint)return;
             var oldMatrix=GUI.matrix;
@@ -641,7 +699,7 @@ namespace LingyueEchoes
             else Fill(new Rect(0,0,1280,720),new Color(.045f,.066f,.12f));
             Text(new Rect(274,58,384,64),"背包  ·  尾之星图",32,Ivory,TextAnchor.MiddleCenter);
             Text(new Rect(305,119,322,27),"七芒星   /   点亮已归还的尾巴",15,Gold,TextAnchor.MiddleCenter);
-            if(Button(new Rect(1030,63,157,49),"关闭")){SetBackpack(false);return;}
+            if(Button(new Rect(1030,63,157,49),"关闭",key:PadKey("B"))){SetBackpack(false);return;}
             var dim=new Color(.49f,.61f,.76f,.72f);
             int tails=sim.TailUpgrades;
             for(int i=0;i<TailStarPoints;i++)
@@ -652,7 +710,7 @@ namespace LingyueEchoes
             }
             for(int i=0;i<TailStarPoints;i++){
                 Vector2 point=TailStarPoint(i);
-                var node=new Rect(point.x-30,point.y-30,60,60);
+                var node=TailStarNode(i);
                 bool obtained=i<tails,selected=i==backpackSelection;
                 if(selected){
                     float glow=.4f+.18f*Mathf.Sin(backpackTime*5);
@@ -690,7 +748,7 @@ namespace LingyueEchoes
             if(stage=="GUARDIAN_DEFEAT"){PlayerHud();return;}
             if(TailStory){TailStoryGUI();return;}
             if(BattleOn||stage=="GATE_DIALOGUE"){
-                if(Button(SettingsButton,"设置",gameSettings))SetGameSettings(true);
+                if(Button(SettingsButton,"设置",gameSettings,key:PadKey("View")))SetGameSettings(true);
                 float lessonBottom=TutorialLessonGUI();
                 if(BattleOn){PlayerHud();BackpackEntryGUI();HealGuideGUI();
                     if(stage=="GUARDIAN_FIGHT"){Text(new Rect(517,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(550,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),bossHealthTrail.Width,new Color(.71f,.31f,.37f));Bar(new Rect(550,92,455,9),(float)(sim.boss.posture/100),postureTrail.Width,Gold);}
@@ -770,13 +828,13 @@ namespace LingyueEchoes
                 Fill(new Rect(0,38,1280,644),new Color(.034f,.051f,.087f,.92f));
                 Text(new Rect(340,278,600,45),"序章结束 · 月门余音",27,Gold,TextAnchor.MiddleCenter);
                 Text(new Rect(275,332,730,118),speech.VisibleText,24,Ivory,TextAnchor.MiddleCenter);
-                if(Button(new Rect(565,475,150,44),"继续"))speech.Confirm();
+                if(MenuButton(new Rect(565,475,150,44),"继续",true))speech.Confirm();
                 return;
             }
             RoundedFill(new Rect(252,538,776,123),Ink,8);
             Text(new Rect(276,550,550,30),speech.Speaker=="hero"?"铃月":"守灯人",18,Gold);
             Text(new Rect(276,583,590,60),speech.VisibleText,22,Ivory);
-            if(Button(new Rect(896,599,106,42),"继续"))speech.Confirm();
+            if(MenuButton(new Rect(896,599,106,42),"继续",true))speech.Confirm();
         }
         void TailLight(Vector2 point,float size,float alpha,float time){
             for(int i=0;i<3;i++){
@@ -857,8 +915,8 @@ namespace LingyueEchoes
             Text(new Rect(380,195,520,65),"铃声沉寂",40,Gold,TextAnchor.MiddleCenter);
             Text(new Rect(380,278,520,48),"气息渐冷，远处的灯仍亮着。",21,Ivory,TextAnchor.MiddleCenter);
             bool ready=DeathMenuReady;
-            if(Button(new Rect(430,355,420,58),checkpointReached?"在月门灯下苏醒":"再次苏醒",deathChoice==0,ready))Retry();
-            if(Button(new Rect(430,435,420,58),"返回主界面",deathChoice==1,ready))Home();
+            if(MenuButton(DeathButtons[0],checkpointReached?"在月门灯下苏醒":"再次苏醒",deathChoice==0,ready))Retry();
+            if(MenuButton(DeathButtons[1],"返回主界面",deathChoice==1,ready))Home();
             Text(new Rect(365,522,550,30),ControlPrompts.DeathMenuHint(device),16,Gold,TextAnchor.MiddleCenter);guiOpacity=1;
         }
         void MobileControlsGUI(){Vector2 center=MobileControls.StickCenter;
