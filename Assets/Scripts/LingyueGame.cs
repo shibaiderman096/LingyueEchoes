@@ -310,12 +310,17 @@ namespace LingyueEchoes
         }
         void DrawActors(double? idleDelta){
             var p=sim.player;var b=sim.boss;
-            string pose=null;int cell=7;float angle=0,lift=0;
-            if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){pose="dead";cell=7;angle=-8;}
-            if(stage=="WAKE_UP"){float t=Ease(Mathf.Clamp01(stageTime/.95f));pose=stageTime<.95f*.45f?"dead":"hurt";cell=pose=="dead"?7:3;angle=(pose=="dead"?-8:-46)*(1-t);lift=pose=="dead"?0:-6*(1-t);}
-            if(stage=="DYING"||stage=="DEATH"){pose="dead";cell=Math.Min(7,(sim.frame-deathFrame)*8/60);}
-            if(stage=="GUARDIAN_INTRO"&&stageTime>=.65f&&stageTime<1.65f){pose="parry";cell=Mathf.Clamp((int)((stageTime-.65f)*8),0,7);}
-            hero.Draw(p,sim.frame,false,pose,cell,angle,lift,idleDelta:idleDelta);
+            string pose=null;double? poseSeconds=null;float angle=0;
+            if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){pose="dead";poseSeconds=PixelWorld.Definition("pixel8",pose).duration;angle=-8;}
+            else if(stage=="WAKE_UP"&&stageTime<.86f){
+                float t=Ease(Mathf.Clamp01(stageTime/.86f));pose="dead";
+                poseSeconds=PixelWorld.Definition("pixel8",pose).duration*(1-t);angle=-8*(1-t);
+            }
+            else if(stage=="DYING"||stage=="DEATH"){pose="dead";poseSeconds=(sim.frame-deathFrame)/(double)Rules.hz;}
+            else if(stage=="GUARDIAN_INTRO"&&stageTime>=.65f&&stageTime<1.65f){
+                pose="parry";poseSeconds=(stageTime-.65f)*PixelWorld.Definition("pixel8",pose).duration;
+            }
+            hero.Draw(p,sim.frame,pose:pose,angle:angle,poseSeconds:poseSeconds,idleDelta:idleDelta);
             if(stage=="GUARDIAN_INTRO"&&stageTime>=.22f&&stageTime<1.62f){
                 int slashCell=stageTime<TrialSlashTime?Mathf.Clamp((int)((stageTime-.22f)*6),0,3):Mathf.Clamp(4+(int)((stageTime-TrialSlashTime)*8),4,7);
                 guardian.Draw(b,sim.frame,pose:"slash",poseCell:slashCell);

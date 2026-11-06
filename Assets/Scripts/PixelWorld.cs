@@ -103,10 +103,10 @@ namespace LingyueEchoes
                 if(age<m.wind){int slots=Math.Max(1,(int)Math.Ceiling(m.wind*8d/60));cell=1+(int)Math.Floor(Math.Floor(age*8d/60)*(contact-2)/Math.Max(1,slots-1));}
                 else if(m.pulses!=null&&age>=m.wind+m.pulses[1])cell=Math.Min(7,5+(int)Math.Floor((age-m.wind-m.pulses[1])*8d/60));
                 else cell=Math.Min(m.pulses!=null?4:7,contact+(int)Math.Floor((age-m.wind)*8d/60));}
-            else if(clip=="jump")cell=hero?(a.y==0?7:a.vy>10?0:a.vy>6?1:a.vy>2?2:a.vy>-1?3:a.vy>-5?4:a.y<25?6:5):(a.y==0?7:a.vy>6?1:a.vy>1?2:a.vy>-2?3:a.vy>-6?4:5);
+            else if(clip=="jump")cell=hero?HeroJumpCell(a):(a.y==0?7:a.vy>6?1:a.vy>1?2:a.vy>-2?3:a.vy>-6?4:5);
             else if(!hero&&clip=="stagger")cell=new[]{1,2,4,6,7}[Math.Min(4,(int)Math.Floor(a.age*8d/60))];
             else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
-            int sampleAge=clip=="heal"?Math.Max(0,a.age-1):a.age;
+            int sampleAge=hero&&(clip=="heal"||clip=="dodge"||clip=="parry")?Math.Max(0,a.age-1):a.age;
             double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:sampleAge)/60d+1e-7);
             PixelWorld.Sample(go,folder,clip,seconds,cell);
             go.transform.localPosition=new Vector3((float)Math.Floor(a.x+.5)/100,((float)Math.Floor(a.y+.5)-95+lift)/100,0);
@@ -114,6 +114,13 @@ namespace LingyueEchoes
             renderer.color=hero&&pose==null&&a.invuln>0&&(frame/3)%2==0?new Color(1,.86f,.86f,.65f):new Color(1,1,1,alpha);go.SetActive(alpha>0);
         }
         static string GuardianClip(Fighter a){if(a.move!=null){switch(a.move.name){case "双连斩":return "double";case "突刺":return "thrust";case "震地":return "slam";case "跃击":return "leap";case "赤月回旋":return "spin";default:return "slash";}}return a.state=="air"?"jump":a.state=="hurt"?"stagger":a.state;}
+        // Physics controls height; the artwork follows the vertical motion without adding a second jump arc.
+        static int HeroJumpCell(Fighter a){
+            if(a.vy>0)return Mathf.Clamp((int)((1-a.vy/Rules.jump)*8),0,7);
+            if(a.vy==0||a.y<12)return 15;
+            if(a.y<45)return 14;
+            return Mathf.Clamp(8+(int)(-a.vy*7/Rules.jump),8,13);
+        }
         // Art is retimed around resolved contacts; this never advances the combat clock.
         public static int DrawnAttackCell(ClipDefinition clip,Move move,int age){
             int tick=Math.Max(0,age-1),contact=clip.contactPose;

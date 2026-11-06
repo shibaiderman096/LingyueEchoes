@@ -135,6 +135,94 @@
         14,
         15
       ]
+    },
+    "dodge": {
+      "source": "dodge.png",
+      "source_anchor_x": 182,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "parry": {
+      "source": "guard.png",
+      "source_anchor_x": 188,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "dead": {
+      "source": "death.png",
+      "source_anchor_x": 184,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "jump": {
+      "source": "jump.png",
+      "source_anchor_x": 186,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
     }
   }
 }
