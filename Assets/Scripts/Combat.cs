@@ -13,7 +13,7 @@ namespace LingyueEchoes
     }
     public static class Rules
     {
-        public const int hz=60, parry=20, parryPerfect=12, hitstop=3, buffer=8, dodgeFrames=28,
+        public const int hz=60, parry=20, parryPerfect=12, hitstop=3, buffer=8, comboBufferLead=5, dodgeFrames=28,
             invulnStart=2, dodgeInvulnFrames=12, perfectDodgeFrames=8, invulnEnd=invulnStart+dodgeInvulnFrames, perfectDodgeEnd=invulnStart+perfectDodgeFrames,
             parryFrames=30, hurtFrames=28, successSlowFrames=24, executeWindow=30, executeCost=1, executeHitstop=8, staggerFrames=36, tailStatBonus=10,
             healCost=1, healRelease=18, healFrames=42, healAmount=15;
@@ -21,8 +21,8 @@ namespace LingyueEchoes
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
         public static readonly Move[] Player={
-            M("横斩",6,4,15,100,90,18,12,true,chainAt:11), M("踏步突刺",8,6,16,115,70,22,15,true,5,chainAt:15),
-            M("回旋斩",10,8,22,140,110,35,26,true,chainAt:24), M("蓄力下斩",23,5,24,115,125,42,30,true)};
+            M("横斩",8,4,18,100,90,18,12,true,chainAt:14), M("踏步突刺",10,6,20,115,70,22,15,true,5,chainAt:18),
+            M("回旋斩",12,8,28,140,110,35,26,true,chainAt:29), M("蓄力下斩",27,5,30,115,125,42,30,true)};
         public static readonly Move[] Boss={
             M("横斩",30,5,28,150,105,18,24,true), M("双连斩",24,29,30,160,105,14,20,true,pulses:new[]{0,24}),
             M("突刺",36,10,32,150,85,24,30,true,10), M("震地",48,8,40,260,35,28,38,false,low:true),
@@ -98,7 +98,7 @@ namespace LingyueEchoes
         }
         public void Press(string action){
             var m=player.move;
-            if(action=="attack"&&player.state=="attack"&&m!=null&&m.chainAt>0&&player.age>=m.wind-3&&player.age<m.chainAt){
+            if(action=="attack"&&player.state=="attack"&&m!=null&&m.chainAt>0&&player.age>=m.wind-Rules.comboBufferLead&&player.age<m.chainAt){
                 comboBuffered=true;return;
             }
             queue.Add(new Command{action=action,until=frame+Rules.buffer});if(queue.Count>16)queue.RemoveAt(0);

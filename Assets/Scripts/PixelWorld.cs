@@ -98,7 +98,6 @@ namespace LingyueEchoes
                 }
             }
             else if(a.move!=null&&definition.contactPose>0)cell=DrawnAttackCell(definition,a.move,a.age);
-            else if(hero&&a.move!=null&&(clip.StartsWith("attack")||clip=="execute"||clip=="finisher"))cell=AttackCell(clip,a.move,a.age);
             else if(!hero&&a.move!=null){var m=a.move;int age=Math.Max(0,a.age-1),contact=clip=="double"||clip=="spin"?3:4;
                 if(age<m.wind){int slots=Math.Max(1,(int)Math.Ceiling(m.wind*8d/60));cell=1+(int)Math.Floor(Math.Floor(age*8d/60)*(contact-2)/Math.Max(1,slots-1));}
                 else if(m.pulses!=null&&age>=m.wind+m.pulses[1])cell=Math.Min(7,5+(int)Math.Floor((age-m.wind-m.pulses[1])*8d/60));
@@ -106,7 +105,7 @@ namespace LingyueEchoes
             else if(clip=="jump")cell=hero?HeroJumpCell(a):(a.y==0?7:a.vy>6?1:a.vy>1?2:a.vy>-2?3:a.vy>-6?4:5);
             else if(!hero&&clip=="stagger")cell=new[]{1,2,4,6,7}[Math.Min(4,(int)Math.Floor(a.age*8d/60))];
             else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
-            int sampleAge=hero&&(clip=="heal"||clip=="dodge"||clip=="parry")?Math.Max(0,a.age-1):a.age;
+            int sampleAge=hero&&(clip=="heal"||clip=="dodge"||clip=="parry"||clip=="hurt")?Math.Max(0,a.age-1):a.age;
             double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:sampleAge)/60d+1e-7);
             PixelWorld.Sample(go,folder,clip,seconds,cell);
             go.transform.localPosition=new Vector3((float)Math.Floor(a.x+.5)/100,((float)Math.Floor(a.y+.5)-95+lift)/100,0);
@@ -139,8 +138,6 @@ namespace LingyueEchoes
             int endTick=move.wind+move.active+move.recovery-1,last=clip.frames.Length-1;
             return Math.Min(last,startPose+(tick-startTick)*(last-startPose)/Math.Max(1,endTick-startTick));
         }
-        public static int AttackCell(string clip,Move move,int age){int contact=clip=="finisher"?4:3,resolved=Math.Max(0,age-1);if(resolved<move.wind){int slots=Math.Max(1,(int)Math.Ceiling(move.wind*8d/60)),slot=(int)Math.Floor(resolved*8d/60);return 1+(int)Math.Floor(slot*(contact-2d)/Math.Max(1,slots-1));}
-            int after=(int)Math.Floor((resolved-move.wind)*8d/60),count=Math.Max(1,(int)Math.Ceiling((move.active+move.recovery)*8d/60));return Math.Min(7,contact+(int)Math.Ceiling(after*(7d-contact)/Math.Max(1,count-1)));}
     }
     public class PixelEffects
     {

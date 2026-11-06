@@ -42,15 +42,17 @@ public static class MigrationChecks
                     }}
                 if(clip.contactPose>0){
                     int index=Array.IndexOf(clip.folder=="guardian8"?new[]{"slash","double","thrust","slam","leap","spin"}:new[]{"attack1","attack2","attack3","attack4"},clip.name);
-                    if(index<0)continue;
-                    var move=clip.folder=="guardian8"?Rules.Boss[index]:Rules.Player[index];
+                    var move=index>=0?(clip.folder=="guardian8"?Rules.Boss[index]:Rules.Player[index]):
+                        clip.folder=="pixel8"&&clip.name=="execute"?Rules.Execute:
+                        clip.folder=="pixel8"&&clip.name=="finisher"?Rules.Finisher:null;
+                    if(move==null)continue;
                     Assert(PixelActor.DrawnAttackCell(clip,move,move.wind)<clip.contactPose&&PixelActor.DrawnAttackCell(clip,move,move.wind+1)==clip.contactPose,"Drawn contact: "+clip.path);
                     if(clip.secondContactPose>0)Assert(PixelActor.DrawnAttackCell(clip,move,move.wind+move.pulses[1]+1)==clip.secondContactPose,"Drawn second contact: "+clip.path);
                     if(clip.authoredTiming){
                         Assert(clip.times.Length==clip.frames.Length&&Mathf.RoundToInt(clip.duration*Rules.hz)==move.wind+move.active+move.recovery,"Authored timing matches move length: "+clip.name);
                         var holds=clip.times.Skip(1).Zip(clip.times,(a,b)=>Mathf.RoundToInt((a-b)*Rules.hz)).ToArray();
                         Assert(holds.All(n=>n>0)&&holds.Distinct().Count()>1,"Ordered poses have varied holds: "+clip.name);
-                        if(index==2)Assert(PixelActor.DrawnAttackCell(clip,move,move.chainAt)>=12,"Spin returns to its starting direction before the chain can cut it off");
+                        if(clip.folder=="pixel8"&&clip.name=="attack3")Assert(PixelActor.DrawnAttackCell(clip,move,move.chainAt)>=12,"Spin returns to its starting direction before the chain can cut it off");
                     }
                 }}}finally{UnityEngine.Object.DestroyImmediate(go);}
         if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
@@ -146,10 +148,13 @@ public static class MigrationChecks
         for(int stage=0;stage<4;stage++){
             Assert(p.state=="attack"&&p.combo==stage&&p.move==Rules.Player[stage],"Attack chain enters stage "+(stage+1));
             var move=p.move;
+            if(move.chainAt>0){
+                while(p.age<move.wind-Rules.comboBufferLead)c.Step();
+                c.Press("attack");
+            }
             while(p.age<move.wind)c.Step();
             Assert(c.hits.Count==0,"No hit before contact for stage "+(stage+1));
             if(stage==3)Assert(c.visuals.Any(v=>v.kind=="charge"&&v.owner==1&&v.attackId==p.attackId),"Fourth attack telegraphs before contact");
-            if(move.chainAt>0)c.Press("attack");
             c.Step();var hit=c.hits.Single();var fx=c.visuals.Last();
             Assert(fx.IsPlayerCombo&&fx.combo==stage&&fx.originX==p.x&&fx.originY==p.y,"Combo effect matches hit frame and pose");
             if(stage==2)Assert(hit.x<p.x&&hit.x+hit.w>p.x,"Spinning cut covers both sides");

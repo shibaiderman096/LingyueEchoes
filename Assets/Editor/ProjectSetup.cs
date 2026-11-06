@@ -51,8 +51,8 @@ public static class ProjectSetup
     public static void InstallTailHealingClips()=>InstallPixelClips(new[]{"heal","heal_fx"});
     [MenuItem("Lingyue/Import player combo animations")]
     public static void InstallPlayerComboClips()=>InstallPixelClips(new[]{"idle","run"}.Concat(Enumerable.Range(1,4).SelectMany(i=>new[]{"attack"+i,"cut_fx"+i})));
-    [MenuItem("Lingyue/Import player movement and defense animations")]
-    public static void InstallPlayerMovementClips()=>InstallPixelClips(new[]{"dodge","dead","parry","jump"});
+    [MenuItem("Lingyue/Import player movement and special animations")]
+    public static void InstallPlayerMovementClips()=>InstallPixelClips(new[]{"dodge","dead","parry","jump","hurt","execute","finisher","heal","counter","victory"});
     static void InstallPixelClips(System.Collections.Generic.IEnumerable<string> names){
         AssetDatabase.Refresh();
         var controller=AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/Resources/Animations/pixel8/Controller.controller");

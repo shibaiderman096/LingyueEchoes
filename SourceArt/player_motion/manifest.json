@@ -223,6 +223,134 @@
         14,
         15
       ]
+    },
+    "hurt": {
+      "source": "hurt.png",
+      "source_anchor_x": 187,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "execute": {
+      "source": "execute.png",
+      "source_anchor_x": 192,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "finisher": {
+      "source": "finisher.png",
+      "source_anchor_x": 186,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "heal": {
+      "source": "heal.png",
+      "source_anchor_x": 184,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "victory": {
+      "source": "victory.png",
+      "source_anchor_x": 186,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "counter": {
+      "clips": [
+        {
+          "name": "parry",
+          "frame_range": [
+            1,
+            4
+          ]
+        },
+        {
+          "name": "execute",
+          "frame_range": [
+            5,
+            16
+          ]
+        }
+      ]
     }
   }
 }
