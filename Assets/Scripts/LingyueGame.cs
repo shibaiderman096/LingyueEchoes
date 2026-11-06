@@ -598,12 +598,16 @@ namespace LingyueEchoes
         }
         static Vector2 TailStarPoint(int index){
             float angle=index*Mathf.PI*2/TailStarPoints;
-            return new Vector2(466+Mathf.Sin(angle)*211,369-Mathf.Cos(angle)*211);
+            return new Vector2(466+Mathf.Sin(angle)*190,392-Mathf.Cos(angle)*190);
         }
         void StarLine(Vector2 from,Vector2 to,float thickness,Color tint){
-            var oldMatrix=GUI.matrix;var delta=to-from;
-            GUIUtility.RotateAroundPivot(Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg,from);
-            Fill(new Rect(from.x,from.y-thickness/2,delta.magnitude,thickness),tint);
+            if(Event.current.type!=EventType.Repaint)return;
+            var oldMatrix=GUI.matrix;
+            var delta=to-from;
+            // Position and rotate in backpack coordinates before applying viewport scaling.
+            GUI.matrix=oldMatrix*Matrix4x4.TRS(new Vector3(from.x,from.y,0),
+                Quaternion.Euler(0,0,Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg),Vector3.one);
+            Fill(new Rect(0,-thickness/2,delta.magnitude,thickness),tint);
             GUI.matrix=oldMatrix;
         }
         void BackpackGUI(){
@@ -612,12 +616,13 @@ namespace LingyueEchoes
             Text(new Rect(274,58,384,64),"背包  ·  尾之星图",32,Ivory,TextAnchor.MiddleCenter);
             Text(new Rect(305,119,322,27),"七芒星   /   点亮已归还的尾巴",15,Gold,TextAnchor.MiddleCenter);
             if(Button(new Rect(1030,63,157,49),"关闭")){SetBackpack(false);return;}
-            var dim=new Color(.35f,.46f,.60f,.52f);
+            var dim=new Color(.49f,.61f,.76f,.72f);
             int tails=sim.TailUpgrades;
+            for(int i=0;i<TailStarPoints;i++)
+                StarLine(TailStarPoint(i),TailStarPoint((i+1)%TailStarPoints),1,new Color(.54f,.62f,.72f,.23f));
             for(int i=0;i<TailStarPoints;i++){
                 int starLink=(i+3)%TailStarPoints;
-                StarLine(TailStarPoint(i),TailStarPoint((i+1)%TailStarPoints),1,new Color(.54f,.62f,.72f,.23f));
-                StarLine(TailStarPoint(i),TailStarPoint(starLink),2,i<tails&&starLink<tails?Gold:dim);
+                StarLine(TailStarPoint(i),TailStarPoint(starLink),2.5f,i<tails&&starLink<tails?Gold:dim);
             }
             for(int i=0;i<TailStarPoints;i++){
                 Vector2 point=TailStarPoint(i);
