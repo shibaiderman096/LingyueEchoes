@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace LingyueEchoes
 {
-    public class LingyueGame:MonoBehaviour
+    public partial class LingyueGame:MonoBehaviour
     {
         public string stage="MENU";
         [NonSerialized] public Combat sim; [NonSerialized] public FixedClock clock;
@@ -16,9 +16,7 @@ namespace LingyueEchoes
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
-        const float TailAppear=.55f,TailDepart=.88f,TailPickup=1.85f,TailGone=2.65f,TailEnd=3.2f;
-        double tailSpawnX;
-        const int TailStarPoints=7;
+        static int TailStarPoints=>TailRewards.Length;
         static readonly Rect BackpackPortrait=new Rect(35,32,110,112);
         bool backpackOpen,backpackGuideSeen;
         int backpackSelection,backpackDirection;
@@ -101,7 +99,7 @@ namespace LingyueEchoes
             rightSeal=PixelWorld.PlaceArenaSeal(world.Find("Props"),false);
             hero=new PixelActor(world.Find("Hero").gameObject,true);guardian=new PixelActor(world.Find("Guardian").gameObject,false);effects=new PixelEffects(world);
             keyart=Resources.Load<Texture2D>("ui/main_menu_keyart");
-            firstTail=Resources.Load<Texture2D>("prologue_route/first-fox-tail");
+            firstTail=Resources.Load<Texture2D>(TailRewards[0].SpritePath);
             backpackArt=Resources.Load<Texture2D>("ui/backpack_moon_gate");
             CreatePlayerHud();
             font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","Noto Sans CJK SC","Droid Sans Fallback","Arial Unicode MS"},24);
@@ -129,7 +127,8 @@ namespace LingyueEchoes
             audioRoot.transform.localPosition=Vector3.back*100;
             AudioSource AddVoice(){var source=audioRoot.AddComponent<AudioSource>();source.spatialBlend=0;return source;}
             voices=new AudioSource[12];for(int i=0;i<voices.Length;i++)voices[i]=AddVoice();
-            uiVoice=AddVoice();music=AddVoice();music.loop=true;music.volume=.22f;
+            uiVoice=AddVoice();music=AddVoice();music.loop=true;music.volume=MusicVolume;
+            tailAudio=AddVoice();
         }
         public void StartTrial(){
             if(stage!="MENU"||modal!="")return;
@@ -181,7 +180,13 @@ namespace LingyueEchoes
             world.gameObject.SetActive(true);SetArenaSeals(false);UpdateCheckpointLamp();gameSettings=false;
         }
         public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=backpackOpen=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
-        void SetStage(string value){stage=value;stageTime=0;}
+        void SetStage(string value){
+            if(stage=="FIRST_TAIL"&&value!="FIRST_TAIL"){
+                music.volume=MusicVolume;
+                if(value!="TAIL_EPILOGUE")tailAudio.Stop();
+            }else if(stage=="TAIL_EPILOGUE"&&value!="GATE_READY")tailAudio.Stop();
+            stage=value;stageTime=0;
+        }
         void BeginTrialIntro(){
             ClearInput();sim.beforeStep=null;sim.nonlethal=false;sim.dummyBox=null;
             sim.boundsMin=PrologueLayout.ArenaMin;sim.boundsMax=PrologueLayout.ArenaMax;
@@ -219,18 +224,6 @@ namespace LingyueEchoes
             p.face=b.x>=p.x?1:-1;b.face=-p.face;
             SetStage("TAIL_DIALOGUE");Say("tail");
         }
-        void BeginTailHandoff(){
-            double p=sim.player.x,b=sim.boss.x,side=p>=b?1:-1;
-            double min=PrologueLayout.ArenaMin+50,max=PrologueLayout.ArenaMax-50;
-            // Choose open floor on either side before falling back to the space between the fighters.
-            double[] spots={p+side*150,p-side*150,Math.Min(p,b)-120,Math.Max(p,b)+120,(p+b)*.5};
-            tailSpawnX=(p+b)*.5;
-            foreach(double spot in spots){
-                if(spot<min||spot>max||Math.Abs(spot-p)<100||Math.Abs(spot-b)<100)continue;
-                tailSpawnX=spot;break;
-            }
-            SetStage("FIRST_TAIL");
-        }
         void CompleteFirstVictory(){
             WriteSave(PrologueLayout.TailCountKey,sim.TailUpgrades);
             WriteSave(PrologueLayout.ProgressKey,1);
@@ -257,6 +250,7 @@ namespace LingyueEchoes
         }
         void Update(){float dt=Math.Min(Time.unscaledDeltaTime,.25f);UpdateViewport();if(!focused&&!Application.isBatchMode)return;ReadInput();
             if(music)music.mute=muted;
+            if(tailAudio)tailAudio.mute=muted;
             if(backpackOpen){backpackTime+=dt;DrawActors(dt);return;}
             if(gameSettings){DrawActors(dt);return;}
             stageTime+=dt;
@@ -268,12 +262,7 @@ namespace LingyueEchoes
                 case "GATE_DIALOGUE":if(speech.Cue=="drawBlade")bladeDrawTime+=dt;break;
                 case "TAIL_DIALOGUE":break;
                 case "TAIL_EPILOGUE":break;
-                case "FIRST_TAIL":
-                    if(stageTime>=TailPickup&&stageTime-dt<TailPickup){
-                        sim.ApplyTailUpgrades(Math.Max(1,sim.TailUpgrades));UiSound("victory");
-                    }
-                    if(stageTime>=TailEnd){SetStage("TAIL_EPILOGUE");Say("tailAfter");}
-                    break;
+                case "FIRST_TAIL":UpdateTailRitual();break;
                 case "GUARDIAN_INTRO":
                     if(stageTime>=TrialSlashTime&&stageTime-dt<TrialSlashTime)UiSound("boss_swing");
                     if(stageTime>=TrialIntroDuration){sim.ai=sim.enemyActive=true;SetStage("GUARDIAN_FIGHT");SetMusic("moon_gate_boss");}
@@ -300,8 +289,9 @@ namespace LingyueEchoes
                 var target=new Vector3((float)p.x/100,((float)p.y-55)/100,-10);view.orthographicSize=Mathf.Lerp(deathCameraSize,3.6f/2.2f,t);view.transform.position=Vector3.Lerp(deathCameraPosition,target,t);}
             else{if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){float t=stage=="FADE_IN"?0:Mathf.Clamp01((stageTime-.7f)/2.8f),ease=Ease(t);zoom=Mathf.Lerp(2.2f,1,ease);cameraX=Mathf.Lerp((float)p.x,RouteCameraX(),ease);focusY=Mathf.Lerp((float)p.y+40,0,ease);}
                 else if(stage=="GUARDIAN_INTRO"){float t=stageTime/TrialIntroDuration;zoom=1+.17f*Mathf.Sin(t*Mathf.PI);focusY=12*Mathf.Sin(t*Mathf.PI);}
-                else if(TailStory){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
-                else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
+                else if(stage=="FIRST_TAIL")TailCamera(out zoom,out focusY);
+                else if(stage=="TAIL_DIALOGUE"){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
+                else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"||stage=="TAIL_EPILOGUE"?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
             // Noninteractive scenes still need idle loops, even when the battle clock is stopped.
             bool ticked=BattleOn||stage=="GUARDIAN_DEFEAT"||stage=="DYING"||stage=="DEATH";
@@ -379,7 +369,7 @@ namespace LingyueEchoes
             menuPointer=pointer;
             if(stage=="DYING"||stage=="GUARDIAN_DEFEAT")return;if(stage=="DEATH"){ReadDeathInput(confirm,padB,hover);return;}
             if(TailStory){
-                if(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5))speech.Confirm();
+                if(stage!="FIRST_TAIL"&&(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5)))speech.Confirm();
                 return;
             }
             bool escape=Input.GetKeyDown(KeyCode.Escape),menu=Input.GetKeyDown(KeyCode.JoystickButton7),viewKey=Input.GetKeyDown(KeyCode.JoystickButton6);
@@ -552,7 +542,7 @@ namespace LingyueEchoes
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
         void OnApplicationPause(bool pause){if(pause)ClearInput();}
-        void OnDestroy(){StopSounds();if(font)Destroy(font);if(hudPortrait)Destroy(hudPortrait);if(hudRing)Destroy(hudRing);}
+        void OnDestroy(){StopSounds();if(font)Destroy(font);if(hudPortrait)Destroy(hudPortrait);if(hudRing)Destroy(hudRing);if(tailGlow)Destroy(tailGlow);if(tailVignette)Destroy(tailVignette);}
 
         void OnGUI(){if(!font)return;var oldMatrix=GUI.matrix;float scale=Math.Min(Screen.width/1280f,Screen.height/720f);GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*scale)/2,(Screen.height-720*scale)/2,0),Quaternion.identity,Vector3.one*scale);
             if(textStyle==null){textStyle=new GUIStyle(GUI.skin.label){font=font,wordWrap=true};buttonStyle=new GUIStyle(GUI.skin.button){font=font,fontSize=21,alignment=TextAnchor.MiddleCenter,wordWrap=true};}
@@ -673,14 +663,14 @@ namespace LingyueEchoes
                 SetBackpack(true);return;
             }
             if(TouchControlsVisible||Application.isMobilePlatform){
-                RoundedFill(new Rect(97,33,46,23),Ink,7);
-                Text(new Rect(97,33,46,23),"背包",13,Gold,TextAnchor.MiddleCenter);
+                RoundedFill(new Rect(82,33,71,23),Ink,7);
+                Text(new Rect(82,33,71,23),TailArchiveTitle,13,Gold,TextAnchor.MiddleCenter);
             }
             if(backpackGuideSeen||speech.Active||stage!="GATE_READY")return;
             var card=new Rect(153,115,310,54);
             RoundedFill(card,Ink,7);
-            Text(new Rect(card.x+12,card.y+2,290,25),"背包已解锁",17,Gold,TextAnchor.MiddleLeft);
-            if(showKeyHints)Text(new Rect(card.x+12,card.y+26,290,24),ControlPrompts.Format("{backpack} 打开背包",device),15,Ivory,TextAnchor.MiddleLeft);
+            Text(new Rect(card.x+12,card.y+2,290,25),TailArchiveTitle+"已解锁",17,Gold,TextAnchor.MiddleLeft);
+            if(showKeyHints)Text(new Rect(card.x+12,card.y+26,290,24),ControlPrompts.Format("{backpack} 打开"+TailArchiveTitle,device),15,Ivory,TextAnchor.MiddleLeft);
         }
         void HealGuideGUI(){
             if(!HealAvailable)return;
@@ -699,7 +689,7 @@ namespace LingyueEchoes
             float angle=index*Mathf.PI*2/TailStarPoints;
             return new Vector2(466+Mathf.Sin(angle)*190,392-Mathf.Cos(angle)*190);
         }
-        static Rect TailStarNode(int index){var point=TailStarPoint(index);return new Rect(point.x-30,point.y-30,60,60);}
+        static Rect TailStarNode(int index){var point=TailStarPoint(index);return new Rect(point.x-28,point.y-28,56,56);}
         void StarLine(Vector2 from,Vector2 to,float thickness,Color tint){
             if(Event.current.type!=EventType.Repaint)return;
             var oldMatrix=GUI.matrix;
@@ -711,40 +701,43 @@ namespace LingyueEchoes
             GUI.matrix=oldMatrix;
         }
         void BackpackGUI(){
+            TailScreenMargins(MoonNight);
             if(backpackArt)GUI.DrawTexture(new Rect(0,0,1280,720),backpackArt,ScaleMode.ScaleAndCrop);
             else Fill(new Rect(0,0,1280,720),new Color(.045f,.066f,.12f));
-            Text(new Rect(274,58,384,64),"背包  ·  尾之星图",32,Ivory,TextAnchor.MiddleCenter);
-            Text(new Rect(305,119,322,27),"七芒星   /   点亮已归还的尾巴",15,Gold,TextAnchor.MiddleCenter);
+            Text(new Rect(274,58,384,64),TailArchiveTitle,36,MoonIvory,TextAnchor.MiddleCenter);
+            Text(new Rect(305,119,322,27),"九尾星图   /   每一颗星，记着一条尾巴",16,MoonGold,TextAnchor.MiddleCenter);
             if(Button(new Rect(1030,63,157,49),"关闭",key:PadKey("B"))){SetBackpack(false);return;}
             var dim=new Color(.49f,.61f,.76f,.72f);
-            int tails=sim.TailUpgrades;
+            int tails=Mathf.Clamp(sim.TailUpgrades,0,TailStarPoints);
             for(int i=0;i<TailStarPoints;i++)
                 StarLine(TailStarPoint(i),TailStarPoint((i+1)%TailStarPoints),1,new Color(.54f,.62f,.72f,.23f));
             for(int i=0;i<TailStarPoints;i++){
-                int starLink=(i+3)%TailStarPoints;
-                StarLine(TailStarPoint(i),TailStarPoint(starLink),2.5f,i<tails&&starLink<tails?Gold:dim);
+                int starLink=(i+2)%TailStarPoints;
+                StarLine(TailStarPoint(i),TailStarPoint(starLink),1.5f,i<tails&&starLink<tails?MoonGold:WithAlpha(dim,.37f));
             }
             for(int i=0;i<TailStarPoints;i++){
                 Vector2 point=TailStarPoint(i);
                 var node=TailStarNode(i);
-                bool obtained=i<tails,selected=i==backpackSelection;
+                var reward=TailRewards[i];
+                bool obtained=reward.IsObtained(tails),selected=i==backpackSelection;
                 if(selected){
                     float glow=.4f+.18f*Mathf.Sin(backpackTime*5);
-                    RoundedFill(new Rect(point.x-36,point.y-36,72,72),new Color(.94f,.72f,.39f,glow),36);
+                    RoundedFill(new Rect(point.x-34,point.y-34,68,68),WithAlpha(MoonGold,glow),34);
                 }
-                RoundedFill(node,obtained?Gold:new Color(.28f,.37f,.51f),30);
-                RoundedFill(new Rect(node.x+2,node.y+2,56,56),obtained?new Color(.34f,.22f,.14f):new Color(.085f,.12f,.21f),28);
-                if(obtained&&i==0&&firstTail)GUI.DrawTexture(new Rect(node.x+7,node.y+7,46,46),firstTail,ScaleMode.ScaleToFit);
-                else Text(node,(i+1).ToString("00"),20,obtained?Gold:new Color(.66f,.74f,.83f),TextAnchor.MiddleCenter);
+                RoundedFill(node,obtained?reward.Theme:new Color(.28f,.37f,.51f),28);
+                RoundedFill(new Rect(node.x+2,node.y+2,52,52),obtained?new Color(.34f,.22f,.14f):new Color(.085f,.12f,.21f),26);
+                if(obtained&&i==0&&firstTail)GUI.DrawTexture(new Rect(node.x+6,node.y+6,44,44),firstTail,ScaleMode.ScaleToFit);
+                else Text(node,reward.Order.ToString("00"),20,obtained?reward.Theme:new Color(.66f,.74f,.83f),TextAnchor.MiddleCenter);
                 if(GUI.Button(node,GUIContent.none,GUIStyle.none))backpackSelection=i;
             }
             var details=new Rect(744,173,365,382);
             RoundedFill(details,new Color(.075f,.11f,.18f,.95f),12);
             Fill(new Rect(770,232,313,1),new Color(.85f,.74f,.53f,.55f));
-            bool owned=backpackSelection<tails;
-            Text(new Rect(770,189,312,38),backpackSelection==0?"第一尾":$"第 {backpackSelection+1} 尾",26,Gold,TextAnchor.MiddleLeft);
+            var selectedTail=TailRewards[backpackSelection];
+            bool owned=selectedTail.IsObtained(tails);
+            Text(new Rect(770,189,312,38),$"{(selectedTail.Order==1?"初尾":$"第 {selectedTail.Order} 尾")} · {selectedTail.Name}",26,selectedTail.Theme,TextAnchor.MiddleLeft);
             Text(new Rect(770,247,312,41),owned?$"已归还 · 生命与气力上限各 +{Rules.tailStatBonus}":"尚未归还",18,Ivory,TextAnchor.MiddleLeft);
-            Text(new Rect(770,295,312,30),$"已归还 {tails} 尾",16,Gold,TextAnchor.MiddleLeft);
+            Text(new Rect(770,295,312,30),TailProgress(tails),16,Gold,TextAnchor.MiddleLeft);
             BackpackStat(new Rect(770,343,313,55),"生命上限",sim.player.maxHp,new Color(.30f,.84f,.52f));
             BackpackStat(new Rect(770,419,313,55),"气力上限",sim.PlayerMaxStamina,new Color(1,.81f,.31f));
             if(owned&&backpackSelection==0)Text(new Rect(770,476,313,29),"回响疗愈 · 消耗一点回响恢复生命",15,Gold);
@@ -813,35 +806,12 @@ namespace LingyueEchoes
             if(manual)Text(new Rect(x+pad,y+7+body,inside,25),(showKeyHints?ControlPrompts.Key("interact",device)+" ":"")+"继续交谈",14,Gold);
         }
         void TailStoryGUI(){
-            Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);
-            if(stage=="FIRST_TAIL"){
-                float reveal=Ease(Mathf.Clamp01(stageTime/TailAppear));
-                float travel=Ease(Mathf.InverseLerp(TailDepart,TailPickup,stageTime));
-                float fade=Ease(Mathf.InverseLerp(TailPickup,TailGone,stageTime));
-                float height=18+reveal*22+Mathf.Sin(stageTime*6)*3*(1-travel);
-                var from=StoryPoint(tailSpawnX,height);
-                var point=Vector2.Lerp(from,StoryPoint(sim.player,78),travel);
-                point.y-=Mathf.Sin(travel*Mathf.PI)*58;
-                if(stageTime<TailDepart){
-                    var floor=StoryPoint(tailSpawnX,4);
-                    float glow=reveal*(1-Mathf.InverseLerp(TailAppear,TailDepart,stageTime));
-                    RoundedFill(new Rect(floor.x-34,floor.y-5,68,10),new Color(1,.72f,.38f,glow*.44f),5);
-                }
-                if(fade<1)TailLight(point,Mathf.Lerp(Mathf.Lerp(40,76,reveal),36,fade),reveal*(1-fade),stageTime);
-                if(stageTime>=TailPickup){
-                    float light=1-Mathf.InverseLerp(TailPickup,TailPickup+.42f,stageTime);
-                    if(light>0){
-                        float radius=Mathf.Lerp(15,50,1-light);
-                        RoundedFill(new Rect(point.x-radius,point.y-radius,2*radius,2*radius),new Color(1,.77f,.47f,.27f*light),radius);
-                    }
-                    Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
-                    Text(new Rect(320,173,640,34),"九尾残响：1 / 9",19,Ivory,TextAnchor.MiddleCenter);
-                }
-                PlayerHud();
-                return;
-            }
+            if(stage=="FIRST_TAIL"){TailRitualGUI();return;}
+            if(stage=="TAIL_DIALOGUE"){Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);}
             if(stage=="TAIL_EPILOGUE"){
-                Fill(new Rect(0,38,1280,644),new Color(.034f,.051f,.087f,.92f));
+                TailScreenMargins(MoonNight);
+                Fill(new Rect(0,0,1280,720),WithAlpha(MoonNight,.94f*Ramp(stageTime,0,.32f)));
+                PlayerHud();
                 Text(new Rect(340,278,600,45),"序章结束 · 月门余音",27,Gold,TextAnchor.MiddleCenter);
                 Text(new Rect(275,332,730,118),speech.VisibleText,24,Ivory,TextAnchor.MiddleCenter);
                 if(MenuButton(new Rect(565,475,150,44),"继续",true))speech.Confirm();
@@ -851,15 +821,6 @@ namespace LingyueEchoes
             Text(new Rect(276,550,550,30),speech.Speaker=="hero"?"铃月":"守灯人",18,Gold);
             Text(new Rect(276,583,590,60),speech.VisibleText,22,Ivory);
             if(MenuButton(new Rect(896,599,106,42),"继续",true))speech.Confirm();
-        }
-        void TailLight(Vector2 point,float size,float alpha,float time){
-            for(int i=0;i<3;i++){
-                float phase=Mathf.Repeat(time*.75f+i/3f,1);
-                float r=3.5f*(1-phase);
-                Vector2 dot=point+new Vector2(Mathf.Sin(i*2.1f+phase*3)*size*.43f,size*(.28f-phase*.9f));
-                RoundedFill(new Rect(dot.x-r,dot.y-r,r*2,r*2),new Color(1,.67f,.46f,alpha*(1-phase)*.85f),r);
-            }
-            if(firstTail){GUI.color=new Color(1,1,1,alpha);GUI.DrawTexture(new Rect(point.x-size/2,point.y-size/2,size,size),firstTail,ScaleMode.ScaleToFit);GUI.color=Color.white;}
         }
         Vector2 StoryPoint(Fighter actor,float height)=>StoryPoint(actor.x,(float)actor.y+height);
         Vector2 StoryPoint(double x,float height){
@@ -1006,8 +967,10 @@ namespace LingyueEchoes
         }
         void UpdateStatusTrails(float dt){
             var p=sim.player;var b=sim.boss;
-            healthBar.Update(HealthHudWidth,dt);
-            staminaBar.Update(StaminaHudWidth,dt);
+            if(stage!="FIRST_TAIL"||stageTime>=3.30f){
+                healthBar.Update(HealthHudWidth,dt);
+                staminaBar.Update(StaminaHudWidth,dt);
+            }
             healthTrail.Update(Mathf.Clamp01((float)(p.hp/p.maxHp)),dt);
             staminaTrail.Update(Mathf.Clamp01((float)(p.stamina/sim.PlayerMaxStamina)),dt);
             float echo=Mathf.Clamp01((float)(p.echo/Rules.echoMax));
@@ -1024,14 +987,14 @@ namespace LingyueEchoes
             HudBar(new Rect(136,87,staminaBar.Width,15),(float)(p.stamina/sim.PlayerMaxStamina),staminaTrail.Width,new Color(1,.81f,.12f),staminaBar);
             RoundedFill(new Rect(38,35,106,106),new Color(.025f,.035f,.05f,.98f),53);
             RoundedFill(new Rect(42,39,98,98),new Color(.14f,.18f,.23f),49);
-            if(hudPortrait)GUI.DrawTexture(new Rect(43,40,96,96),hudPortrait);
+            if(hudPortrait)DrawTintedTexture(new Rect(43,40,96,96),hudPortrait,WithAlpha(Color.white,guiOpacity));
             int echo=Mathf.RoundToInt(Mathf.Clamp01((float)(p.echo/Rules.echoMax))*100),trail=Mathf.RoundToInt(echoTrail.Width*100);
             if(hudRing&&(echo!=hudEcho||trail!=hudEchoTrail)){hudEcho=echo;hudEchoTrail=trail;for(int i=0;i<hudRingPixels.Length;i++){
                     float arc=hudRingPosition[i]*100;
                     Color color=arc<=echo&&echo>0?EchoOrange:arc<=trail&&trail>echo?Color.white:new Color(.72f,.28f,.06f,.8f);
                     color.a*=hudRingCoverage[i];hudRingPixels[i]=color;}
                 hudRing.SetPixels(hudRingPixels);hudRing.Apply(false,false);}
-            if(hudRing)GUI.DrawTexture(new Rect(27,24,128,128),hudRing);
+            if(hudRing)DrawTintedTexture(new Rect(27,24,128,128),hudRing,WithAlpha(Color.white,guiOpacity));
             for(int i=0;i<3;i++){float angle=(75-i*25)*Mathf.Deg2Rad;float x=91+60*Mathf.Cos(angle),y=88+60*Mathf.Sin(angle);
                 RoundedFill(new Rect(x-8,y-8,16,16),new Color(.025f,.035f,.05f,.98f),8);
                 RoundedFill(new Rect(x-6,y-6,12,12),EchoOrange,6);
