@@ -1,0 +1,140 @@
+{
+  "art_source": "host_image",
+  "character_reference": "../pixel8/hero-master.png",
+  "sheet_layout": "4x4 row-major, 384x256 cells",
+  "frame_canvas": [
+    192,
+    128
+  ],
+  "foot_anchor": [
+    96,
+    112
+  ],
+  "source_scale": 0.315,
+  "actions": {
+    "idle": {
+      "source": "idle.png",
+      "source_anchor_x": 186,
+      "selection_0_based": [
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14
+      ]
+    },
+    "run": {
+      "source": "run.png",
+      "source_anchor_x": 185,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "attack1": {
+      "source": "horizontal.png",
+      "source_anchor_x": 189,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "attack2": {
+      "source": "thrust.png",
+      "source_anchor_x": 179,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "attack3": {
+      "source": "spin.png",
+      "source_anchor_x": 190,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "attack4": {
+      "source": "overhead.png",
+      "source_anchor_x": 184,
+      "selection_0_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  }
+}

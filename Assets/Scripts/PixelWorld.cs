@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LingyueEchoes
 {
-    [Serializable] public class ClipDefinition {public string name,folder,path;public float duration,sample;public bool loop;public float[] times;public string[] frames;public int contactPose,secondContactPose;}
+    [Serializable] public class ClipDefinition {public string name,folder,path;public float duration,sample;public bool loop,authoredTiming;public float[] times;public string[] frames;public int contactPose,secondContactPose;}
     [Serializable] public class ClipManifest {public ClipDefinition[] clips;}
     public static class PixelWorld
     {
@@ -117,6 +117,11 @@ namespace LingyueEchoes
         // Art is retimed around resolved contacts; this never advances the combat clock.
         public static int DrawnAttackCell(ClipDefinition clip,Move move,int age){
             int tick=Math.Max(0,age-1),contact=clip.contactPose;
+            if(clip.authoredTiming){
+                int pose=0;
+                while(pose+1<clip.times.Length&&Mathf.RoundToInt(clip.times[pose+1]*Rules.hz)<=tick)pose++;
+                return pose;
+            }
             if(tick<move.wind)return tick*contact/Math.Max(1,move.wind);
             int startTick=move.wind,startPose=contact;
             if(clip.secondContactPose>contact&&move.pulses!=null&&move.pulses.Length>1){

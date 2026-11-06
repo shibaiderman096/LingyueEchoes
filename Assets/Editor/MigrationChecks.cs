@@ -46,6 +46,12 @@ public static class MigrationChecks
                     var move=clip.folder=="guardian8"?Rules.Boss[index]:Rules.Player[index];
                     Assert(PixelActor.DrawnAttackCell(clip,move,move.wind)<clip.contactPose&&PixelActor.DrawnAttackCell(clip,move,move.wind+1)==clip.contactPose,"Drawn contact: "+clip.path);
                     if(clip.secondContactPose>0)Assert(PixelActor.DrawnAttackCell(clip,move,move.wind+move.pulses[1]+1)==clip.secondContactPose,"Drawn second contact: "+clip.path);
+                    if(clip.authoredTiming){
+                        Assert(clip.times.Length==clip.frames.Length&&Mathf.RoundToInt(clip.duration*Rules.hz)==move.wind+move.active+move.recovery,"Authored timing matches move length: "+clip.name);
+                        var holds=clip.times.Skip(1).Zip(clip.times,(a,b)=>Mathf.RoundToInt((a-b)*Rules.hz)).ToArray();
+                        Assert(holds.All(n=>n>0)&&holds.Distinct().Count()>1,"Ordered poses have varied holds: "+clip.name);
+                        if(index==2)Assert(PixelActor.DrawnAttackCell(clip,move,move.chainAt)>=12,"Spin returns to its starting direction before the chain can cut it off");
+                    }
                 }}}finally{UnityEngine.Object.DestroyImmediate(go);}
         if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
         else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; tail healing; V2 content, reading hold, broken steps and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
@@ -136,22 +142,38 @@ public static class MigrationChecks
     }
     static void CheckPlayerCombo(){
         var c=new Combat{ai=false,enemyActive=false};var p=c.player;p.x=0;
+        c.Press("attack");c.Step();
         for(int stage=0;stage<4;stage++){
-            c.Press("attack");c.Step();
             Assert(p.state=="attack"&&p.combo==stage&&p.move==Rules.Player[stage],"Attack chain enters stage "+(stage+1));
-            while(p.age<p.move.wind)c.Step();
+            var move=p.move;
+            while(p.age<move.wind)c.Step();
             Assert(c.hits.Count==0,"No hit before contact for stage "+(stage+1));
             if(stage==3)Assert(c.visuals.Any(v=>v.kind=="charge"&&v.owner==1&&v.attackId==p.attackId),"Fourth attack telegraphs before contact");
+            if(move.chainAt>0)c.Press("attack");
             c.Step();var hit=c.hits.Single();var fx=c.visuals.Last();
             Assert(fx.IsPlayerCombo&&fx.combo==stage&&fx.originX==p.x&&fx.originY==p.y,"Combo effect matches hit frame and pose");
             if(stage==2)Assert(hit.x<p.x&&hit.x+hit.w>p.x,"Spinning cut covers both sides");
             else Assert(hit.x==p.x,"Directional attacks hit forward only");
-            while(p.age<p.move.wind+p.move.active)c.Step();
+            int until=move.chainAt>0?move.chainAt:move.wind+move.active;
+            while(p.age<until){c.Step();Assert(p.move==move,"Follow-up never skips contact or the required follow-through");}
+            if(move.chainAt>0){
+                Assert(until<move.wind+move.active+move.recovery,"Combo can skip the final recovery poses");
+                c.Step();
+            }
         }
         Assert(p.x==30,"Only the thrust moves the player, by one short step");
         c.Press("attack");c.Step();Assert(p.combo==3,"Fourth attack does not wrap while recovering");
         c.ClearCommands();while(p.state=="attack")c.Step();
         c.Press("attack");c.Step();Assert(p.combo==0,"A new chain starts from the horizontal cut");
+        var cancel=new Combat{ai=false,enemyActive=false};
+        cancel.Press("attack");cancel.Step();
+        while(cancel.player.age<Rules.Player[0].wind)cancel.Step();
+        cancel.Press("attack");
+        while(cancel.player.age<Rules.Player[0].wind+Rules.Player[0].active)cancel.Step();
+        cancel.Press("dodge");cancel.Step();
+        Assert(cancel.player.state=="dodge","Dodge can cancel a buffered combo during recovery");
+        for(int i=0;i<Rules.dodgeFrames+4;i++)cancel.Step();
+        Assert(cancel.player.state=="idle","Interrupted combo does not replay buffered attacks");
         var wall=new Combat{ai=false,enemyActive=false};wall.player.x=0;wall.player.face=-1;wall.player.combo=1;
         wall.player.state="attack";wall.player.move=Rules.Player[1];wall.player.age=wall.player.move.wind;
         wall.terrain.Add(new Box(-70,0,25,45));for(int i=0;i<6;i++)wall.Step();

@@ -50,7 +50,7 @@ public static class ProjectSetup
     [MenuItem("Lingyue/Import tail healing animations")]
     public static void InstallTailHealingClips()=>InstallPixelClips(new[]{"heal","heal_fx"});
     [MenuItem("Lingyue/Import player combo animations")]
-    public static void InstallPlayerComboClips()=>InstallPixelClips(Enumerable.Range(1,4).SelectMany(i=>new[]{"attack"+i,"cut_fx"+i}));
+    public static void InstallPlayerComboClips()=>InstallPixelClips(new[]{"idle","run"}.Concat(Enumerable.Range(1,4).SelectMany(i=>new[]{"attack"+i,"cut_fx"+i})));
     static void InstallPixelClips(System.Collections.Generic.IEnumerable<string> names){
         AssetDatabase.Refresh();
         var controller=AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/Resources/Animations/pixel8/Controller.controller");
