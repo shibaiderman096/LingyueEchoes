@@ -110,6 +110,7 @@ namespace LingyueEchoes
             inputDevice.Select(lastInputDevice??(Application.isMobilePlatform||previewTouchControls?"touch":Input.GetJoystickNames().Any(n=>!string.IsNullOrWhiteSpace(n))?"pad":"keyboard"));
             CreateAudioSources();
             foreach(string name in new[]{"step","jump","land","slash1","slash2","slash3","guard","dodge","counter","hit_player","hit_boss","parry","perfect_dodge","boss_swing","break","phase","death","victory","heal","ui_confirm","ui_back"})soundClips[name]=Resources.Load<AudioClip>("audio/sfx/"+name);
+            soundClips["slash4"]=soundClips["slash3"];
             speech.onClose=id=>{
                 if(stage=="GATE_DIALOGUE"){BeginTrialIntro();return;}
                 if(stage=="TUTORIAL"){tutorialDialogue=false;tutorial.FinishDialogue(sim,id);}
@@ -354,7 +355,7 @@ namespace LingyueEchoes
         void SetMusic(string name){if(musicKey==name)return;musicKey=name;var clip=Resources.Load<AudioClip>("contentpack_20261104/music/"+name);if(!clip)return;music.Stop();music.clip=clip;music.Play();}
         void StopSounds(){if(voices!=null)foreach(var voice in voices)voice.Stop();}
         void UiSound(string name){if(!muted&&soundClips.TryGetValue(name,out var clip)&&clip){uiVoice.Stop();uiVoice.clip=clip;uiVoice.volume=.45f;uiVoice.Play();}}
-        void SyncSounds(){if(soundModel!=sim){StopSounds();soundModel=sim;soundCursor=0;}foreach(var cue in sim.sounds){if(cue.id<=soundCursor)continue;soundCursor=cue.id;if(muted||clock.paused||cue.name=="victory")continue;if(!soundClips.TryGetValue(cue.name,out var clip)||!clip)continue;var voice=voices.FirstOrDefault(v=>!v.isPlaying)??voices[voiceIndex++%voices.Length];voice.Stop();voice.clip=clip;voice.volume=cue.name=="step"?.22f:cue.name=="guard"?.3f:.65f;voice.Play();}}
+        void SyncSounds(){if(soundModel!=sim){StopSounds();soundModel=sim;soundCursor=0;}foreach(var cue in sim.sounds){if(cue.id<=soundCursor)continue;soundCursor=cue.id;if(muted||clock.paused||cue.name=="victory")continue;if(!soundClips.TryGetValue(cue.name,out var clip)||!clip)continue;var voice=voices.FirstOrDefault(v=>!v.isPlaying)??voices[voiceIndex++%voices.Length];voice.Stop();voice.clip=clip;voice.pitch=cue.name=="slash4"?.76f:1;voice.volume=cue.name=="step"?.22f:cue.name=="guard"?.3f:.65f;voice.Play();}}
         void UpdateViewport(){float aspect=(float)Screen.width/Screen.height,desired=16f/9;if(aspect>desired){float w=desired/aspect;view.rect=new Rect((1-w)/2,0,w,1);}else{float h=aspect/desired;view.rect=new Rect(0,(1-h)/2,1,h);}}
         Vector2 UiPoint(Vector2 screen){float scale=Math.Min(Screen.width/1280f,Screen.height/720f);return new Vector2((screen.x-(Screen.width-1280*scale)/2)/scale,(Screen.height-screen.y-(Screen.height-720*scale)/2)/scale);}
         void DetectInputDevice(){bool keyboard=Input.anyKeyDown&&keyboardKeys.Any(k=>Input.GetKeyDown(k)),padButton=false;

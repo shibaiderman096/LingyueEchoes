@@ -137,14 +137,13 @@ namespace LingyueEchoes
         public PixelEffects(Transform parent){for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
         public void Clear(){foreach(var e in pool){e.cue=null;e.go.SetActive(false);}cursor=next=0;model=null;}
         public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
-            foreach(var e in pool){var cue=e.cue;if(cue==null)continue;string clip=cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
+            foreach(var e in pool){var cue=e.cue;if(cue==null)continue;string clip=cue.IsPlayerCombo?"cut_fx"+(cue.combo+1):cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
                 var d=PixelWorld.Definition("pixel8",clip);if(d==null){e.cue=null;e.go.SetActive(false);continue;}
                 int source=(int)Math.Round(d.duration*60),life=cue.kind=="charge"?Math.Min(12,source):source,age=sim.frame-cue.frame;
                 if(age>=life||!cue.TryGetAnchor(cue.owner==1?sim.player:sim.boss,out double x,out double y)){e.cue=null;e.go.SetActive(false);continue;}
-                e.go.SetActive(age>=0);float size=cue.kind=="charge"?.22f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:cue.kind=="heal_fx"?1.5f:1.8f;
+                e.go.SetActive(age>=0);float size=cue.kind=="charge"?(cue.owner==1?.48f:.22f):cue.IsPlayerCombo?1.5f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:cue.kind=="heal_fx"?1.5f:1.8f;
                 e.go.transform.localPosition=new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100,0);e.go.transform.localScale=new Vector3(cue.face*size,size,1);
-                e.go.transform.localRotation=Quaternion.Euler(0,0,cue.RotationDegrees);
-                e.renderer.color=cue.owner==2&&(cue.kind=="charge"||cue.kind=="slash")?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):Color.white;
+                e.renderer.color=cue.owner==2&&(cue.kind=="charge"||cue.kind=="slash")?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):cue.kind=="charge"?new Color(1,.78f,.49f):Color.white;
                 PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1));}
         }
     }

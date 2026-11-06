@@ -14,7 +14,7 @@ public class PixelImport:AssetPostprocessor
         var importer=(TextureImporter)assetImporter;importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;importer.spritePixelsPerUnit=100;
         importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.maxTextureSize=8192;
         var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);settings.spriteMeshType=SpriteMeshType.FullRect;settings.spriteAlignment=(int)SpriteAlignment.Custom;
-        bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/","heal_fx/"}.Any(s=>assetPath.Contains(s));
+        bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/","heal_fx/","attack_fx/"}.Any(s=>assetPath.Contains(s));
         bool guardian=assetPath.Contains("/guardian8/frames/")||assetPath.Contains("/guardian8/frames16/");
         settings.spritePivot=guardian?new Vector2(.5f,24f/224):hero?new Vector2(.5f,.125f):new Vector2(.5f,.5f);importer.SetTextureSettings(settings);
     }
@@ -48,12 +48,16 @@ public static class ProjectSetup
         EditorUtility.CopySerialized(clip,existing);EditorUtility.SetDirty(existing);UnityEngine.Object.DestroyImmediate(clip);return existing;
     }
     [MenuItem("Lingyue/Import tail healing animations")]
-    public static void InstallTailHealingClips(){
+    public static void InstallTailHealingClips()=>InstallPixelClips(new[]{"heal","heal_fx"});
+    [MenuItem("Lingyue/Import player combo animations")]
+    public static void InstallPlayerComboClips()=>InstallPixelClips(Enumerable.Range(1,4).SelectMany(i=>new[]{"attack"+i,"cut_fx"+i}));
+    static void InstallPixelClips(System.Collections.Generic.IEnumerable<string> names){
         AssetDatabase.Refresh();
         var controller=AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/Resources/Animations/pixel8/Controller.controller");
         var machine=controller.layers[0].stateMachine;
-        foreach(string name in new[]{"heal","heal_fx"}){
-            var motion=WriteClip(PixelWorld.Definition("pixel8",name));
+        var manifest=JsonUtility.FromJson<ClipManifest>(File.ReadAllText("Assets/Resources/Data/animations.json"));
+        foreach(string name in names){
+            var motion=WriteClip(manifest.clips.Single(d=>d.folder=="pixel8"&&d.name==name));
             var state=machine.states.Select(s=>s.state).FirstOrDefault(s=>s.name==name)??machine.AddState(name);
             state.motion=motion;EditorUtility.SetDirty(state);
         }

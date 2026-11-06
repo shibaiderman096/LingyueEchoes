@@ -516,26 +516,26 @@
       "name": "attack1",
       "folder": "pixel8",
       "path": "Animations/pixel8/attack1",
-      "duration": 1.0,
+      "duration": 0.5333333333333333,
       "sample": 60,
       "loop": false,
       "times": [
         0.0,
-        0.0625,
-        0.125,
-        0.1875,
-        0.25,
-        0.3125,
-        0.375,
-        0.4375,
-        0.5,
-        0.5625,
-        0.625,
-        0.6875,
-        0.75,
-        0.8125,
-        0.875,
-        0.9375
+        0.016666666666666666,
+        0.05,
+        0.06666666666666667,
+        0.08333333333333333,
+        0.11666666666666667,
+        0.13333333333333333,
+        0.18333333333333332,
+        0.21666666666666667,
+        0.26666666666666666,
+        0.3,
+        0.35,
+        0.38333333333333336,
+        0.43333333333333335,
+        0.4666666666666667,
+        0.5166666666666667
       ],
       "frames": [
         "pixel8/frames16/attack1/attack1-01",
@@ -561,26 +561,26 @@
       "name": "attack2",
       "folder": "pixel8",
       "path": "Animations/pixel8/attack2",
-      "duration": 1.0,
+      "duration": 0.5333333333333333,
       "sample": 60,
       "loop": false,
       "times": [
         0.0,
-        0.0625,
-        0.125,
-        0.1875,
-        0.25,
-        0.3125,
-        0.375,
-        0.4375,
-        0.5,
-        0.5625,
-        0.625,
-        0.6875,
-        0.75,
-        0.8125,
-        0.875,
-        0.9375
+        0.016666666666666666,
+        0.03333333333333333,
+        0.05,
+        0.06666666666666667,
+        0.08333333333333333,
+        0.1,
+        0.11666666666666667,
+        0.16666666666666666,
+        0.21666666666666667,
+        0.26666666666666666,
+        0.31666666666666665,
+        0.36666666666666664,
+        0.4166666666666667,
+        0.4666666666666667,
+        0.5166666666666667
       ],
       "frames": [
         "pixel8/frames16/attack2/attack2-01",
@@ -600,32 +600,32 @@
         "pixel8/frames16/attack2/attack2-15",
         "pixel8/frames16/attack2/attack2-16"
       ],
-      "contactPose": 6
+      "contactPose": 7
     },
     {
       "name": "attack3",
       "folder": "pixel8",
       "path": "Animations/pixel8/attack3",
-      "duration": 1.0,
+      "duration": 0.8,
       "sample": 60,
       "loop": false,
       "times": [
         0.0,
-        0.0625,
-        0.125,
-        0.1875,
-        0.25,
-        0.3125,
-        0.375,
-        0.4375,
+        0.03333333333333333,
+        0.05,
+        0.08333333333333333,
+        0.11666666666666667,
+        0.15,
+        0.16666666666666666,
+        0.2,
+        0.26666666666666666,
+        0.35,
+        0.4166666666666667,
         0.5,
-        0.5625,
-        0.625,
-        0.6875,
-        0.75,
-        0.8125,
-        0.875,
-        0.9375
+        0.5666666666666667,
+        0.6333333333333333,
+        0.7166666666666667,
+        0.7833333333333333
       ],
       "frames": [
         "pixel8/frames16/attack3/attack3-01",
@@ -646,6 +646,131 @@
         "pixel8/frames16/attack3/attack3-16"
       ],
       "contactPose": 7
+    },
+    {
+      "name": "attack4",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/attack4",
+      "duration": 0.9166666666666666,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.08333333333333333,
+        0.11666666666666667,
+        0.16666666666666666,
+        0.2,
+        0.25,
+        0.2833333333333333,
+        0.3333333333333333,
+        0.36666666666666664,
+        0.45,
+        0.55,
+        0.6333333333333333,
+        0.7166666666666667,
+        0.8166666666666667,
+        0.9
+      ],
+      "frames": [
+        "pixel8/frames16/attack4/attack4-01",
+        "pixel8/frames16/attack4/attack4-02",
+        "pixel8/frames16/attack4/attack4-03",
+        "pixel8/frames16/attack4/attack4-04",
+        "pixel8/frames16/attack4/attack4-05",
+        "pixel8/frames16/attack4/attack4-06",
+        "pixel8/frames16/attack4/attack4-07",
+        "pixel8/frames16/attack4/attack4-08",
+        "pixel8/frames16/attack4/attack4-09",
+        "pixel8/frames16/attack4/attack4-10",
+        "pixel8/frames16/attack4/attack4-11",
+        "pixel8/frames16/attack4/attack4-12",
+        "pixel8/frames16/attack4/attack4-13",
+        "pixel8/frames16/attack4/attack4-14",
+        "pixel8/frames16/attack4/attack4-15",
+        "pixel8/frames16/attack4/attack4-16"
+      ],
+      "contactPose": 9
+    },
+    {
+      "name": "cut_fx1",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/cut_fx1",
+      "duration": 0.23333333333333334,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.16666666666666666
+      ],
+      "frames": [
+        "pixel8/frames/attack_fx/cut_fx1/cut_fx1-01",
+        "pixel8/frames/attack_fx/cut_fx1/cut_fx1-02",
+        "pixel8/frames/attack_fx/cut_fx1/cut_fx1-03",
+        "pixel8/frames/attack_fx/cut_fx1/cut_fx1-04"
+      ]
+    },
+    {
+      "name": "cut_fx2",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/cut_fx2",
+      "duration": 0.23333333333333334,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.16666666666666666
+      ],
+      "frames": [
+        "pixel8/frames/attack_fx/cut_fx2/cut_fx2-01",
+        "pixel8/frames/attack_fx/cut_fx2/cut_fx2-02",
+        "pixel8/frames/attack_fx/cut_fx2/cut_fx2-03",
+        "pixel8/frames/attack_fx/cut_fx2/cut_fx2-04"
+      ]
+    },
+    {
+      "name": "cut_fx3",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/cut_fx3",
+      "duration": 0.23333333333333334,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.16666666666666666
+      ],
+      "frames": [
+        "pixel8/frames/attack_fx/cut_fx3/cut_fx3-01",
+        "pixel8/frames/attack_fx/cut_fx3/cut_fx3-02",
+        "pixel8/frames/attack_fx/cut_fx3/cut_fx3-03",
+        "pixel8/frames/attack_fx/cut_fx3/cut_fx3-04"
+      ]
+    },
+    {
+      "name": "cut_fx4",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/cut_fx4",
+      "duration": 0.23333333333333334,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.16666666666666666
+      ],
+      "frames": [
+        "pixel8/frames/attack_fx/cut_fx4/cut_fx4-01",
+        "pixel8/frames/attack_fx/cut_fx4/cut_fx4-02",
+        "pixel8/frames/attack_fx/cut_fx4/cut_fx4-03",
+        "pixel8/frames/attack_fx/cut_fx4/cut_fx4-04"
+      ]
     },
     {
       "name": "counter",

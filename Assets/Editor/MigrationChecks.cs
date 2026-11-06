@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckPlayerCombo();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -41,7 +41,7 @@ public static class MigrationChecks
                         Assert((sprite.pivot-foot).sqrMagnitude<.001f,"Imported foot pivot: "+clip.frames[cell]+" actual "+sprite.pivot);
                     }}
                 if(clip.contactPose>0){
-                    int index=Array.IndexOf(clip.folder=="guardian8"?new[]{"slash","double","thrust","slam","leap","spin"}:new[]{"attack1","attack2","attack3"},clip.name);
+                    int index=Array.IndexOf(clip.folder=="guardian8"?new[]{"slash","double","thrust","slam","leap","spin"}:new[]{"attack1","attack2","attack3","attack4"},clip.name);
                     if(index<0)continue;
                     var move=clip.folder=="guardian8"?Rules.Boss[index]:Rules.Player[index];
                     Assert(PixelActor.DrawnAttackCell(clip,move,move.wind)<clip.contactPose&&PixelActor.DrawnAttackCell(clip,move,move.wind+1)==clip.contactPose,"Drawn contact: "+clip.path);
@@ -132,7 +132,33 @@ public static class MigrationChecks
         Assert(edge.boss.x==560&&hit.x==560&&slash.originX==560&&slash.originY==edge.boss.y,"Airborne attack contact and effects share the clamped pose");
         edge.Step();Assert(slash.TryGetAnchor(edge.boss,out double x,out double y)&&edge.boss.y!=slash.originY&&Math.Abs(y-slash.y-edge.boss.y+slash.originY)<1e-7&&x==slash.x,"The slash follows the moving attack pose");
         edge.boss.face=-1;Assert(!slash.TryGetAnchor(edge.boss,out _,out _),"An old slash is hidden when the actor turns");
-        Assert(new VisualCue{kind="slash",combo=1,face=-1}.RotationDegrees==40,"Angled combo arcs mirror with the actor");
+        Assert(new VisualCue{kind="slash",owner=1,combo=1,face=-1}.IsPlayerCombo&&!new VisualCue{kind="slash",owner=1,power=true}.IsPlayerCombo,"Normal combo uses authored arcs; executions retain the shared effect");
+    }
+    static void CheckPlayerCombo(){
+        var c=new Combat{ai=false,enemyActive=false};var p=c.player;p.x=0;
+        for(int stage=0;stage<4;stage++){
+            c.Press("attack");c.Step();
+            Assert(p.state=="attack"&&p.combo==stage&&p.move==Rules.Player[stage],"Attack chain enters stage "+(stage+1));
+            while(p.age<p.move.wind)c.Step();
+            Assert(c.hits.Count==0,"No hit before contact for stage "+(stage+1));
+            if(stage==3)Assert(c.visuals.Any(v=>v.kind=="charge"&&v.owner==1&&v.attackId==p.attackId),"Fourth attack telegraphs before contact");
+            c.Step();var hit=c.hits.Single();var fx=c.visuals.Last();
+            Assert(fx.IsPlayerCombo&&fx.combo==stage&&fx.originX==p.x&&fx.originY==p.y,"Combo effect matches hit frame and pose");
+            if(stage==2)Assert(hit.x<p.x&&hit.x+hit.w>p.x,"Spinning cut covers both sides");
+            else Assert(hit.x==p.x,"Directional attacks hit forward only");
+            while(p.age<p.move.wind+p.move.active)c.Step();
+        }
+        Assert(p.x==30,"Only the thrust moves the player, by one short step");
+        c.Press("attack");c.Step();Assert(p.combo==3,"Fourth attack does not wrap while recovering");
+        c.ClearCommands();while(p.state=="attack")c.Step();
+        c.Press("attack");c.Step();Assert(p.combo==0,"A new chain starts from the horizontal cut");
+        var wall=new Combat{ai=false,enemyActive=false};wall.player.x=0;wall.player.face=-1;wall.player.combo=1;
+        wall.player.state="attack";wall.player.move=Rules.Player[1];wall.player.age=wall.player.move.wind;
+        wall.terrain.Add(new Box(-70,0,25,45));for(int i=0;i<6;i++)wall.Step();
+        Assert(wall.player.x==-18&&wall.visuals.Single().face==-1,"Left-facing thrust stops at terrain and emits a mirrored cue");
+        var rear=new Combat{ai=false};rear.player.x=0;rear.boss.x=-130;rear.player.combo=2;
+        rear.player.state="attack";rear.player.move=Rules.Player[2];rear.player.age=rear.player.move.wind;
+        for(int i=0;i<12;i++)rear.Step();Assert(rear.boss.hp==rear.boss.maxHp-Rules.Player[2].damage,"Spinning cut hits a rear target exactly once");
     }
     static void CheckPrologueContent(){
         var asset=Resources.Load<TextAsset>("Data/prologue-content");

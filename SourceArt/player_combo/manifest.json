@@ -1,0 +1,20 @@
+{
+  "art_source": "host_image",
+  "layout": "4 columns x 4 rows, row-major",
+  "character_reference": "../pixel8/hero-master.png",
+  "hero_sheets": {
+    "attack1": "horizontal.png",
+    "attack2": "thrust.png",
+    "attack3": "spin.png",
+    "attack4": "overhead.png"
+  },
+  "replacement_poses": {
+    "attack4-09": "overhead-pose09.png"
+  },
+  "hero_frame_canvas": [192, 128],
+  "hero_frame_foot_from_top_left": [96, 112],
+  "effects_sheet": "blade-fx.png",
+  "effects_rows": ["cut_fx1", "cut_fx2", "cut_fx3", "cut_fx4"],
+  "effects_frame_canvas": [288, 192],
+  "effects_anchor_from_top_left": [144, 96]
+}

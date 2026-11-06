@@ -21,7 +21,8 @@ namespace LingyueEchoes
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
         public static readonly Move[] Player={
-            M("斩一",8,6,18,100,90,18,12,true), M("斩二",7,6,19,115,95,22,15,true), M("斩三",12,7,29,140,110,35,26,true)};
+            M("横斩",8,6,18,100,90,18,12,true), M("踏步突刺",7,6,19,115,70,22,15,true,5),
+            M("回旋斩",12,7,29,140,110,35,26,true), M("蓄力下斩",22,5,28,115,125,42,30,true)};
         public static readonly Move[] Boss={
             M("横斩",30,5,28,150,105,18,24,true), M("双连斩",24,29,30,160,105,14,20,true,pulses:new[]{0,24}),
             M("突刺",36,10,32,150,85,24,30,true,10), M("震地",48,8,40,260,35,28,38,false,low:true),
@@ -47,7 +48,7 @@ namespace LingyueEchoes
     public class Hitbox:Box {public int owner,attackId,pulse;public Move move;}
     public class VisualCue {
         public int id,frame,face,combo,owner,attackId;public double x,y,originX,originY;public string kind;public bool power,danger;
-        public int RotationDegrees=>kind=="slash"?face*(combo==1?-40:combo==2?45:0):0;
+        public bool IsPlayerCombo=>kind=="slash"&&owner==1&&!power;
         public bool TryGetAnchor(Fighter actor,out double anchorX,out double anchorY){
             anchorX=x;anchorY=y;
             if(kind!="slash"&&kind!="charge")return true;
@@ -59,6 +60,7 @@ namespace LingyueEchoes
     public class DummyContact {public int id,attackId,combo,frame;}
     public class Combat
     {
+        static readonly string[] PlayerSlashSounds={"slash1","slash2","slash3","slash4"};
         public Fighter player=new Fighter(1,-250,Rules.playerMaxHp),boss=new Fighter(2,250,650);
         public int TailUpgrades {get;private set;}
         public bool HealUnlocked=>TailUpgrades>0;
@@ -127,6 +129,9 @@ namespace LingyueEchoes
                 if(a.id==2&&a.move?.name=="跃击"){if(a.age==a.move.wind-24)a.vy=7.2;if(a.age>=a.move.wind-24&&a.age<a.move.wind)a.x+=a.face*5;}
                 double oldY=a.y;bool airborne=a.vy!=0;a.y+=a.vy;a.vy-=Rules.gravity;
                 if(a.id==1&&a.state=="run"&&a.age%20==0)Sound("step");if(a.state=="dodge")a.x+=a.face*Rules.dodgeSpeed;
+                var move=a.move;
+                bool stepping=move!=null&&a.age>=move.wind&&a.age<move.wind+move.active;
+                if(stepping&&a.id==1)a.x+=a.face*move.speed; // Player lunges go through the normal terrain collision.
                 double radius=BodyWidth(a)/2,floor=0,oldX=a.id==1?oldPX:oldBX;
                 foreach(var slab in terrain){double top=slab.y+slab.h;
                     if(a.y<top&&oldY<top){if(oldX+radius<=slab.x&&a.x+radius>slab.x)a.x=slab.x-radius;if(oldX-radius>=slab.x+slab.w&&a.x-radius<slab.x+slab.w)a.x=slab.x+slab.w+radius;}
@@ -140,8 +145,7 @@ namespace LingyueEchoes
                         }else if(!slab.noFoothold&&oldY>=top)floor=Math.Max(floor,top);
                     }}
                 if(a.y<=floor){a.y=floor;a.vy=0;if(airborne&&a.id==1)Sound("land");}
-                var move=a.move;
-                if(move!=null&&a.age>=move.wind&&a.age<move.wind+move.active)a.x+=a.face*move.speed;
+                if(stepping&&a.id==2)a.x+=a.face*move.speed;
                 a.x=Math.Max(boundsMin,Math.Min(boundsMax,a.x));
             }
             if(p.state=="execute"&&p.move!=null&&p.age<=p.move.wind&&b.x!=p.x)p.face=b.x>p.x?1:-1;
@@ -166,16 +170,21 @@ namespace LingyueEchoes
             var m=a.move;if(m==null)return;
             int t=a.age-m.wind;
             if(a.id==2&&t==-12){var pt=WeaponPoint(m.name);Visual("charge",a.x+a.face*pt.Item1,a.y+pt.Item2,a);}
+            bool normal=a.id==1&&a.state=="attack";
+            if(normal&&a.combo==3&&t==-12)Visual("charge",a.x-a.face*15,a.y+132,a);
             if(t<0||t>=m.active)return;
             int pulse=m.pulses==null?0:Array.FindIndex(m.pulses,s=>t>=s&&t<s+4);
             if(pulse<0)return;
             bool execute=a.id==1&&a.state=="execute";
+            bool spin=normal&&a.combo==2;
             // The target was in reach at startup; resolve the lock at its current position on contact.
-            var area=execute?Hurtbox(boss):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
+            var area=execute?Hurtbox(boss):spin?new Box(a.x-m.reach,a.y,m.reach*2,m.height):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
             hits.Add(new Hitbox{x=area.x,y=area.y,w=area.w,h=area.h,owner=a.id,attackId=a.attackId,pulse=pulse,move=m});
             if(t==(m.pulses==null?0:m.pulses[pulse])){
-                Visual("slash",a.x+a.face*m.reach*.45,a.y+m.height*.5,a);
-                Sound(a.id==1?(a.state=="finisher"||execute?"counter":new[]{"slash1","slash2","slash3"}[a.combo]):"boss_swing");
+                double x=normal?(a.combo==0?63:a.combo==1?88:a.combo==2?0:72):m.reach*.45;
+                double y=normal?(a.combo==0?64:a.combo==1?63:a.combo==2?52:79):m.height*.5;
+                Visual("slash",a.x+a.face*x,a.y+y,a);
+                Sound(normal?PlayerSlashSounds[a.combo]:a.id==1?"counter":"boss_swing");
             }
         }
         static Tuple<double,double> WeaponPoint(string n){switch(n){case "横斩":return Tuple.Create(35d,62d);case "双连斩":return Tuple.Create(30d,100d);case "突刺":return Tuple.Create(40d,65d);case "震地":return Tuple.Create(-15d,146d);case "跃击":return Tuple.Create(-10d,145d);case "赤月回旋":return Tuple.Create(-35d,75d);default:return Tuple.Create(35d,75d);}}
@@ -189,7 +198,7 @@ namespace LingyueEchoes
                     else if(p.vy==0&&Consume("jump")){if(Spend(p,30)){p.vy=13;Enter(p,"air");Sound("jump");}else Log("气力不足 · 无法跳跃");}
                     else if(p.y==0&&p.vy==0&&Consume("heal")&&HealUnlocked&&p.hp<p.maxHp&&p.energy>=Rules.healCost){
                         if(axis!=0)p.face=Math.Sign(axis);Enter(p,"heal");}}
-                else if(p.state=="attack"&&p.combo<2&&Consume("attack")){p.combo++;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
+                else if(p.state=="attack"&&p.combo+1<Rules.Player.Length&&Consume("attack")){p.combo++;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
         void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;
             if(p.hp<=0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}b.face=p.x>=b.x?1:-1;
