@@ -1,0 +1,165 @@
+{
+  "scripts": [
+    {
+      "id": "stele",
+      "lines": [
+        {
+          "speaker": "guardian",
+          "text": "月门之外，便是七罪侵染的土地。"
+        },
+        {
+          "speaker": "hero",
+          "text": "那里的火光……一直没有熄灭吗？"
+        },
+        {
+          "speaker": "guardian",
+          "text": "有人不愿让它熄灭。"
+        },
+        {
+          "speaker": "guardian",
+          "text": "去看看吧。或许你会在那里找到第二条尾巴。"
+        }
+      ]
+    },
+    {
+      "id": "wrathEnter",
+      "lines": [
+        {
+          "speaker": "narration",
+          "text": "赤月照着废墟。风从空无一人的城门里吹过，灰烬仍带着温度。"
+        },
+        {
+          "speaker": "hero",
+          "text": "这里的火……像是在等谁回来。"
+        }
+      ]
+    },
+    {
+      "id": "wrathBossPre",
+      "lines": [
+        {
+          "speaker": "general",
+          "text": "又有人来了。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你就是这座城的主人？"
+        },
+        {
+          "speaker": "general",
+          "text": "主人？不。我只是个没能守住它的将军。"
+        },
+        {
+          "speaker": "hero",
+          "text": "我在寻找一条狐尾。"
+        },
+        {
+          "speaker": "general",
+          "text": "狐尾……"
+        },
+        {
+          "speaker": "general",
+          "text": "原来如此。连你也忘了那一夜。"
+        },
+        {
+          "speaker": "hero",
+          "text": "你认识我？"
+        },
+        {
+          "speaker": "general",
+          "text": "拔刀吧。"
+        },
+        {
+          "speaker": "general",
+          "text": "我已经不想听任何人的解释了。"
+        }
+      ]
+    },
+    {
+      "id": "wrathPhase2",
+      "lines": [
+        {
+          "speaker": "general",
+          "text": "火还没有熄。我也还没有倒下！"
+        }
+      ]
+    },
+    {
+      "id": "wrathBossAfter",
+      "lines": [
+        {
+          "speaker": "general",
+          "text": "为什么……我明明已经把一切都烧尽了……"
+        },
+        {
+          "speaker": "hero",
+          "text": "你究竟想守护什么？"
+        },
+        {
+          "speaker": "general",
+          "text": "城里的人。"
+        },
+        {
+          "speaker": "general",
+          "text": "那些……还在等我回去的人。"
+        },
+        {
+          "speaker": "narration",
+          "text": "赤绫低下头，手中的武器化作灰烬。",
+          "cue": "weaponAsh"
+        },
+        {
+          "speaker": "general",
+          "text": "如果那天……我没有被愤怒蒙住眼睛……"
+        },
+        {
+          "speaker": "general",
+          "text": "或许，还能再救一个人。"
+        },
+        {
+          "speaker": "general",
+          "text": "这条尾巴……本就是你的。"
+        },
+        {
+          "speaker": "general",
+          "text": "带走吧。别再让它困在这里了。"
+        }
+      ]
+    },
+    {
+      "id": "wrathEpilogue",
+      "lines": [
+        {
+          "speaker": "narration",
+          "text": "第二条狐尾在灰烬中归位。"
+        },
+        {
+          "speaker": "narration",
+          "text": "这一次，铃月没有听见号角。只听见城门外的风。"
+        },
+        {
+          "speaker": "narration",
+          "text": "来时的路上，神社的灯仍亮着。"
+        }
+      ]
+    },
+    {
+      "id": "wrathRetry",
+      "lines": [
+        {
+          "speaker": "general",
+          "text": "又来了？那就出刀。这一次，别忘了为什么而战。"
+        }
+      ]
+    },
+    {
+      "id": "wrathRematch",
+      "lines": [
+        {
+          "speaker": "general",
+          "text": "你的刀已经比那一夜稳多了。走吧。"
+        }
+      ]
+    }
+  ]
+}

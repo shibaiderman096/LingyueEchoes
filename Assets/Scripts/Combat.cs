@@ -9,7 +9,18 @@ namespace LingyueEchoes
     {
         public string name; public int wind, active, recovery, chainAt; public double reach, height, damage, posture, speed;
         public bool parry, low; public int[] pulses;
+        public string pose; public int fireDelay;
         public Move Copy() => (Move)MemberwiseClone();
+    }
+    public sealed class OpponentPattern
+    {
+        public readonly Move[] opening,rage;
+        public readonly int wait,rageWait,phaseFrames;
+        public readonly double pace,engage;
+        public OpponentPattern(Move[] opening,int wait,double pace,double engage,Move[] rage=null,int rageWait=0,int phaseFrames=54){
+            this.opening=opening;this.wait=wait;this.pace=pace;this.engage=engage;this.rage=rage;this.rageWait=rageWait;this.phaseFrames=phaseFrames;
+        }
+        public Move[] Moves(int phase)=>phase==2&&rage!=null?rage:opening;
     }
     public static class Rules
     {
@@ -90,11 +101,15 @@ namespace LingyueEchoes
         class Command {public string action;public int until;}
         readonly List<Command> queue=new List<Command>();
         bool dodgeRewarded,comboBuffered;int serial,visualSerial,soundSerial,aiWait=75,lastChoice=-1;
+        OpponentPattern opponent;
+        int fireAttack;double fireX;
+        static readonly Move DelayedFire=new Move{name="余焰",damage=16};
         public static double BodyWidth(Fighter a)=>a.id==1?54:78;
         public static double BodyHeight(Fighter a)=>a.id==1?117:146;
         public void TuneBoss(double hp,int open=90,int wait=46,int wait2=24){boss.maxHp=boss.hp=hp;aiOpenWait=open;aiWaitPhase1=wait;aiWaitPhase2=wait2;aiWait=open;}
-        public void ResetBoss(double x,double hp){
+        public void ResetBoss(double x,double hp,OpponentPattern pattern=null){
             boss=new Fighter(2,x,hp);TuneBoss(hp);
+            opponent=pattern;fireAttack=0;if(pattern!=null)aiWait=30;
             BossDefeated=false;phase=1;moveIndex=0;lastChoice=-1;
             hitstop=executeWindow=0;successFrame=-100;successKind="";hits.Clear();visuals.Clear();
         }
@@ -146,11 +161,12 @@ namespace LingyueEchoes
             if(player.hp<=0&&!continueAfterDeath||(enemyActive&&boss.hp<=0))return;
             var p=player;var b=boss;double oldPX=p.x,oldBX=b.x;beforeStep?.Invoke(this);
             if(continueAfterDeath&&p.hp<=0&&p.state!="dead")Enter(p,"dead");
-            if(p.hp>0&&enemyActive&&!nonlethal&&phase==1&&b.hp<=b.maxHp*.5&&b.state!="broken"&&b.state!="stagger"&&p.state!="finisher"&&p.state!="execute"){phase=2;Enter(b,"phase");Log("第二阶段：节奏加速");}
+            bool phaseThreshold=opponent==null?b.hp<=b.maxHp*.5:opponent.rage!=null&&b.hp<b.maxHp*.5;
+            if(p.hp>0&&enemyActive&&!nonlethal&&phase==1&&phaseThreshold&&b.state!="broken"&&b.state!="stagger"&&p.state!="finisher"&&p.state!="execute"){phase=2;Enter(b,"phase");Log("第二阶段：节奏加速");}
             if(p.hp>0)ControlPlayer();ControlBoss();
             foreach(var a in new[]{p,b}){
                 if(a.invuln>0)a.invuln--;
-                if(a.id==2&&a.move?.name=="跃击"){if(a.age==a.move.wind-24)a.vy=7.2;if(a.age>=a.move.wind-24&&a.age<a.move.wind)a.x+=a.face*5;}
+                if(a.id==2&&(a.move?.name=="跃击"||a.move?.pose=="leap")){if(a.age==a.move.wind-24)a.vy=7.2;if(a.age>=a.move.wind-24&&a.age<a.move.wind)a.x+=a.face*5;}
                 bool plunging=a.id==1&&a.state=="plunge";
                 if(plunging){a.vy=-Rules.plungeFallSpeed;a.x+=a.face*Rules.plungeDrift;}
                 double oldY=a.y;bool airborne=a.vy!=0;a.y+=a.vy;a.vy-=Rules.gravity;
@@ -188,7 +204,7 @@ namespace LingyueEchoes
             }
             foreach(var a in new[]{p,b}){a.age++;if(a.hp<=0){if(!continueAfterDeath||a.state!="dead")Enter(a,"dead");continue;}
                 if(a.move!=null&&a.age>=a.move.wind+a.move.active+a.move.recovery)Enter(a,a.y>0?"air":"idle");
-                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=90)){
+                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=(opponent?.phaseFrames??90))){
                     if(a.state=="broken")a.posture=0;Enter(a,a.y>0?"air":"idle");}
                 if(a.id==2&&(a.state=="idle"||a.state=="run")&&a.age%30==0)a.posture=Math.Max(0,a.posture-3);
                 if(a.id==1&&(a.state=="idle"||a.state=="run")&&a.stamina<PlayerMaxStamina)a.stamina=Math.Min(PlayerMaxStamina,a.stamina+Rules.staminaRegen);
@@ -197,6 +213,7 @@ namespace LingyueEchoes
         void EmitAttack(Fighter a){
             var m=a.move;if(m==null)return;
             int t=a.age-m.wind;
+            if(a.id==2&&m.fireDelay>0)EmitDelayedFire(a,m,t);
             if(a.id==2&&t==-12){var pt=WeaponPoint(m.name);Visual("charge",a.x+a.face*pt.Item1,a.y+pt.Item2,a);}
             bool normal=a.id==1&&a.state=="attack";
             if(normal&&a.combo==3&&t==-12)Visual("charge",a.x-a.face*15,a.y+132,a);
@@ -216,6 +233,16 @@ namespace LingyueEchoes
                 Visual("slash",a.x+a.face*x,a.y+y,a);
                 Sound(normal?PlayerSlashSounds[a.combo]:a.id==1?"counter":"boss_swing");
             }
+        }
+        void EmitDelayedFire(Fighter a,Move m,int t){
+            if(t==0){
+                fireAttack=a.attackId;
+                fireX=Math.Max(boundsMin+48,Math.Min(boundsMax-48,a.x+a.face*m.reach*.73));
+                Visual("fire_warning",fireX,0,a);
+            }
+            if(fireAttack!=a.attackId||t<m.fireDelay||t>=m.fireDelay+5)return;
+            if(t==m.fireDelay){Visual("fire_burst",fireX,0,a);Sound("fire_burst");}
+            hits.Add(new Hitbox{x=fireX-68,y=0,w=136,h=52,owner=2,attackId=a.attackId,pulse=-1,move=DelayedFire});
         }
         static Tuple<double,double> WeaponPoint(string n){switch(n){case "横斩":return Tuple.Create(35d,62d);case "双连斩":return Tuple.Create(30d,100d);case "突刺":return Tuple.Create(40d,65d);case "震地":return Tuple.Create(-15d,146d);case "跃击":return Tuple.Create(-10d,145d);case "赤月回旋":return Tuple.Create(-35d,75d);default:return Tuple.Create(35d,75d);}}
         void ControlPlayer(){var p=player;bool free=Free(p.state),recovering=(p.move!=null&&(p.state=="attack"||p.state=="finisher"||p.state=="execute")&&p.age>=p.move.wind+p.move.active)||(p.state=="parry"&&p.age>=Rules.parry);
@@ -237,10 +264,24 @@ namespace LingyueEchoes
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
         void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;
             if(p.hp<=0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}b.face=p.x>=b.x?1:-1;
+            if(opponent!=null){
+                double gap=Math.Abs(p.x-b.x);
+                if(aiWait>0)aiWait--;
+                if(aiWait>0||gap>opponent.engage){
+                    bool approach=gap>opponent.engage*.82;
+                    if(approach)b.x+=b.face*opponent.pace*(phase==2?1.15:1);
+                    string state=approach?"run":"idle";if(b.state!=state)Enter(b,state);return;
+                }
+                var moves=opponent.Moves(phase);
+                var move=moves[moveIndex++%moves.Length];
+                StartAttack(b,move);
+                aiWait=phase==2?opponent.rageWait:opponent.wait;
+                Log(move.name+(move.parry?" · 可弹反":" · 危险招式"));return;
+            }
             if(--aiWait>0){bool moving=Math.Abs(p.x-b.x)>215;if(moving)b.x+=b.face*(phase==2?3:2);string next=moving?"run":"idle";if(b.state!=next)Enter(b,next);return;}
             double distance=Math.Abs(p.x-b.x);int choice=moveIndex++%6;if(distance>330&&choice<2)choice=2;if(choice==lastChoice)choice=(choice+1)%6;lastChoice=choice;var m=Rules.Boss[choice].Copy();
             if(phase==2){m.wind=(int)Math.Ceiling(m.wind*.75);m.recovery=(int)Math.Ceiling(m.recovery*.75);}StartAttack(b,m);aiWait=phase==2?aiWaitPhase2:aiWaitPhase1;Log(m.name+(m.parry?" · 可弹反":" · 危险招式"));}
-        public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;boss.face=player.x>=boss.x?1:-1;StartAttack(boss,Rules.Boss[index].Copy());}
+        public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;boss.face=player.x>=boss.x?1:-1;var moves=opponent?.Moves(phase)??Rules.Boss;StartAttack(boss,moves[index%moves.Length].Copy());}
         void Resolve(Hitbox h,Fighter t){string key=h.attackId+":"+h.pulse+":"+t.id;if(!seen.Add(key))return;if(t.hp<=0||t.state=="phase"||t.invuln>0)return;
             var attacker=h.owner==1?player:boss;if(attacker.attackId!=h.attackId||attacker.move==null)return;
             if(t.state=="dodge"&&t.age>=Rules.invulnStart&&t.age<Rules.invulnEnd){if(t.id==1){dodgeEvades++;if(!dodgeRewarded){dodgeRewarded=true;bool perfect=t.age<Rules.perfectDodgeEnd;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoDodge);

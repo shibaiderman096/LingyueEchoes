@@ -79,9 +79,14 @@ namespace LingyueEchoes
     public class PixelActor
     {
         readonly GameObject go;readonly SpriteRenderer renderer;readonly bool hero;string previous="";int started,previousFrame=-1,attackId=-1;Fighter actor;
+        public Color Tint=Color.white;
+        public float Size=1;
+        public WrathGeneralArt GeneralArt;
         double idleSeconds;
         public PixelActor(GameObject go,bool hero){this.go=go;this.hero=hero;renderer=go.GetComponent<SpriteRenderer>();}
         public void Draw(Fighter a,int frame,bool victory=false,string pose=null,int poseCell=7,float angle=0,float lift=0,float alpha=1,double? poseSeconds=null,double? idleDelta=null){
+            if(alpha<=0){go.SetActive(false);return;}
+            if(!go.activeSelf)go.SetActive(true);
             bool plunge=hero&&pose==null&&!victory&&(a.state=="plunge"||a.state=="plungeLand");
             string clip=hero?(plunge?"attack4":a.state=="attack"?"attack"+(a.combo+1):a.state=="air"?"jump":a.state=="broken"||a.state=="stagger"?"hurt":a.state=="phase"?"idle":a.state):GuardianClip(a);
             if(victory&&a.hp>0)clip="victory";if(pose!=null)clip=pose;string folder=hero?"pixel8":"guardian8";var definition=PixelWorld.Definition(folder,clip);
@@ -113,12 +118,18 @@ namespace LingyueEchoes
             else if(!hero&&clip=="broken")cell=Math.Min(7,(int)Math.Floor(a.age*8d/60));
             int sampleAge=hero&&(clip=="heal"||clip=="dodge"||clip=="parry"||clip=="hurt")?Math.Max(0,a.age-1):a.age;
             double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:sampleAge)/60d+1e-7);
-            PixelWorld.Sample(go,folder,clip,seconds,cell);
+            if(GeneralArt!=null){
+                var animator=go.GetComponent<Animator>();if(animator)animator.enabled=false;
+                renderer.sprite=GeneralArt.Pose(a,pose,poseCell,poseSeconds);
+            }else{
+                var animator=go.GetComponent<Animator>();if(animator&&!animator.enabled)animator.enabled=true;
+                PixelWorld.Sample(go,folder,clip,seconds,cell);
+            }
             go.transform.localPosition=new Vector3((float)Math.Floor(a.x+.5)/100,((float)Math.Floor(a.y+.5)-95+lift)/100,0);
-            float scale=hero?1.5f:1;go.transform.localScale=new Vector3(a.face*scale,scale,1);go.transform.localRotation=Quaternion.Euler(0,0,angle*a.face);
-            renderer.color=hero&&pose==null&&a.invuln>0&&(frame/3)%2==0?new Color(1,.86f,.86f,.65f):new Color(1,1,1,alpha);go.SetActive(alpha>0);
+            float scale=(hero?1.5f:1)*Size;go.transform.localScale=new Vector3(a.face*scale,scale,1);go.transform.localRotation=Quaternion.Euler(0,0,angle*a.face);
+            renderer.color=hero&&pose==null&&a.invuln>0&&(frame/3)%2==0?new Color(1,.86f,.86f,.65f):new Color(Tint.r,Tint.g,Tint.b,alpha);
         }
-        static string GuardianClip(Fighter a){if(a.move!=null){switch(a.move.name){case "双连斩":return "double";case "突刺":return "thrust";case "震地":return "slam";case "跃击":return "leap";case "赤月回旋":return "spin";default:return "slash";}}return a.state=="air"?"jump":a.state=="hurt"?"stagger":a.state;}
+        static string GuardianClip(Fighter a){if(a.move!=null){if(!string.IsNullOrEmpty(a.move.pose))return a.move.pose;switch(a.move.name){case "双连斩":return "double";case "突刺":return "thrust";case "震地":return "slam";case "跃击":return "leap";case "赤月回旋":return "spin";default:return "slash";}}return a.state=="air"?"jump":a.state=="hurt"?"stagger":a.state;}
         // Physics controls height; the artwork follows the vertical motion without adding a second jump arc.
         static int HeroJumpCell(Fighter a){
             if(a.vy>0)return Mathf.Clamp((int)((1-a.vy/Rules.jump)*8),0,7);

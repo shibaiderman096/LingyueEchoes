@@ -32,8 +32,9 @@ public static class ProjectSetup
         AssetDatabase.SaveAssets();
         foreach(string folder in new[]{"pixel8","guardian8"}){string path="Assets/Resources/Animations/"+folder+"/Controller.controller";if(File.Exists(path))AssetDatabase.DeleteAsset(path);var controller=UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);var machine=controller.layers[0].stateMachine;foreach(var d in manifest.clips.Where(c=>c.folder==folder)){var state=machine.AddState(d.name);state.motion=Resources.Load<AnimationClip>(d.path);if(d.name=="idle")machine.defaultState=state;}}
         AssetDatabase.SaveAssets();CreateScene("MainMenu");CreateScene("Prologue");EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/MainMenu.unity",true),new EditorBuildSettingsScene("Assets/Scenes/Prologue.unity",true)};
+        WrathSceneSetup.EnsureScene();
         EditorSceneManager.OpenScene("Assets/Scenes/MainMenu.unity");AssetDatabase.SaveAssets();
-        MigrationChecks.Run();Debug.Log("LINGYUE_MIGRATION_READY: 2 scenes, native sprite clips, golden parity passed");
+        MigrationChecks.Run();Debug.Log("LINGYUE_MIGRATION_READY: campaign scenes, native sprite clips, golden parity passed");
     }
     static AnimationClip WriteClip(ClipDefinition d){
         var clip=new AnimationClip{name=d.name,frameRate=d.sample,legacy=false};
