@@ -9,7 +9,7 @@ namespace LingyueEchoes
     public class MigrationSmoke:MonoBehaviour
     {
         float elapsed,beatTime,parryFarewellTime;
-        int phase,firstVictoryFrame,stepsBlockedFrame=-1,guardianDefeatStartFrame=-1;
+        int phase,firstVictoryFrame,stepsBlockedFrame=-1,guardianDefeatStartFrame=-1,backpackFrame=-1;
         bool editorRun,captured,restored,sawTail,sawEpilogue,sawOpeningPose,stepsJumpIssued,lostFirstFight,sawOpeningStory,sawDummyStop;
         const int TestSlot=2;
         static readonly string[] progressKeys={PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.CheckpointKey,PrologueLayout.FirstVictoryStoryKey};
@@ -48,6 +48,7 @@ namespace LingyueEchoes
                 if(phase==1&&game.stage=="STORY")sawOpeningStory=true;
                 if(phase==1&&game.stage=="TUTORIAL"){
                     Require(sawOpeningStory&&game.SaveSlot==TestSlot,"Selecting an empty slot plays the opening even with a completed first slot.");
+                    game.SetBackpack(true);Require(!game.BackpackUnlocked&&!game.BackpackOpen,"Backpack is locked before the first tail.");
                     var world=game.transform.Find("World");
                     Require(game.sim.terrain.Count==1&&world.Find("SceneryModules").childCount==6,"Expected one broken-step obstacle on the modular route.");
                     var steps=world.Find("Props/BrokenSteps").GetComponent<SpriteRenderer>();
@@ -155,10 +156,9 @@ namespace LingyueEchoes
                             firstVictoryFrame=c.frame;Next();
                         }
                         else{
-                            Require(game.stage=="GATE_READY"&&PlayerPrefs.GetInt(TestKey(PrologueLayout.TailCountKey),0)==1&&
+                            Require(game.stage=="GATE_READY"&&c.TailUpgrades==1&&p.maxHp==130&&c.PlayerMaxStamina==110&&PlayerPrefs.GetInt(TestKey(PrologueLayout.TailCountKey),0)==1&&
                                 progressKeys.All(key=>PlayerPrefs.GetInt(key,0)==1),"Rematch does not grant another tail or change the first slot.");
-                            Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker opens and cancels, independent empty and occupied slots, selected-slot reload, checkpoint retry, first victory, epilogue, and rematch.");
-                            Finish(0);
+                            game.Home();game.StartTrial();phase=17;game.ActivateSaveChoice(TestSlot-1);
                         }
                         break;
                     case 10:
@@ -170,6 +170,13 @@ namespace LingyueEchoes
                         }
                         Require(sawTail&&sawEpilogue&&PlayerPrefs.GetInt(TestKey(PrologueLayout.TailCountKey),0)==1&&PlayerPrefs.GetInt(TestKey(PrologueLayout.ProgressKey),0)==1&&
                             PlayerPrefs.GetInt(TestKey(PrologueLayout.FirstVictoryStoryKey),0)==1&&LingyueGame.SaveStatus(TestSlot).StartsWith("序章已完成"),"First tail, epilogue and saved progression in the selected slot.");
+                        Require(game.BackpackUnlocked&&c.TailUpgrades==1&&p.maxHp==130&&p.hp==130&&c.PlayerMaxStamina==110,"The first tail unlocks the backpack and grants both upgrades.");
+                        if(backpackFrame<0){game.SetBackpack(true);backpackFrame=c.frame;return;}
+                        if(game.BackpackOpen){
+                            Require(c.frame==backpackFrame,"The backpack blocks combat and world input.");
+                            game.SetBackpack(false);
+                        }
+                        originalHp=p.hp;
                         game.Interact();if(game.stage=="GATE_DIALOGUE")Next();
                         break;
                     case 14:
@@ -177,7 +184,7 @@ namespace LingyueEchoes
                         Require(p.hp==0&&!c.BossDefeated&&!PlayerPrefs.HasKey(TestKey(PrologueLayout.FirstVictoryStoryKey))&&PlayerPrefs.GetInt(TestKey(PrologueLayout.TailCountKey),0)==0,
                             "A real first defeat opens the death menu without granting victory progress.");
                         // Simulate a pre-update save with progression flags but no record of this closing scene.
-                        PlayerPrefs.SetInt(TestKey(PrologueLayout.ProgressKey),1);PlayerPrefs.SetInt(TestKey(PrologueLayout.TailCountKey),1);
+                        PlayerPrefs.SetInt(TestKey(PrologueLayout.ProgressKey),1);
                         lostFirstFight=true;game.Retry();
                         Require(game.stage=="FADE_IN"&&game.sim.player.x==PrologueLayout.CheckpointX&&game.sim.player.hp==game.sim.player.maxHp,
                             "Retry returns a living player to the moon gate checkpoint.");
@@ -198,6 +205,11 @@ namespace LingyueEchoes
                             game.Interact();if(game.stage=="GATE_DIALOGUE"){phase=7;beatTime=0;}
                         }
                         break;
+                    case 17:
+                        Require(game.SaveSlot==TestSlot&&game.BackpackUnlocked&&c.TailUpgrades==1&&p.hp==130&&p.stamina==110,
+                            "Reload restores exactly one tail, both caps, and backpack access.");
+                        Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker, checkpoint retry, first victory, tail upgrades and backpack, rematch and reload.");
+                        Finish(0);break;
                 }
             }catch(Exception error){Debug.LogError("MIGRATION_RUNTIME_SMOKE_FAILED: "+error);Finish(1);}
         }

@@ -18,6 +18,12 @@ namespace LingyueEchoes
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
         const float TailAppear=.55f,TailDepart=.88f,TailPickup=1.85f,TailGone=2.65f,TailEnd=3.2f;
         double tailSpawnX;
+        int tailGrowthFrom;
+        const int TailStarPoints=7;
+        static readonly Rect BackpackPortrait=new Rect(35,32,110,112);
+        bool backpackOpen,backpackGuideSeen;
+        int backpackSelection,backpackDirection;
+        float backpackTime;
         bool debug,boxes,focused=true,motion,muted,hadTouch,showKeyHints,gameSettings;
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
@@ -55,16 +61,20 @@ namespace LingyueEchoes
         string storyPhase="in";bool tutorialDialogue,phase2Spoken,deathAxisHeld;
         public float DeathMenuOpacity=>stage=="DEATH"?Ease(Mathf.Clamp01(stageTime/DeathMenuFadeDuration)):0;
         public bool DeathMenuReady=>stage=="DEATH"&&stageTime>=DeathMenuFadeDuration;
-        Texture2D keyart,hudPortrait,hudRing,firstTail;Font font;GUIStyle textStyle,buttonStyle;
+        Texture2D keyart,hudPortrait,hudRing,firstTail,backpackArt;Font font;GUIStyle textStyle,buttonStyle;
         readonly GUIContent measureContent=new GUIContent();
         Color[] hudRingPixels;float[] hudRingCoverage,hudRingPosition;int hudEcho=-1,hudEchoTrail=-1,lastEchoPoints;
         StatusTrail healthTrail,staminaTrail,echoTrail,echoPointsTrail,bossHealthTrail,postureTrail;
+        float healthBarWidth=302,staminaBarWidth=266;
         AudioSource[] voices;AudioSource uiVoice,music;readonly Dictionary<string,AudioClip> soundClips=new Dictionary<string,AudioClip>();
         Combat soundModel;string musicKey="";
         readonly MobileControls mobileControls=new MobileControls();bool previewTouchControls;
         public bool PreviewTouchControls {get=>previewTouchControls;set{previewTouchControls=value;inputDevice.Select(value||Application.isMobilePlatform?"touch":"keyboard");ClearInput();}}
         bool TouchControlsVisible=>previewTouchControls||device=="touch";
         public bool BattleOn=>stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GUARDIAN_FIGHT";
+        internal bool BackpackUnlocked=>sim!=null&&sim.TailUpgrades>0;
+        internal bool BackpackOpen=>backpackOpen;
+        bool BackpackAvailable=>BackpackUnlocked&&BattleOn&&!WakeDialogue&&!gameSettings;
         bool TailStory=>stage=="TAIL_DIALOGUE"||stage=="FIRST_TAIL"||stage=="TAIL_EPILOGUE";
         int guardianDefeatFrame;
         float guardianDefeatDuration;
@@ -85,6 +95,7 @@ namespace LingyueEchoes
             hero=new PixelActor(world.Find("Hero").gameObject,true);guardian=new PixelActor(world.Find("Guardian").gameObject,false);effects=new PixelEffects(world);
             keyart=Resources.Load<Texture2D>("ui/main_menu_keyart");
             firstTail=Resources.Load<Texture2D>("prologue_route/first-fox-tail");
+            backpackArt=Resources.Load<Texture2D>("ui/backpack_moon_gate");
             CreatePlayerHud();
             font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","Noto Sans CJK SC","Droid Sans Fallback","Arial Unicode MS"},24);
             motion=PlayerPrefs.GetString("lingyue.menuMotion","on")!="off";muted=PlayerPrefs.GetString("lingyue.sfxMuted","off")=="on";previewTouchControls=PlayerPrefs.GetInt("lingyue.touchControls",0)==1;
@@ -110,7 +121,7 @@ namespace LingyueEchoes
         internal void ActivateSaveChoice(int choice){
             if(!SavePickerOpen||deleteSaveSlot!=0||choice<0||choice>PrologueLayout.SaveSlots)return;
             if(choice==PrologueLayout.SaveSlots){CloseMenuModal();return;}
-            SaveSlot=choice+1;modal="";UiSound("ui_confirm");
+            SaveSlot=choice+1;modal="";backpackGuideSeen=false;UiSound("ui_confirm");
             if(SceneManager.GetActiveScene().name!="Prologue"){
                 pendingSaveSlot=SaveSlot;SceneManager.LoadScene("Prologue");
             }else BeginTrial();
@@ -137,7 +148,11 @@ namespace LingyueEchoes
         }
         void PrepareRoute(bool fromCheckpoint){
             sim=new Combat{continueAfterDeath=true,bossYields=true,ai=false,enemyActive=false};
+            sim.ApplyTailUpgrades(SaveValue(PrologueLayout.TailCountKey,SaveSlot));
+            backpackOpen=false;
             healthTrail.Reset(1);staminaTrail.Reset(1);echoTrail.Reset(0);echoPointsTrail.Reset(0);lastEchoPoints=0;
+            healthBarWidth=GrowthBarWidth(302,398,sim.player.maxHp-Rules.playerMaxHp);
+            staminaBarWidth=GrowthBarWidth(266,374,sim.PlayerMaxStamina-Rules.staminaMax);
             clock=new FixedClock(sim);sim.boundsMin=-1560;sim.boundsMax=PrologueLayout.ArenaMax;
             checkpointReached=fromCheckpoint;checkpointToast=0;tutorial=new TutorialDirector();
             sim.player.x=fromCheckpoint?PrologueLayout.CheckpointX:-1400;
@@ -147,7 +162,7 @@ namespace LingyueEchoes
             speech.Reset();tutorialDialogue=false;effects.Clear();cameraX=-960;ClearInput();
             world.gameObject.SetActive(true);SetArenaSeals(false);UpdateCheckpointLamp();gameSettings=false;
         }
-        public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
+        public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=backpackOpen=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
         void SetStage(string value){stage=value;stageTime=0;}
         void BeginTrialIntro(){
             ClearInput();sim.beforeStep=null;sim.nonlethal=false;sim.dummyBox=null;
@@ -187,6 +202,7 @@ namespace LingyueEchoes
             SetStage("TAIL_DIALOGUE");Say("tail");
         }
         void BeginTailHandoff(){
+            tailGrowthFrom=sim.TailUpgrades;
             double p=sim.player.x,b=sim.boss.x,side=p>=b?1:-1;
             double min=PrologueLayout.ArenaMin+50,max=PrologueLayout.ArenaMax-50;
             // Choose open floor on either side before falling back to the space between the fighters.
@@ -199,7 +215,7 @@ namespace LingyueEchoes
             SetStage("FIRST_TAIL");
         }
         void CompleteFirstVictory(){
-            WriteSave(PrologueLayout.TailCountKey,Math.Max(1,SaveValue(PrologueLayout.TailCountKey,SaveSlot)));
+            WriteSave(PrologueLayout.TailCountKey,sim.TailUpgrades);
             WriteSave(PrologueLayout.ProgressKey,1);
             WriteSave(PrologueLayout.FirstVictoryStoryKey,1);PlayerPrefs.Save();
             SetStage("GATE_READY");
@@ -223,6 +239,7 @@ namespace LingyueEchoes
         }
         void Update(){float dt=Math.Min(Time.unscaledDeltaTime,.25f);UpdateViewport();if(!focused&&!Application.isBatchMode)return;ReadInput();
             if(music)music.mute=muted;
+            if(backpackOpen){backpackTime+=dt;DrawActors(dt);return;}
             if(gameSettings){DrawActors(dt);return;}
             stageTime+=dt;
             switch(stage){case "MENU":break;
@@ -234,7 +251,9 @@ namespace LingyueEchoes
                 case "TAIL_DIALOGUE":break;
                 case "TAIL_EPILOGUE":break;
                 case "FIRST_TAIL":
-                    if(stageTime>=TailPickup&&stageTime-dt<TailPickup)UiSound("victory");
+                    if(stageTime>=TailPickup&&stageTime-dt<TailPickup){
+                        sim.ApplyTailUpgrades(Math.Max(1,sim.TailUpgrades));UiSound("victory");
+                    }
                     if(stageTime>=TailEnd){SetStage("TAIL_EPILOGUE");Say("tailAfter");}
                     break;
                 case "GUARDIAN_INTRO":
@@ -295,7 +314,7 @@ namespace LingyueEchoes
             return stage=="TUTORIAL"&&tutorial.CanInteract(sim)?"交谈":null;
         }
         public void Interact(){
-            if(clock==null||clock.paused)return;
+            if(clock==null||clock.paused||backpackOpen)return;
             string interaction=Interaction();
             if(interaction==null)return;
             if(interaction=="继续"){speech.Confirm();return;}
@@ -336,9 +355,16 @@ namespace LingyueEchoes
                 if(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5))speech.Confirm();
                 return;
             }
-            bool escape=Input.GetKeyDown(KeyCode.Escape),menu=Input.GetKeyDown(KeyCode.JoystickButton7);
-            if(gameSettings){ReadGameSettings(confirm,padB||escape||menu);return;}
-            if((BattleOn||stage=="GATE_DIALOGUE")&&(escape||menu)){SetGameSettings(true);return;}
+            bool escape=Input.GetKeyDown(KeyCode.Escape),menu=Input.GetKeyDown(KeyCode.JoystickButton7),viewKey=Input.GetKeyDown(KeyCode.JoystickButton6);
+            bool backpackKey=Input.GetKeyDown(KeyCode.B)||menu;
+            if(backpackOpen){
+                if(backpackKey||padB||escape||viewKey)SetBackpack(false);
+                else ReadBackpackNavigation();
+                return;
+            }
+            if(gameSettings){ReadGameSettings(confirm,padB||escape||menu||viewKey);return;}
+            if(BackpackAvailable&&backpackKey){SetBackpack(true);return;}
+            if((BattleOn||stage=="GATE_DIALOGUE")&&(escape||viewKey||menu&&!BackpackUnlocked)){SetGameSettings(true);return;}
             if(stage=="MENU"){ReadMenuInput(confirm,padB||escape);return;}
             if(escape){Home();return;}
             if(stage=="STORY"){if(padB){Home();return;}if(confirm)AdvanceStory();return;}
@@ -408,6 +434,19 @@ namespace LingyueEchoes
             if(open){settingsChoice=0;settingsDirection=0;}
             UiSound(open?"ui_confirm":"ui_back");
         }
+        internal void SetBackpack(bool open){
+            if((open&&!BackpackAvailable)||open==backpackOpen)return;
+            ClearInput();backpackOpen=open;
+            if(open){backpackGuideSeen=true;backpackSelection=backpackDirection=0;backpackTime=0;}
+            UiSound(open?"ui_confirm":"ui_back");
+        }
+        void ReadBackpackNavigation(){
+            float horizontal=Input.GetAxisRaw("Horizontal"),vertical=Input.GetAxisRaw("Vertical"),dpad=Input.GetAxisRaw("PadDpad");
+            float axis=Math.Abs(horizontal)>.5f?horizontal:Math.Abs(dpad)>.5f?dpad:-vertical;
+            int direction=axis>.5f?1:axis<-.5f?-1:0;
+            if(direction!=0&&direction!=backpackDirection)backpackSelection=(backpackSelection+direction+TailStarPoints)%TailStarPoints;
+            backpackDirection=direction;
+        }
         void ReadGameSettings(bool confirm,bool back){
             if(back){SetGameSettings(false);return;}
             float vertical=Input.GetAxisRaw("Vertical");
@@ -456,7 +495,7 @@ namespace LingyueEchoes
         void MobileAction(string action){if(action==null||clock.paused&&action!="pause")return;if(action=="interact")Interact();else Act(action);}
         double ReadAxis(){if(scriptedAxis.HasValue)return scriptedAxis.Value;float pad=Input.GetAxisRaw("PadX"),dpad=Input.GetAxisRaw("PadDpad");if(Math.Abs(pad)>.2f)return pad;if(Math.Abs(dpad)>.2f)return dpad;
             bool left=Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow),right=Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow);int keys=(right?1:0)-(left?1:0);return keys!=0?keys:mobileControls.Axis;}
-        public void Act(string action){if(!BattleOn||WakeDialogue)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun"){sim.boss.state="broken";sim.boss.age=0;sim.boss.move=null;sim.boss.posture=100;}else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
+        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun"){sim.boss.state="broken";sim.boss.age=0;sim.boss.move=null;sim.boss.posture=100;}else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
         void OnApplicationPause(bool pause){if(pause)ClearInput();}
@@ -466,9 +505,12 @@ namespace LingyueEchoes
             if(textStyle==null){textStyle=new GUIStyle(GUI.skin.label){font=font,wordWrap=true};buttonStyle=new GUIStyle(GUI.skin.button){font=font,fontSize=21,alignment=TextAnchor.MiddleCenter,wordWrap=true};}
             if(stage=="MENU")MenuGUI();
             else{
-                bool settingsOpen=gameSettings;
-                GUI.enabled=!settingsOpen;GameGUI();GUI.enabled=true;
-                if(settingsOpen)GameSettingsGUI();
+                if(backpackOpen)BackpackGUI();
+                else{
+                    bool settingsOpen=gameSettings;
+                    GUI.enabled=!settingsOpen;GameGUI();GUI.enabled=true;
+                    if(settingsOpen)GameSettingsGUI();
+                }
             }
             GUI.matrix=oldMatrix;GUI.color=Color.white;
         }
@@ -539,6 +581,85 @@ namespace LingyueEchoes
                 if(Button(new Rect(938,166+i*55,282,45),label,settingsChoice==i))ActivateGameSetting(i);
             }
         }
+        void BackpackEntryGUI(){
+            if(!BackpackAvailable)return;
+            if((TouchControlsVisible||Application.isMobilePlatform)&&GUI.Button(BackpackPortrait,GUIContent.none,GUIStyle.none)){
+                SetBackpack(true);return;
+            }
+            if(TouchControlsVisible||Application.isMobilePlatform){
+                RoundedFill(new Rect(97,33,46,23),Ink,7);
+                Text(new Rect(97,33,46,23),"背包",13,Gold,TextAnchor.MiddleCenter);
+            }
+            if(backpackGuideSeen||speech.Active||stage!="GATE_READY")return;
+            var card=new Rect(153,115,310,54);
+            RoundedFill(card,Ink,7);
+            Text(new Rect(card.x+12,card.y+2,290,25),"背包已解锁",17,Gold,TextAnchor.MiddleLeft);
+            if(showKeyHints)Text(new Rect(card.x+12,card.y+26,290,24),ControlPrompts.Format("{backpack} 打开背包",device),15,Ivory,TextAnchor.MiddleLeft);
+        }
+        static Vector2 TailStarPoint(int index){
+            float angle=index*Mathf.PI*2/TailStarPoints;
+            return new Vector2(466+Mathf.Sin(angle)*211,369-Mathf.Cos(angle)*211);
+        }
+        void StarLine(Vector2 from,Vector2 to,float thickness,Color tint){
+            var oldMatrix=GUI.matrix;var delta=to-from;
+            GUIUtility.RotateAroundPivot(Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg,from);
+            Fill(new Rect(from.x,from.y-thickness/2,delta.magnitude,thickness),tint);
+            GUI.matrix=oldMatrix;
+        }
+        void BackpackGUI(){
+            if(backpackArt)GUI.DrawTexture(new Rect(0,0,1280,720),backpackArt,ScaleMode.ScaleAndCrop);
+            else Fill(new Rect(0,0,1280,720),new Color(.045f,.066f,.12f));
+            Text(new Rect(274,58,384,64),"背包  ·  尾之星图",32,Ivory,TextAnchor.MiddleCenter);
+            Text(new Rect(305,119,322,27),"七芒星   /   点亮已归还的尾巴",15,Gold,TextAnchor.MiddleCenter);
+            if(Button(new Rect(1030,63,157,49),"关闭")){SetBackpack(false);return;}
+            var dim=new Color(.35f,.46f,.60f,.52f);
+            int tails=sim.TailUpgrades;
+            for(int i=0;i<TailStarPoints;i++){
+                int starLink=(i+3)%TailStarPoints;
+                StarLine(TailStarPoint(i),TailStarPoint((i+1)%TailStarPoints),1,new Color(.54f,.62f,.72f,.23f));
+                StarLine(TailStarPoint(i),TailStarPoint(starLink),2,i<tails&&starLink<tails?Gold:dim);
+            }
+            for(int i=0;i<TailStarPoints;i++){
+                Vector2 point=TailStarPoint(i);
+                var node=new Rect(point.x-30,point.y-30,60,60);
+                bool obtained=i<tails,selected=i==backpackSelection;
+                if(selected){
+                    float glow=.4f+.18f*Mathf.Sin(backpackTime*5);
+                    RoundedFill(new Rect(point.x-36,point.y-36,72,72),new Color(.94f,.72f,.39f,glow),36);
+                }
+                RoundedFill(node,obtained?Gold:new Color(.28f,.37f,.51f),30);
+                RoundedFill(new Rect(node.x+2,node.y+2,56,56),obtained?new Color(.34f,.22f,.14f):new Color(.085f,.12f,.21f),28);
+                if(obtained&&i==0&&firstTail)GUI.DrawTexture(new Rect(node.x+7,node.y+7,46,46),firstTail,ScaleMode.ScaleToFit);
+                else Text(node,(i+1).ToString("00"),20,obtained?Gold:new Color(.66f,.74f,.83f),TextAnchor.MiddleCenter);
+                if(GUI.Button(node,GUIContent.none,GUIStyle.none))backpackSelection=i;
+            }
+            var details=new Rect(744,173,365,382);
+            RoundedFill(details,new Color(.075f,.11f,.18f,.95f),12);
+            Fill(new Rect(770,232,313,1),new Color(.85f,.74f,.53f,.55f));
+            bool owned=backpackSelection<tails;
+            Text(new Rect(770,189,312,38),backpackSelection==0?"第一尾":$"第 {backpackSelection+1} 尾",26,Gold,TextAnchor.MiddleLeft);
+            Text(new Rect(770,247,312,41),owned?$"已归还 · 生命与气力上限各 +{Rules.tailStatBonus}":"尚未归还",18,Ivory,TextAnchor.MiddleLeft);
+            Text(new Rect(770,295,312,30),$"已归还 {tails} 尾",16,Gold,TextAnchor.MiddleLeft);
+            BackpackStat(new Rect(770,343,313,55),"生命上限",sim.player.maxHp,new Color(.30f,.84f,.52f));
+            BackpackStat(new Rect(770,419,313,55),"气力上限",sim.PlayerMaxStamina,new Color(1,.81f,.31f));
+            string guide=device=="pad"?"左摇杆 / 十字键切换   ·   Start / B 关闭":device=="touch"?"轻触星位查看   ·   点击关闭":"方向键切换   ·   B / Esc 关闭";
+            Text(new Rect(744,507,365,33),guide,15,Ivory,TextAnchor.MiddleCenter);
+        }
+        void BackpackStat(Rect rect,string label,double value,Color color){
+            RoundedFill(rect,new Color(.115f,.17f,.25f),6);
+            Fill(new Rect(rect.x+1,rect.y+8,3,rect.height-16),color);
+            Text(new Rect(rect.x+15,rect.y,140,rect.height),label,18,Ivory,TextAnchor.MiddleLeft);
+            Text(new Rect(rect.x+150,rect.y,rect.width-166,rect.height),value.ToString("0"),24,color,TextAnchor.MiddleRight);
+        }
+        void TailGrowthStat(Rect rect,string label,int oldValue,float progress,Color color){
+            RoundedFill(rect,Ink,8);
+            Text(new Rect(rect.x+14,rect.y+6,170,30),label,17,Ivory,TextAnchor.MiddleLeft);
+            Text(new Rect(rect.x+14,rect.y+31,160,34),(oldValue+Mathf.RoundToInt(progress*Rules.tailStatBonus)).ToString(),24,color,TextAnchor.MiddleLeft);
+            Text(new Rect(rect.x+135,rect.y+25-9*progress,60,40),$"+{Rules.tailStatBonus}",24,Gold,TextAnchor.MiddleRight);
+            Fill(new Rect(rect.x+14,rect.y+71,rect.width-28,5),new Color(.17f,.23f,.30f));
+            Fill(new Rect(rect.x+14,rect.y+71,rect.width-62,5),color);
+            if(progress>0)Fill(new Rect(rect.x+rect.width-48,rect.y+71,34*progress,5),Gold);
+        }
         void GameGUI(){if(stage=="DYING")return;if(stage=="DEATH"){DeathGUI();return;}if(stage=="STORY"){Fill(new Rect(0,0,1280,720),Color.black);if(stageTime>=.4f&&storyIndex<content.story.Length){float a=storyPhase=="in"?storyTime/.4f:storyPhase=="out"?1-storyTime/.4f:1;Text(new Rect(90,300,1100,150),content.story[storyIndex],30,new Color(.96f,.94f,.88f,a),TextAnchor.MiddleCenter);Text(new Rect(900,650,300,35),ControlPrompts.StoryHint(device),16,Gold);}
                 if(Event.current.type==EventType.MouseUp)AdvanceStory();return;}
             if(stage=="FADE_IN")Fill(new Rect(0,0,1280,720),new Color(0,0,0,1-Mathf.Clamp01(stageTime/.8f)));
@@ -548,8 +669,8 @@ namespace LingyueEchoes
             if(BattleOn||stage=="GATE_DIALOGUE"){
                 if(Button(SettingsButton,"设置",gameSettings))SetGameSettings(true);
                 float lessonBottom=TutorialLessonGUI();
-                if(BattleOn){PlayerHud();
-                    if(stage=="GUARDIAN_FIGHT"){Text(new Rect(450,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(490,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),bossHealthTrail.Width,new Color(.71f,.31f,.37f));Bar(new Rect(490,92,455,9),(float)(sim.boss.posture/100),postureTrail.Width,Gold);}
+                if(BattleOn){PlayerHud();BackpackEntryGUI();
+                    if(stage=="GUARDIAN_FIGHT"){Text(new Rect(517,25,520,30),"守门人 · 残月的守灯者",23,Gold,TextAnchor.MiddleCenter);Bar(new Rect(550,67,455,14),(float)(sim.boss.hp/sim.boss.maxHp),bossHealthTrail.Width,new Color(.71f,.31f,.37f));Bar(new Rect(550,92,455,9),(float)(sim.boss.posture/100),postureTrail.Width,Gold);}
                     if(showKeyHints&&!gameSettings&&!TouchControlsVisible&&!speech.Active)RightControlHints();
                     string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):sim.CanExecute?ControlPrompts.Format("{attack} 回响小处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
                     if(status!="")Text(new Rect(330,Mathf.Max(lessonBottom,TouchControlsVisible?195:155),620,44),status,25,Gold,TextAnchor.MiddleCenter);}
@@ -597,6 +718,7 @@ namespace LingyueEchoes
         void TailStoryGUI(){
             Fill(new Rect(0,0,1280,38),Ink);Fill(new Rect(0,682,1280,38),Ink);
             if(stage=="FIRST_TAIL"){
+                PlayerHud();
                 float reveal=Ease(Mathf.Clamp01(stageTime/TailAppear));
                 float travel=Ease(Mathf.InverseLerp(TailDepart,TailPickup,stageTime));
                 float fade=Ease(Mathf.InverseLerp(TailPickup,TailGone,stageTime));
@@ -618,6 +740,11 @@ namespace LingyueEchoes
                     }
                     Text(new Rect(320,122,640,52),"第一尾 · 归还",30,Gold,TextAnchor.MiddleCenter);
                     Text(new Rect(320,173,640,34),"九尾残响：1 / 9",19,Ivory,TextAnchor.MiddleCenter);
+                    if(sim.TailUpgrades>tailGrowthFrom){
+                        float growth=Ease(Mathf.InverseLerp(TailPickup,TailPickup+.85f,stageTime));
+                        TailGrowthStat(new Rect(412,495,212,91),"生命上限",(int)Rules.playerMaxHp+tailGrowthFrom*Rules.tailStatBonus,growth,new Color(.30f,.84f,.52f));
+                        TailGrowthStat(new Rect(656,495,212,91),"气力上限",(int)Rules.staminaMax+tailGrowthFrom*Rules.tailStatBonus,growth,new Color(1,.81f,.31f));
+                    }
                 }
                 return;
             }
@@ -756,10 +883,17 @@ namespace LingyueEchoes
                 hudPortrait.SetPixels(pixels);hudPortrait.Apply(false,true);
             }finally{RenderTexture.active=previous;RenderTexture.ReleaseTemporary(copy);if(readable)Destroy(readable);}}
         void RoundedFill(Rect rect,Color color,float radius){color.a*=guiOpacity;GUI.DrawTexture(rect,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,color,Vector4.zero,radius);}
+        static float GrowthBarWidth(float baseWidth,float limit,double gain){
+            gain=Math.Max(0,gain);
+            return Mathf.Lerp(baseWidth,limit,(float)(gain/(gain+30)));
+        }
         void UpdateStatusTrails(float dt){
             var p=sim.player;var b=sim.boss;
+            float widthEase=1-Mathf.Exp(-10*dt);
+            healthBarWidth=Mathf.Lerp(healthBarWidth,GrowthBarWidth(302,398,p.maxHp-Rules.playerMaxHp),widthEase);
+            staminaBarWidth=Mathf.Lerp(staminaBarWidth,GrowthBarWidth(266,374,sim.PlayerMaxStamina-Rules.staminaMax),widthEase);
             healthTrail.Update(Mathf.Clamp01((float)(p.hp/p.maxHp)),dt);
-            staminaTrail.Update(Mathf.Clamp01((float)(p.stamina/Rules.staminaMax)),dt);
+            staminaTrail.Update(Mathf.Clamp01((float)(p.stamina/sim.PlayerMaxStamina)),dt);
             float echo=Mathf.Clamp01((float)(p.echo/Rules.echoMax));
             if(p.energy>lastEchoPoints)echoTrail.Reset(echo);else echoTrail.Update(echo,dt);
             lastEchoPoints=p.energy;
@@ -770,8 +904,8 @@ namespace LingyueEchoes
             }
         }
         void PlayerHud(){if(Event.current.type!=EventType.Repaint)return;var p=sim.player;
-            HudBar(new Rect(136,61,302,20),(float)(p.hp/p.maxHp),healthTrail.Width,new Color(.12f,.78f,.32f));
-            HudBar(new Rect(136,87,266,15),(float)(p.stamina/Rules.staminaMax),staminaTrail.Width,new Color(1,.81f,.12f));
+            HudBar(new Rect(136,61,healthBarWidth,20),(float)(p.hp/p.maxHp),healthTrail.Width,new Color(.12f,.78f,.32f));
+            HudBar(new Rect(136,87,staminaBarWidth,15),(float)(p.stamina/sim.PlayerMaxStamina),staminaTrail.Width,new Color(1,.81f,.12f));
             RoundedFill(new Rect(38,35,106,106),new Color(.025f,.035f,.05f,.98f),53);
             RoundedFill(new Rect(42,39,98,98),new Color(.14f,.18f,.23f),49);
             if(hudPortrait)GUI.DrawTexture(new Rect(43,40,96,96),hudPortrait);

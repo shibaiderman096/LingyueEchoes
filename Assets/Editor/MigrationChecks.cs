@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckTailUpgrades();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -71,6 +71,20 @@ public static class MigrationChecks
             route.boss.x+Combat.BodyWidth(route.boss)/2<route.dummyBox.x,"Guide stops clear of the practice dummy");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
         Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Expanded prologue arena width");
+    }
+    static void CheckTailUpgrades(){
+        var c=new Combat{ai=false,enemyActive=false};
+        c.player.hp=37;c.player.stamina=50;c.ApplyTailUpgrades(1);
+        Assert(c.player.maxHp==130&&c.PlayerMaxStamina==110&&c.player.hp==47&&c.player.stamina==60,"First tail adds ten to both caps");
+        c.ApplyTailUpgrades(1);Assert(c.player.maxHp==130&&c.player.hp==47&&c.player.stamina==60,"Reapplying saved tails never stacks bonuses");
+        c.ApplyTailUpgrades(2);Assert(c.player.maxHp==140&&c.PlayerMaxStamina==120,"Each new tail adds its own ten-point increase");
+        for(int i=0;i<240;i++)c.Step();Assert(c.player.stamina==120,"Passive regeneration fills the upgraded cap");
+        foreach(string defense in new[]{"parry","dodge"}){
+            var perfect=Contact(defense,defense=="parry"?0:2);perfect.ApplyTailUpgrades(1);perfect.player.stamina=40;perfect.Step();
+            Assert(perfect.player.stamina==110,"Perfect defense refills the upgraded stamina cap");
+        }
+        var loaded=new Combat();loaded.ApplyTailUpgrades(1);
+        Assert(loaded.player.hp==130&&loaded.player.stamina==110,"Reload derives full upgraded stats from tail count");
     }
     static void CheckExecutionAndEffects(){
         var c=new Combat{ai=false};var p=c.player;var b=c.boss;p.x=0;p.face=-1;b.x=80;b.posture=80;p.energy=1;c.executeWindow=30;
