@@ -37,9 +37,13 @@ public static class ScenerySetup
         PixelWorld.PlaceBrokenSteps(props);
         PixelWorld.PlaceCheckpoint(props);
         PixelWorld.PlacePrologueGate(props);
+        MoveToX(world.Find("Hero"),(float)PrologueLayout.WakeX/100);
+        MoveToX(world.Find("Guardian"),(float)PrologueLayout.WakeGuideX/100);
         Camera.main.backgroundColor=PixelWorld.PrologueSky;
+        MoveToX(Camera.main.transform,PrologueLayout.ClampViewX((float)PrologueLayout.WakeX+100,PrologueLayout.FullViewHalfWidth)/100);
         EditorSceneManager.SaveScene(scene);
     }
+    static void MoveToX(Transform target,float x){var p=target.localPosition;p.x=x;target.localPosition=p;}
     static void Remove(Transform parent,string name){var child=parent.Find(name);if(child)UnityEngine.Object.DestroyImmediate(child.gameObject);}
     static void SaveProp(string name,string resource,float width,float height)
     {

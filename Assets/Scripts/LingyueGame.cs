@@ -325,6 +325,11 @@ namespace LingyueEchoes
                     cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"||stage=="TAIL_EPILOGUE"||ChapterDialogue||stage==WrathTransfer?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
+            if(!wrath){
+                var cameraPosition=view.transform.position;
+                cameraPosition.x=PrologueLayout.ClampViewX(cameraPosition.x*100,view.orthographicSize*view.aspect*100)/100;
+                view.transform.position=cameraPosition;
+            }
             // Noninteractive scenes still need idle loops, even when the battle clock is stopped.
             bool ticked=BattleOn||stage=="GUARDIAN_DEFEAT"||stage=="DYING"||stage=="DEATH";
             DrawActors(ticked?(double?)null:dt);
@@ -360,7 +365,7 @@ namespace LingyueEchoes
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&(!ChapterDialogue||speech.Id=="wrathEnter")?0:1,idleDelta:idleDelta);
         }
-        float RouteCameraX()=>wrath?ChapterCameraX():Mathf.Clamp((float)sim.player.x+100,PrologueLayout.CameraMinX,PrologueLayout.CameraMaxX);
+        float RouteCameraX()=>wrath?ChapterCameraX():PrologueLayout.ClampViewX((float)sim.player.x+100,PrologueLayout.FullViewHalfWidth);
         static float Ease(float t)=>t<.5f?4*t*t*t:1-Mathf.Pow(-2*t+2,3)/2;
         void Say(string id){var script=Array.Find(content.scripts,s=>s.id==id);if(script!=null){if(stage=="TUTORIAL")tutorial.BeginDialogue(id);speech.Play(script);}}
         string Interaction(){

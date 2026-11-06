@@ -61,7 +61,7 @@ namespace LingyueEchoes
                 (float)PrologueLayout.StepsWidth+2*RubblePadding,(float)PrologueLayout.StepsHeight+2*RubblePadding,6,Vector2.zero);
         }
         public static SpriteRenderer PlaceArenaSeal(Transform props,bool left){
-            int boundary=(int)(left?PrologueLayout.ArenaMin:PrologueLayout.ArenaMax);
+            float boundary=(float)(left?PrologueLayout.ArenaMin:PrologueLayout.ArenaMax);
             // Fighters' centers stop at the boundary; leave their feet in front of the stone.
             return Sprite(props,left?"ArenaSealLeft":"ArenaSealRight","prologue_route/moon-boundary",
                 boundary+(left?-54:54),-98,61,176,8,new Vector2(.5f,0));
@@ -71,19 +71,21 @@ namespace LingyueEchoes
         public static SpriteRenderer PlacePrologueGate(Transform props){
             var existing=props.Find("MoonGateExit");
             if(existing)return existing.GetComponent<SpriteRenderer>();
-            return Sprite(props,"MoonGateExit",WarmArt+"moon-gate",(float)PrologueLayout.MoonGateX,-98,278,287,3,new Vector2(.5f,0));
+            return Sprite(props,"MoonGateExit",WarmArt+"moon-gate",(float)PrologueLayout.MoonGateX,-98,350,361,3,new Vector2(.5f,0));
         }
         public static GameObject CreatePrologueBackdrop(Transform world){
             var group=new GameObject("SceneryModules");group.transform.SetParent(world,false);
-            Sprite(group.transform,"Shared sunrise backdrop",WarmArt+"sunrise-valley",-1660,40,2690,920,-20,new Vector2(0,.5f));
-            Sprite(group.transform,"01 · 苏醒地",WarmArt+"waking-tree",(float)PrologueLayout.WakeX-150,-98,415,284,-3,new Vector2(.5f,0));
-            Sprite(group.transform,"02 · 断阶参道",WarmArt+"road-balustrade",(float)(PrologueLayout.StepsLeft+PrologueLayout.StepsWidth/2),-98,260,64,-3,new Vector2(.5f,0));
-            Sprite(group.transform,"03 · 练武庭",WarmArt+"training-pavilion",(float)PrologueLayout.PracticeDummyX,-98,424,173,-3,new Vector2(.5f,0));
+            const float width=PrologueLayout.BackdropRight-PrologueLayout.BackdropLeft;
+            Sprite(group.transform,"Shared sunrise backdrop",WarmArt+"sunrise-valley",PrologueLayout.BackdropLeft,425,width,width/3,-20,new Vector2(0,1));
+            Sprite(group.transform,"01 · 苏醒地",WarmArt+"waking-tree",(float)PrologueLayout.WakeX-205,-98,525,360,-3,new Vector2(.5f,0));
+            Sprite(group.transform,"02 · 断阶参道",WarmArt+"road-balustrade",(float)(PrologueLayout.StepsLeft+PrologueLayout.StepsWidth/2),-98,315,78,-3,new Vector2(.5f,0));
+            Sprite(group.transform,"03 · 练武庭",WarmArt+"training-pavilion",(float)PrologueLayout.PracticeDummyX,-98,510,208,-3,new Vector2(.5f,0));
             var floor=new GameObject("Warm paving · reusable modules").transform;
             floor.SetParent(group.transform,false);
-            const int tileWidth=930;
-            for(int i=0;i<3;i++){
-                var tile=Sprite(floor,"Paving "+(i+1),WarmArt+"warm-paving",-1660+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
+            const int tileCount=4;
+            const float tileWidth=width/tileCount;
+            for(int i=0;i<tileCount;i++){
+                var tile=Sprite(floor,"Paving "+(i+1),WarmArt+"warm-paving",PrologueLayout.BackdropLeft+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
                 tile.flipX=i%2==1;
             }
             return group;
