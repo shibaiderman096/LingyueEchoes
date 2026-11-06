@@ -15,7 +15,8 @@ namespace LingyueEchoes
     {
         public const int hz=60, parry=20, parryPerfect=12, hitstop=3, buffer=8, dodgeFrames=28,
             invulnStart=2, dodgeInvulnFrames=12, perfectDodgeFrames=8, invulnEnd=invulnStart+dodgeInvulnFrames, perfectDodgeEnd=invulnStart+perfectDodgeFrames,
-            parryFrames=30, hurtFrames=28, successSlowFrames=24, executeWindow=30, executeCost=1, executeHitstop=8, staggerFrames=36, tailStatBonus=10;
+            parryFrames=30, hurtFrames=28, successSlowFrames=24, executeWindow=30, executeCost=1, executeHitstop=8, staggerFrames=36, tailStatBonus=10,
+            healCost=1, healRelease=18, healFrames=42, healAmount=15;
         public const double playerMaxHp=120, speed=5, jump=13, gravity=.6, dodgeSpeed=9, successSlowRate=.25, finisherReach=195, finisherBase=45,
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
@@ -60,6 +61,7 @@ namespace LingyueEchoes
     {
         public Fighter player=new Fighter(1,-250,Rules.playerMaxHp),boss=new Fighter(2,250,650);
         public int TailUpgrades {get;private set;}
+        public bool HealUnlocked=>TailUpgrades>0;
         public double PlayerMaxStamina=>Rules.staminaMax+TailUpgrades*Rules.tailStatBonus;
         public void ApplyTailUpgrades(int count){
             count=Math.Max(0,Math.Min(9,count));
@@ -148,9 +150,13 @@ namespace LingyueEchoes
                 dummyHits++;dummyContacts.Add(new DummyContact{id=dummyHits,attackId=h.attackId,combo=p.combo,frame=frame});if(dummyContacts.Count>32)dummyContacts.RemoveAt(0);
                 Visual("impact",dummyBox.x+dummyBox.w*.5,dummyBox.y+dummyBox.h*.5,p);Sound("hit_boss");}
             foreach(var h in hits){var target=h.owner==1?b:p;if(target.id==2&&!enemyActive)continue;if(Box.Overlaps(h,Hurtbox(target)))Resolve(h,target);}
+            if(p.state=="heal"&&p.age==Rules.healRelease&&p.hp>0&&p.hp<p.maxHp&&p.energy>=Rules.healCost){
+                p.energy-=Rules.healCost;p.hp=Math.Min(p.maxHp,p.hp+Rules.healAmount);
+                Visual("heal_fx",p.x,p.y,p);Sound("heal");Log("回响疗愈 · 恢复生命");
+            }
             foreach(var a in new[]{p,b}){a.age++;if(a.hp<=0){if(!continueAfterDeath||a.state!="dead")Enter(a,"dead");continue;}
                 if(a.move!=null&&a.age>=a.move.wind+a.move.active+a.move.recovery)Enter(a,a.y>0?"air":"idle");
-                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=90)){
+                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=90)){
                     if(a.state=="broken")a.posture=0;Enter(a,a.y>0?"air":"idle");}
                 if(a.id==2&&(a.state=="idle"||a.state=="run")&&a.age%30==0)a.posture=Math.Max(0,a.posture-3);
                 if(a.id==1&&(a.state=="idle"||a.state=="run")&&a.stamina<PlayerMaxStamina)a.stamina=Math.Min(PlayerMaxStamina,a.stamina+Rules.staminaRegen);
@@ -180,7 +186,9 @@ namespace LingyueEchoes
             else if(free||recovering){if(Consume("dodge")){if(Spend(p,45)){if(axis!=0)p.face=Math.Sign(axis);Enter(p,"dodge");}else Log("气力不足 · 无法闪避");}
                 else if(free){if(Consume("parry")){if(Spend(p,20))Enter(p,"parry");else Log("气力不足 · 无法格挡");}
                     else if(Consume("attack")){p.combo=0;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[0]);}
-                    else if(p.vy==0&&Consume("jump")){if(Spend(p,30)){p.vy=13;Enter(p,"air");Sound("jump");}else Log("气力不足 · 无法跳跃");}}
+                    else if(p.vy==0&&Consume("jump")){if(Spend(p,30)){p.vy=13;Enter(p,"air");Sound("jump");}else Log("气力不足 · 无法跳跃");}
+                    else if(p.y==0&&p.vy==0&&Consume("heal")&&HealUnlocked&&p.hp<p.maxHp&&p.energy>=Rules.healCost){
+                        if(axis!=0)p.face=Math.Sign(axis);Enter(p,"heal");}}
                 else if(p.state=="attack"&&p.combo<2&&Consume("attack")){p.combo++;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
         void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;

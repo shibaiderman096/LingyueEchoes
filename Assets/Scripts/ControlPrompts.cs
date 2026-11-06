@@ -30,6 +30,7 @@ namespace LingyueEchoes
                 case "parry":return keyboard?"K":touch?"屏幕 Y":"Y";
                 case "dodge":return keyboard?"Shift":touch?"屏幕 B":"B";
                 case "interact":return keyboard?"E":touch?"屏幕 RB":"RB";
+                case "heal":return keyboard?"E":touch?"屏幕 LB":"LB";
                 case "pause":return keyboard?"P":touch?"右上暂停键":"Menu";
                 case "settings":return keyboard?"Esc":touch?"右上设置":"View";
                 case "backpack":return keyboard?"B":touch?"点击头像":"Start";
@@ -41,7 +42,7 @@ namespace LingyueEchoes
             foreach(string action in Actions)text=text.Replace("{"+action+"}",Key(action,device));
             return text;
         }
-        static readonly string[] Actions={"move","jump","attack","parry","dodge","interact","pause","settings","backpack"};
+        static readonly string[] Actions={"move","jump","attack","parry","dodge","interact","heal","pause","settings","backpack"};
         public static string Summary(string device)=>Format("{move} 移动\n{jump} 跳跃 · {attack} 攻击\n{parry} 格挡 · {dodge} 闪避\n{interact} 交谈 · {settings} 游戏设置",device);
         public static string MenuHint(string device)=>device=="keyboard"?"↑ / ↓ 选择 · ENTER 确认 · ESC 返回":device=="pad"?"左摇杆 ↑ / ↓ 选择 · A 确认 · B 返回":"轻触按钮选择";
         public static string StoryHint(string device)=>device=="keyboard"?"空格 / ENTER 继续":device=="pad"?"A 继续":"轻触屏幕继续";

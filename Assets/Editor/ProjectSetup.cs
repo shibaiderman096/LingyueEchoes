@@ -14,7 +14,7 @@ public class PixelImport:AssetPostprocessor
         var importer=(TextureImporter)assetImporter;importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;importer.spritePixelsPerUnit=100;
         importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.maxTextureSize=8192;
         var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);settings.spriteMeshType=SpriteMeshType.FullRect;settings.spriteAlignment=(int)SpriteAlignment.Custom;
-        bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/"}.Any(s=>assetPath.Contains(s));
+        bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/","heal_fx/"}.Any(s=>assetPath.Contains(s));
         bool guardian=assetPath.Contains("/guardian8/frames/")||assetPath.Contains("/guardian8/frames16/");
         settings.spritePivot=guardian?new Vector2(.5f,24f/224):hero?new Vector2(.5f,.125f):new Vector2(.5f,.5f);importer.SetTextureSettings(settings);
     }
@@ -28,18 +28,36 @@ public static class ProjectSetup
         PlayerSettings.runInBackground=false;PlayerSettings.colorSpace=ColorSpace.Gamma;SetInput();
         var manifest=JsonUtility.FromJson<ClipManifest>(File.ReadAllText("Assets/Resources/Data/animations.json"));
         Directory.CreateDirectory("Assets/Resources/Animations/pixel8");Directory.CreateDirectory("Assets/Resources/Animations/guardian8");Directory.CreateDirectory("Assets/Scenes");Directory.CreateDirectory("Assets/Prefabs");AssetDatabase.Refresh();
-        foreach(var d in manifest.clips){var clip=new AnimationClip{name=d.name,frameRate=d.sample,legacy=false};
-            var keys=d.times.Select((time,i)=>new ObjectReferenceKeyframe{time=time,value=Resources.Load<Sprite>(d.frames[i])}).ToList();
-            if(keys.Any(k=>!k.value))throw new Exception("Missing animation frame: "+d.name);
-            keys.Add(new ObjectReferenceKeyframe{time=Math.Max(d.duration-.00001f,d.times.Last()),value=keys.Last().value});
-            AnimationUtility.SetObjectReferenceCurve(clip,new EditorCurveBinding{path="",type=typeof(SpriteRenderer),propertyName="m_Sprite"},keys.ToArray());
-            var settings=AnimationUtility.GetAnimationClipSettings(clip);settings.loopTime=d.loop;AnimationUtility.SetAnimationClipSettings(clip,settings);clip.wrapMode=d.loop?WrapMode.Loop:WrapMode.ClampForever;
-            string output="Assets/Resources/"+d.path+".anim";if(File.Exists(output))AssetDatabase.DeleteAsset(output);AssetDatabase.CreateAsset(clip,output);}
+        foreach(var d in manifest.clips)WriteClip(d);
         AssetDatabase.SaveAssets();
         foreach(string folder in new[]{"pixel8","guardian8"}){string path="Assets/Resources/Animations/"+folder+"/Controller.controller";if(File.Exists(path))AssetDatabase.DeleteAsset(path);var controller=UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(path);var machine=controller.layers[0].stateMachine;foreach(var d in manifest.clips.Where(c=>c.folder==folder)){var state=machine.AddState(d.name);state.motion=Resources.Load<AnimationClip>(d.path);if(d.name=="idle")machine.defaultState=state;}}
         AssetDatabase.SaveAssets();CreateScene("MainMenu");CreateScene("Prologue");EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/MainMenu.unity",true),new EditorBuildSettingsScene("Assets/Scenes/Prologue.unity",true)};
         EditorSceneManager.OpenScene("Assets/Scenes/MainMenu.unity");AssetDatabase.SaveAssets();
         MigrationChecks.Run();Debug.Log("LINGYUE_MIGRATION_READY: 2 scenes, native sprite clips, golden parity passed");
+    }
+    static AnimationClip WriteClip(ClipDefinition d){
+        var clip=new AnimationClip{name=d.name,frameRate=d.sample,legacy=false};
+        var keys=d.times.Select((time,i)=>new ObjectReferenceKeyframe{time=time,value=Resources.Load<Sprite>(d.frames[i])}).ToList();
+        if(keys.Any(k=>!k.value))throw new Exception("Missing animation frame: "+d.name);
+        keys.Add(new ObjectReferenceKeyframe{time=Math.Max(d.duration-.00001f,d.times.Last()),value=keys.Last().value});
+        AnimationUtility.SetObjectReferenceCurve(clip,new EditorCurveBinding{path="",type=typeof(SpriteRenderer),propertyName="m_Sprite"},keys.ToArray());
+        var settings=AnimationUtility.GetAnimationClipSettings(clip);settings.loopTime=d.loop;AnimationUtility.SetAnimationClipSettings(clip,settings);clip.wrapMode=d.loop?WrapMode.Loop:WrapMode.ClampForever;
+        string output="Assets/Resources/"+d.path+".anim";
+        var existing=AssetDatabase.LoadAssetAtPath<AnimationClip>(output);
+        if(!existing){AssetDatabase.CreateAsset(clip,output);return clip;}
+        EditorUtility.CopySerialized(clip,existing);EditorUtility.SetDirty(existing);UnityEngine.Object.DestroyImmediate(clip);return existing;
+    }
+    [MenuItem("Lingyue/Import tail healing animations")]
+    public static void InstallTailHealingClips(){
+        AssetDatabase.Refresh();
+        var controller=AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>("Assets/Resources/Animations/pixel8/Controller.controller");
+        var machine=controller.layers[0].stateMachine;
+        foreach(string name in new[]{"heal","heal_fx"}){
+            var motion=WriteClip(PixelWorld.Definition("pixel8",name));
+            var state=machine.states.Select(s=>s.state).FirstOrDefault(s=>s.name==name)??machine.AddState(name);
+            state.motion=motion;EditorUtility.SetDirty(state);
+        }
+        AssetDatabase.SaveAssets();
     }
     static void SetInput(){var playerSettings=new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0]);var active=playerSettings.FindProperty("activeInputHandler");if(active!=null){active.intValue=0;playerSettings.ApplyModifiedPropertiesWithoutUndo();}
         var manager=new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset")[0]);var axes=manager.FindProperty("m_Axes");

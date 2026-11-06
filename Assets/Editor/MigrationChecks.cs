@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckTailUpgrades();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -48,7 +48,29 @@ public static class MigrationChecks
                     if(clip.secondContactPose>0)Assert(PixelActor.DrawnAttackCell(clip,move,move.wind+move.pulses[1]+1)==clip.secondContactPose,"Drawn second contact: "+clip.path);
                 }}}finally{UnityEngine.Object.DestroyImmediate(go);}
         if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
-        else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; V2 content, reading hold, broken steps and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
+        else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; tail healing; V2 content, reading hold, broken steps and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
+    static void CheckTailHealing(){
+        Combat Setup(int tails,int energy,double missing){var c=new Combat{ai=false,enemyActive=false};c.ApplyTailUpgrades(tails);
+            c.player.hp=c.player.maxHp-missing;c.player.energy=energy;c.player.echo=46;c.Press("heal");return c;}
+        foreach(var c in new[]{Setup(0,1,40),Setup(1,0,40),Setup(1,1,0)}){
+            double hp=c.player.hp;int energy=c.player.energy;c.Step();
+            Assert(c.player.state!="heal"&&c.player.hp==hp&&c.player.energy==energy,"Healing cannot start while locked, empty, or full");
+        }
+        var heal=Setup(1,2,40);var p=heal.player;
+        for(int i=0;i<Rules.healRelease;i++)heal.Step();
+        Assert(p.state=="heal"&&p.hp==90&&p.energy==2&&heal.visuals.Count==0,"Healing windup does not spend or restore");
+        heal.Step();Assert(p.hp==105&&p.energy==1&&p.echo==46&&heal.visuals.Single().kind=="heal_fx"&&heal.sounds.Single().name=="heal","Release spends one full point, restores 15 and emits a single cue");
+        for(int i=0;i<Rules.healFrames;i++)heal.Step();
+        Assert(p.state=="idle"&&p.hp==105&&p.energy==1&&heal.visuals.Count==1,"Healing recovers to idle without repeat spending");
+        var capped=Setup(1,1,4);for(int i=0;i<=Rules.healRelease;i++)capped.Step();
+        Assert(capped.player.hp==capped.player.maxHp&&capped.player.energy==0,"Healing is capped at the current maximum");
+        var interrupted=Setup(1,1,40);interrupted.player.x=0;
+        for(int i=0;i<Rules.healRelease;i++)interrupted.Step();
+        interrupted.enemyActive=true;interrupted.boss.x=90;interrupted.boss.face=-1;
+        interrupted.boss.state="attack";interrupted.boss.move=Rules.Boss[0].Copy();interrupted.boss.age=interrupted.boss.move.wind;
+        interrupted.Step();Assert(interrupted.player.state=="hurt"&&interrupted.player.hp==72&&interrupted.player.energy==1&&
+            !interrupted.visuals.Any(c=>c.kind=="heal_fx"),"Hit on the release frame interrupts without spending");
+    }
     static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=c.player,boss=c.boss,visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return JsonUtility.FromJson<Snapshot>(JsonUtility.ToJson(snapshot));}
     static Combat Contact(string state,int age,int energy=0,double echo=0){var c=new Combat{ai=false};c.player.x=0;c.player.state=state;c.player.age=age;c.player.energy=energy;c.player.echo=echo;c.boss.x=90;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;return c;}
     static void CheckDefenseAndTutorial(){

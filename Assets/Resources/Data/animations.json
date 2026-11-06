@@ -1082,6 +1082,78 @@
         "pixel8/frames/victory/victory-07",
         "pixel8/frames/victory/victory-08"
       ]
+    },
+    {
+      "name": "heal",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/heal",
+      "duration": 0.7,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667,
+        0.1,
+        0.13333333333333333,
+        0.16666666666666666,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65
+      ],
+      "frames": [
+        "pixel8/frames16/heal/heal-01",
+        "pixel8/frames16/heal/heal-02",
+        "pixel8/frames16/heal/heal-03",
+        "pixel8/frames16/heal/heal-04",
+        "pixel8/frames16/heal/heal-05",
+        "pixel8/frames16/heal/heal-06",
+        "pixel8/frames16/heal/heal-07",
+        "pixel8/frames16/heal/heal-08",
+        "pixel8/frames16/heal/heal-09",
+        "pixel8/frames16/heal/heal-10",
+        "pixel8/frames16/heal/heal-11",
+        "pixel8/frames16/heal/heal-12",
+        "pixel8/frames16/heal/heal-13",
+        "pixel8/frames16/heal/heal-14",
+        "pixel8/frames16/heal/heal-15",
+        "pixel8/frames16/heal/heal-16"
+      ]
+    },
+    {
+      "name": "heal_fx",
+      "folder": "pixel8",
+      "path": "Animations/pixel8/heal_fx",
+      "duration": 0.55,
+      "sample": 60,
+      "loop": false,
+      "times": [
+        0.0,
+        0.05,
+        0.1,
+        0.15,
+        0.21666666666666667,
+        0.3,
+        0.38333333333333336,
+        0.4666666666666667
+      ],
+      "frames": [
+        "pixel8/frames/heal_fx/heal_fx-01",
+        "pixel8/frames/heal_fx/heal_fx-02",
+        "pixel8/frames/heal_fx/heal_fx-03",
+        "pixel8/frames/heal_fx/heal_fx-04",
+        "pixel8/frames/heal_fx/heal_fx-05",
+        "pixel8/frames/heal_fx/heal_fx-06",
+        "pixel8/frames/heal_fx/heal_fx-07",
+        "pixel8/frames/heal_fx/heal_fx-08"
+      ]
     }
   ]
 }

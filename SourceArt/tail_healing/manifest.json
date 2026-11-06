@@ -1,0 +1,28 @@
+{
+  "art_source": "host_image",
+  "layout": "4 columns x 2 rows, row-major",
+  "hero_sheets": [
+    "hero-cast-key.png",
+    "hero-cast-between.png"
+  ],
+  "effects_sheet": "jade-foxfire.png",
+  "character_reference": "../pixel8/hero-master.png",
+  "hero_frame_canvas": [
+    192,
+    128
+  ],
+  "hero_frame_foot_from_top_left": [
+    96,
+    112
+  ],
+  "effects_frame_canvas": [
+    192,
+    192
+  ],
+  "effects_anchor_from_top_left": [
+    96,
+    96
+  ],
+  "hero_clip": "pixel8/heal",
+  "effects_clip": "pixel8/heal_fx"
+}

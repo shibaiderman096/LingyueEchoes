@@ -21,6 +21,10 @@ namespace LingyueEchoes.EditorTools
             Require(ControlPrompts.Key("attack","touch")=="屏幕 X"&&ControlPrompts.Key("move","touch")=="左侧摇杆","touch bindings");
             Require(ControlPrompts.Format("{backpack}","keyboard")=="B"&&ControlPrompts.Format("{backpack}","pad")=="Start"&&
                 ControlPrompts.Format("{backpack}","touch")=="点击头像"&&ControlPrompts.Key("settings","pad")=="View","separate backpack and settings bindings");
+            Require(ControlPrompts.Format("{heal}","keyboard")=="E"&&ControlPrompts.Format("{heal}","pad")=="LB"&&
+                ControlPrompts.Format("{heal}","touch")=="屏幕 LB","healing uses the current device prompt");
+            var controls=new MobileControls();var healCenter=MobileControls.ButtonCenters[Array.IndexOf(MobileControls.Commands,"heal")];
+            Require(controls.Begin(12,healCenter)==null&&controls.Begin(12,healCenter,true)=="heal","healing touch target is enabled only after unlock");
             var content=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/prologue-content").text);
             foreach(var lesson in content.lessons)foreach(string device in new[]{"keyboard","pad","touch"}){
                 string rendered=ControlPrompts.Format(lesson.controls,device);
