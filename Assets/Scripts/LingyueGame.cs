@@ -215,7 +215,7 @@ namespace LingyueEchoes
         void BeginTrialIntro(){
             ClearInput();sim.beforeStep=null;sim.nonlethal=false;sim.dummyBox=null;
             sim.boundsMin=PrologueLayout.ArenaMin;sim.boundsMax=PrologueLayout.ArenaMax;
-            sim.ResetBoss(PrologueLayout.GuardianFightX,520);
+            sim.ResetBoss(PrologueLayout.GuardianFightX,Rules.guardianHp,walkScale:Rules.guardianWalkScale);
             bossHealthTrail.Reset(1);postureTrail.Reset(0);
             var p=sim.player;p.x=PrologueLayout.PlayerFightX;p.y=p.vy=0;p.face=1;
             p.state="idle";p.move=null;p.age=p.combo=p.invuln=0;

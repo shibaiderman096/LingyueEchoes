@@ -5,6 +5,8 @@ namespace LingyueEchoes
     // Decorative layers only: no colliders, combat timers, or gameplay state.
     public sealed class PrologueAmbience:MonoBehaviour
     {
+        // Embed the sparse leaf tips slightly so the body of each rock meets the paving.
+        const float StoneBase=-97;
         public Transform rearLayer,frontLayer;
         public SpriteRenderer[] lanterns;
         public ParticleSystem[] petals;
@@ -46,14 +48,22 @@ namespace LingyueEchoes
             Prop(middle,"Incense by the waking tree","incense-altar",-1520,-99,73,101,-2);
             Prop(middle,"Offering beside the moon gate","incense-altar",1960,-99,73,101,-2);
             foreach(float x in new[]{-1825f,-970f,-430f,1430f,1900f,2520f})
-                Prop(middle,"Mossy flower stones","flower-stones",x,-95,110,43,-1);
+                Prop(middle,"Mossy flower stones","flower-stones",x,StoneBase,110,43,-1);
             foreach(float x in new[]{-1650f,-920f,-180f,1190f,1730f,2440f}){
-                var stones=Prop(ambience.frontLayer,"Foreground moss","flower-stones",x,-95,75,29,15);
+                var stones=Prop(ambience.frontLayer,"Foreground moss","flower-stones",x,StoneBase,75,29,15);
                 stones.color=new Color(.79f,.83f,.70f);stones.flipX=x>0;
             }
             Prop(ambience.frontLayer,"Left canopy fringe","hanging-blossoms",-1830,205,182,119,14);
             var branch=Prop(ambience.frontLayer,"Right canopy fringe","hanging-blossoms",2540,260,152,100,14);branch.flipX=true;
             ambience.InstallPetals();
+        }
+        public void GroundStones(){
+            foreach(var stone in GetComponentsInChildren<SpriteRenderer>(true)){
+                if(stone.name!="Foreground moss"&&stone.name!="Mossy flower stones")continue;
+                var position=stone.transform.position;
+                position.y+=StoneBase/100-stone.bounds.min.y;
+                stone.transform.position=position;
+            }
         }
         public void InstallPetals(){
             petals=new ParticleSystem[2];
@@ -67,15 +77,21 @@ namespace LingyueEchoes
                 var main=system.main;main.duration=12;main.loop=true;main.prewarm=true;main.playOnAwake=false;
                 main.useUnscaledTime=true;main.simulationSpace=ParticleSystemSimulationSpace.World;
                 main.startLifetime=new ParticleSystem.MinMaxCurve(7,11);main.startSpeed=0;
-                main.startSize=new ParticleSystem.MinMaxCurve(i==0?.035f:.055f,i==0?.065f:.10f);
-                main.startRotation=new ParticleSystem.MinMaxCurve(0,Mathf.PI*2);main.maxParticles=i==0?72:36;
+                main.startSize=new ParticleSystem.MinMaxCurve(i==0?.045f:.07f,i==0?.075f:.12f);
+                main.startRotation=new ParticleSystem.MinMaxCurve(0,Mathf.PI*2);main.maxParticles=i==0?104:48;
                 main.startColor=new ParticleSystem.MinMaxGradient(new Color(1,.68f,.73f,.65f),new Color(1,.88f,.84f,.9f));
-                var emission=system.emission;emission.rateOverTime=i==0?6:3;
+                var emission=system.emission;emission.rateOverTime=i==0?9:4;
                 var shape=system.shape;shape.enabled=true;shape.shapeType=ParticleSystemShapeType.Box;
                 shape.scale=new Vector3((PrologueLayout.BackdropRight-PrologueLayout.BackdropLeft)/100f,4,.01f);
                 var velocity=system.velocityOverLifetime;velocity.enabled=true;velocity.space=ParticleSystemSimulationSpace.World;
-                velocity.x=new ParticleSystem.MinMaxCurve(.05f,.13f);velocity.y=new ParticleSystem.MinMaxCurve(-.43f,-.24f);velocity.z=0;
-                var rotation=system.rotationOverLifetime;rotation.enabled=true;rotation.z=new ParticleSystem.MinMaxCurve(-1.2f,1.2f);
+                velocity.x=new ParticleSystem.MinMaxCurve(.05f,.13f);velocity.y=new ParticleSystem.MinMaxCurve(-.43f,-.24f);
+                velocity.z=new ParticleSystem.MinMaxCurve(0,0);
+                var rotation=system.rotationOverLifetime;rotation.enabled=true;rotation.separateAxes=true;
+                rotation.x=new ParticleSystem.MinMaxCurve(-.6f,.6f);rotation.y=new ParticleSystem.MinMaxCurve(-1.1f,1.1f);
+                rotation.z=new ParticleSystem.MinMaxCurve(-1.2f,1.2f);
+                var noise=system.noise;noise.enabled=true;noise.separateAxes=true;
+                noise.strengthX=.16f;noise.strengthY=.055f;noise.strengthZ=0;
+                noise.frequency=.45f;noise.scrollSpeed=.18f;noise.quality=ParticleSystemNoiseQuality.Low;noise.octaveCount=1;
                 var fade=system.colorOverLifetime;fade.enabled=true;
                 var gradient=new Gradient();gradient.SetKeys(new[]{new GradientColorKey(Color.white,0),new GradientColorKey(Color.white,1)},
                     new[]{new GradientAlphaKey(0,0),new GradientAlphaKey(1,.12f),new GradientAlphaKey(1,.65f),new GradientAlphaKey(0,1)});

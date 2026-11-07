@@ -32,6 +32,7 @@ namespace LingyueEchoes
             finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
         public const double plungeMinHeight=72, plungeFallSpeed=18, plungeDrift=3.5;
+        public const double guardianHp=650, guardianWalkScale=1.3;
         public static readonly Move[] Player={
             M("横斩",8,4,18,100,90,18,12,true,chainAt:14), M("踏步突刺",10,6,20,115,70,22,15,true,5,chainAt:18),
             M("回旋斩",12,8,28,140,110,35,26,true,chainAt:29), M("蓄力下斩",27,5,30,115,125,42,30,true)};
@@ -102,13 +103,15 @@ namespace LingyueEchoes
         readonly List<Command> queue=new List<Command>();
         bool dodgeRewarded,comboBuffered;int serial,visualSerial,soundSerial,aiWait=75,lastChoice=-1;
         OpponentPattern opponent;
+        double bossWalkScale=1;
         int fireAttack;double fireX;
         static readonly Move DelayedFire=new Move{name="余焰",damage=16};
         public static double BodyWidth(Fighter a)=>a.id==1?54:78;
         public static double BodyHeight(Fighter a)=>a.id==1?117:146;
         public void TuneBoss(double hp,int open=90,int wait=46,int wait2=24){boss.maxHp=boss.hp=hp;aiOpenWait=open;aiWaitPhase1=wait;aiWaitPhase2=wait2;aiWait=open;}
-        public void ResetBoss(double x,double hp,OpponentPattern pattern=null){
+        public void ResetBoss(double x,double hp,OpponentPattern pattern=null,double walkScale=1){
             boss=new Fighter(2,x,hp);TuneBoss(hp);
+            bossWalkScale=walkScale;
             opponent=pattern;fireAttack=0;if(pattern!=null)aiWait=30;
             BossDefeated=false;phase=1;moveIndex=0;lastChoice=-1;
             hitstop=executeWindow=0;successFrame=-100;successKind="";hits.Clear();visuals.Clear();
@@ -278,7 +281,7 @@ namespace LingyueEchoes
                 aiWait=phase==2?opponent.rageWait:opponent.wait;
                 Log(move.name+(move.parry?" · 可弹反":" · 危险招式"));return;
             }
-            if(--aiWait>0){bool moving=Math.Abs(p.x-b.x)>215;if(moving)b.x+=b.face*(phase==2?3:2);string next=moving?"run":"idle";if(b.state!=next)Enter(b,next);return;}
+            if(--aiWait>0){bool moving=Math.Abs(p.x-b.x)>215;if(moving)b.x+=b.face*(phase==2?3:2)*bossWalkScale;string next=moving?"run":"idle";if(b.state!=next)Enter(b,next);return;}
             double distance=Math.Abs(p.x-b.x);int choice=moveIndex++%6;if(distance>330&&choice<2)choice=2;if(choice==lastChoice)choice=(choice+1)%6;lastChoice=choice;var m=Rules.Boss[choice].Copy();
             if(phase==2){m.wind=(int)Math.Ceiling(m.wind*.75);m.recovery=(int)Math.Ceiling(m.recovery*.75);}StartAttack(b,m);aiWait=phase==2?aiWaitPhase2:aiWaitPhase1;Log(m.name+(m.parry?" · 可弹反":" · 危险招式"));}
         public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;boss.face=player.x>=boss.x?1:-1;var moves=opponent?.Moves(phase)??Rules.Boss;StartAttack(boss,moves[index%moves.Length].Copy());}

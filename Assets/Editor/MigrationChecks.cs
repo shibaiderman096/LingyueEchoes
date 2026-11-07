@@ -29,7 +29,7 @@ public static class MigrationChecks
                 else if(test.kind!="contact"){c.axis=t%240<120?1:-1;if(t%37==0)c.Press("attack");if(t%113==0)c.Press("parry");if(t%157==0)c.Press("dodge");if(t%191==0)c.Press("jump");if(t%173==0&&test.kind=="mixed")c.DebugBoss(t/173%6);}
                 c.Step();if(update)test.expected[t]=Capture(c);else Compare(c,test.expected[t],test.name+" tick "+t);}}
         foreach(var test in data.clocks){var c=new Combat();c.god=true;c.player.x=0;c.boss.x=150;var clock=new FixedClock(c);c.Press("parry");for(int i=0;i<test.hz*10;i++)clock.Advance(1d/test.hz);if(update)test.expected=Capture(c);else Compare(c,test.expected,"clock "+test.hz);}
-        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckPlayerCombo();CheckPlungeCombo();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();
+        CheckDefenseAndTutorial();CheckExecutionAndEffects();CheckPlayerCombo();CheckPlungeCombo();CheckTailUpgrades();CheckTailHealing();CheckDeathAftermath();CheckPrologueContent();CheckBrokenSteps();CheckGuardianTuning();
         int callbacks=0;var dialogue=new DialogueDirector();dialogue.onClose=id=>callbacks++;dialogue.Play(new DialogueScript{id="test",lines=new[]{new DialogueLine{speaker="guardian",text="铃月，沿着灯火前进。"}}});for(int i=0;i<600;i++)dialogue.Update(1d/60);Assert(!dialogue.Active&&callbacks==1,"Nonblocking dialogue auto advance");
         var sim=new Combat();sim.player.x=1393;sim.player.hp=72;sim.player.energy=2;var tut=new TutorialDirector();tut.Begin(sim);Assert(sim.player.x==1393&&sim.player.hp==72&&sim.player.energy==2,"Tutorial must not reset player");
         var manifest=JsonUtility.FromJson<ClipManifest>(Resources.Load<TextAsset>("Data/animations").text);var go=new GameObject("ClipCheck");var renderer=go.AddComponent<SpriteRenderer>();
@@ -291,5 +291,17 @@ public static class MigrationChecks
     static void Compare(Combat c,Snapshot expected,string label){CompareActor(c.player,expected.player,label+" player");CompareActor(c.boss,expected.boss,label+" boss");
         foreach(var f in typeof(Snapshot).GetFields()){if(f.Name=="player"||f.Name=="boss")continue;object actual=f.Name=="visuals"?(object)c.visuals.Count:f.Name=="sounds"?c.sounds.Count:typeof(Combat).GetField(f.Name).GetValue(c);if(!actual.Equals(f.GetValue(expected)))throw new Exception(label+" "+f.Name+": "+actual+" != "+f.GetValue(expected));}compared++;}
     static void CompareActor(Fighter actual,Fighter expected,string label){foreach(var f in typeof(Fighter).GetFields()){if(f.Name=="move")continue;object a=f.GetValue(actual),b=f.GetValue(expected);if(a is double){if(Math.Abs((double)a-(double)b)>1e-7)throw new Exception(label+" "+f.Name+": "+a+" != "+b);}else if(!Equals(a,b))throw new Exception(label+" "+f.Name+": "+a+" != "+b);}}
+    static void CheckGuardianTuning(){
+        var c=new Combat{god=true,boundsMin=-2000,boundsMax=2000};c.player.x=600;
+        foreach(int phase in new[]{1,2}){
+            c.ResetBoss(0,Rules.guardianHp,walkScale:Rules.guardianWalkScale);c.phase=phase;c.Step();
+            Assert(c.boss.hp==650&&c.boss.maxHp==650,"Guardian starts with increased full HP");
+            Assert(Math.Abs(c.boss.x-(phase==1?2.6:3.9))<1e-9&&c.boss.state=="run","Guardian walk increase in phase "+phase);
+        }
+        c.ResetBoss(0,140);c.Step();
+        Assert(Math.Abs(c.boss.x-2)<1e-9,"Reset clears previous guardian walk multiplier");
+        c.ResetBoss(0,595,WrathRoute.General);c.Step();
+        Assert(Math.Abs(c.boss.x-WrathRoute.General.pace)<1e-9,"Chapter boss keeps its own movement configuration");
+    }
     static void Assert(bool value,string label){if(!value)throw new Exception(label);}
 }
