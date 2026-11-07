@@ -235,7 +235,7 @@ public static class MigrationChecks
         Assert(asset,"Prologue JSON asset loads");
         var data=JsonUtility.FromJson<PrologueContent>(asset.text);
         string[] required={"routeWake","routeSteps","routeStepsClear","routeDummy","routeSpar","routeHit","routeDodge","routeParry",
-            "bossPre","bossRetry","bossPhase2","tail","tailAfter","rematchWin"};
+            "bossPre","bossRetry","bossPhase2","tail","tailAfter","rematchWin","chapterGuide"};
         Assert(data.scripts.Length==required.Length&&required.All(id=>data.scripts.Count(s=>s.id==id)==1),"Prologue IDs are unique and preserved");
         Assert(data.story.Length==4&&data.lessons.Length==7&&data.scripts.All(s=>s.lines.Length>0),"V2 opening, dialogue and lesson content");
         foreach(var line in data.scripts.SelectMany(s=>s.lines))

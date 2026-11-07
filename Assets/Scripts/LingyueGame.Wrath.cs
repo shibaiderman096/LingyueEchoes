@@ -72,7 +72,7 @@ namespace LingyueEchoes
         string ChapterInteraction()
         {
             if(!wrath){
-                if(stage=="GATE_READY"&&ChapterUnlocked(SaveSlot)&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<113)return ShrineEntrance;
+                if(stage=="GATE_READY"&&ChapterUnlocked(SaveSlot)&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<=PrologueLayout.MoonGateWidth/2)return ShrineEntrance;
                 return null;
             }
             if(stage!=WrathRoam)return null;
@@ -104,6 +104,7 @@ namespace LingyueEchoes
         }
         void PrepareWrath(bool onEntry)
         {
+            fallenArrival=!onEntry;
             int saved=Mathf.Clamp(SaveValue(WrathRoute.Checkpoint,SaveSlot),0,2);
             wrathCheckpoint=WrathCompleted?2:saved;
             wrathNext=WrathRoute.EncounterAfter(wrathCheckpoint);
@@ -121,7 +122,7 @@ namespace LingyueEchoes
         }
         void UpdateWrathArrival()
         {
-            if(stageTime<(wrathShowOpening?2.65f:1.1f))return;
+            if(stageTime<Mathf.Max(wrathShowOpening?2.65f:1.1f,.42f+ArrivalRiseDuration))return;
             if(wrathShowOpening){SetStage(WrathDialogue);ChapterSay("wrathEnter");}
             else SetStage(WrathRoam);
         }
@@ -240,7 +241,7 @@ namespace LingyueEchoes
         void ChapterFieldGUI()
         {
             if(!wrath){
-                if(WrathCompleted&&stage=="GATE_READY"&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<310){
+                if(WrathCompleted&&stage=="GATE_READY"&&Math.Abs(sim.player.x-PrologueLayout.MoonGateX)<=PrologueLayout.MoonGateWidth/2){
                     RoundedFill(new Rect(536,115,208,31),Ink,6);
                     Text(new Rect(536,115,208,31),TailProgress(sim.TailUpgrades),17,MoonGold,TextAnchor.MiddleCenter);
                 }

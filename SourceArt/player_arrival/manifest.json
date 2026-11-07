@@ -1,0 +1,268 @@
+{
+  "art_source": "host_image",
+  "character_reference": "../pixel8/hero-master.png",
+  "sit_rise": {
+    "source": "sit-rise-source.png",
+    "source_grid": [
+      4,
+      4
+    ],
+    "registration": "connected subject ownership; no clipped ears",
+    "scale": 0.308,
+    "canvas": [
+      192,
+      128
+    ],
+    "foot_anchor": [
+      96,
+      112
+    ],
+    "source_anchors": [
+      {
+        "bounds": [
+          61,
+          26,
+          315,
+          241
+        ],
+        "root": [
+          185,
+          241
+        ]
+      },
+      {
+        "bounds": [
+          444,
+          26,
+          699,
+          241
+        ],
+        "root": [
+          569,
+          241
+        ]
+      },
+      {
+        "bounds": [
+          827,
+          24,
+          1082,
+          241
+        ],
+        "root": [
+          953,
+          241
+        ]
+      },
+      {
+        "bounds": [
+          1207,
+          30,
+          1470,
+          241
+        ],
+        "root": [
+          1337,
+          241
+        ]
+      },
+      {
+        "bounds": [
+          50,
+          287,
+          326,
+          499
+        ],
+        "root": [
+          185,
+          499
+        ]
+      },
+      {
+        "bounds": [
+          434,
+          286,
+          708,
+          499
+        ],
+        "root": [
+          569,
+          499
+        ]
+      },
+      {
+        "bounds": [
+          817,
+          282,
+          1093,
+          499
+        ],
+        "root": [
+          953,
+          499
+        ]
+      },
+      {
+        "bounds": [
+          1201,
+          275,
+          1482,
+          499
+        ],
+        "root": [
+          1337,
+          499
+        ]
+      },
+      {
+        "bounds": [
+          48,
+          528,
+          328,
+          753
+        ],
+        "root": [
+          185,
+          753
+        ]
+      },
+      {
+        "bounds": [
+          437,
+          523,
+          707,
+          753
+        ],
+        "root": [
+          569,
+          753
+        ]
+      },
+      {
+        "bounds": [
+          823,
+          515,
+          1089,
+          753
+        ],
+        "root": [
+          953,
+          753
+        ]
+      },
+      {
+        "bounds": [
+          1209,
+          508,
+          1473,
+          753
+        ],
+        "root": [
+          1337,
+          753
+        ]
+      },
+      {
+        "bounds": [
+          58,
+          763,
+          321,
+          1013
+        ],
+        "root": [
+          185,
+          1013
+        ]
+      },
+      {
+        "bounds": [
+          445,
+          763,
+          712,
+          1013
+        ],
+        "root": [
+          569,
+          1013
+        ]
+      },
+      {
+        "bounds": [
+          826,
+          763,
+          1094,
+          1013
+        ],
+        "root": [
+          953,
+          1013
+        ]
+      },
+      {
+        "bounds": [
+          1209,
+          763,
+          1480,
+          1013
+        ],
+        "root": [
+          1337,
+          1013
+        ]
+      }
+    ],
+    "settle_frame": "pixel8/frames/idle/idle-01"
+  },
+  "decorations": {
+    "source": "shrine-decoration-source.png",
+    "grid": [
+      3,
+      2
+    ],
+    "crops": {
+      "sunset-lantern": [
+        130,
+        71,
+        388,
+        456
+      ],
+      "blossom-shrub": [
+        28,
+        140,
+        478,
+        412
+      ],
+      "balustrade": [
+        26,
+        194,
+        489,
+        402
+      ],
+      "hanging-blossoms": [
+        22,
+        96,
+        463,
+        397
+      ],
+      "flower-stones": [
+        20,
+        183,
+        493,
+        366
+      ],
+      "incense-altar": [
+        109,
+        38,
+        404,
+        453
+      ]
+    },
+    "scale": 0.5
+  },
+  "alpha": "binary >=128; disconnected specks removed",
+  "prompts": {
+    "sit-rise": "Using the existing fox shrine swordswoman master and idle sheet as identity references, draw 16 chronological poses of peaceful cross-legged sitting, opening eyes, hand bracing, kneeling, planting a boot, rising through crouch, standing and settling into right-facing idle. Preserve white-pink hair, one white tail, fox ears, amber eyes, red ribbon, golden bells, white-red kimono, black thigh-highs and katana. 4x4 row-major 1536x1024, constant camera and scale, shared ground contact, full isolated poses and transparent gutters, no text, scenery or effects. Match the existing restrained warm pixel-art finish.",
+    "shrine-decoration": "Using the waking tree and training pavilion as style references, draw six isolated warm sunset eastern fantasy pixel-art shrine props in a 3x2 1536x1024 transparent sheet: sandstone amber lantern, pink flowering sage shrub, low golden stone balustrade, hanging cherry branch, mossy flower stones, small incense altar. Welcoming, peaceful, pink flowers, sage greens, ochre stone, side-view, generous empty gutters, no characters, labels or background."
+  },
+  "prompts_note": "Production prompt summaries; generated through the built-in image tool from the referenced project art."
+}

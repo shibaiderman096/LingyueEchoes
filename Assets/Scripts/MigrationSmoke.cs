@@ -177,7 +177,10 @@ namespace LingyueEchoes
                         Require(sawTail&&sawEpilogue&&PlayerPrefs.GetInt(TestKey(PrologueLayout.TailCountKey),0)==1&&PlayerPrefs.GetInt(TestKey(PrologueLayout.ProgressKey),0)==1&&
                             PlayerPrefs.GetInt(TestKey(PrologueLayout.FirstVictoryStoryKey),0)==1&&LingyueGame.SaveStatus(TestSlot).StartsWith("序章已完成"),"First tail, epilogue and saved progression in the selected slot.");
                         Require(game.BackpackUnlocked&&c.TailUpgrades==1&&p.maxHp==130&&p.hp==130&&c.PlayerMaxStamina==110,"The first tail unlocks the backpack and grants both upgrades.");
-                        if(backpackFrame<0){game.SetBackpack(true);backpackFrame=c.frame;return;}
+                        if(backpackFrame<0){
+                            Require(game.HasActiveDialogue&&game.BattleOn,"The guardian guides the player toward the moon gate in a nonblocking bubble after the epilogue.");
+                            game.SetBackpack(true);backpackFrame=c.frame;return;
+                        }
                         if(game.BackpackOpen){
                             Require(c.frame==backpackFrame,"The backpack blocks combat and world input.");
                             game.SetBackpack(false);

@@ -66,13 +66,13 @@ namespace LingyueEchoes
         public static SpriteRenderer PlacePrologueGate(Transform props){
             var existing=props.Find("MoonGateExit");
             if(existing)return existing.GetComponent<SpriteRenderer>();
-            return Sprite(props,"MoonGateExit",WarmArt+"moon-gate",(float)PrologueLayout.MoonGateX,-98,700,722,3,new Vector2(.5f,0));
+            return Sprite(props,"MoonGateExit",WarmArt+"moon-gate",(float)PrologueLayout.MoonGateX,-98,PrologueLayout.MoonGateWidth,722,3,new Vector2(.5f,0));
         }
         public static GameObject CreatePrologueBackdrop(Transform world){
             var group=new GameObject("SceneryModules");group.transform.SetParent(world,false);
             const float width=PrologueLayout.BackdropRight-PrologueLayout.BackdropLeft;
             Sprite(group.transform,"Shared sunrise backdrop",WarmArt+"sunrise-valley",PrologueLayout.BackdropLeft,680,width,width/3,-20,new Vector2(0,1));
-            Sprite(group.transform,"01 · 苏醒地",WarmArt+"waking-tree",(float)PrologueLayout.WakeX-205,-110,525,360,-3,new Vector2(.5f,0));
+            Sprite(group.transform,"01 · 苏醒地",WarmArt+"waking-tree",PrologueLayout.BackdropLeft+40+525/2f,-110,525,360,-3,new Vector2(.5f,0));
             Sprite(group.transform,"02 · 断阶参道",WarmArt+"road-balustrade",(float)(PrologueLayout.StepsLeft+PrologueLayout.StepsWidth/2),-98,315,78,-3,new Vector2(.5f,0));
             Sprite(group.transform,"04 · 试炼木亭",WarmArt+"training-pavilion",(float)PrologueLayout.ArenaCenter,-98,TrialPavilionWidth,TrialPavilionHeight,-4,new Vector2(.5f,0));
             var floor=new GameObject("Warm paving · reusable modules").transform;
@@ -84,6 +84,7 @@ namespace LingyueEchoes
                 var tile=Sprite(floor,"Paving "+(i+1),WarmArt+"warm-paving",PrologueLayout.BackdropLeft+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
                 tile.flipX=i%2==1;
             }
+            PrologueAmbience.Create(group.transform);
             return group;
         }
         public static Transform Create(Transform parent){var world=new GameObject("World").transform;world.SetParent(parent,false);

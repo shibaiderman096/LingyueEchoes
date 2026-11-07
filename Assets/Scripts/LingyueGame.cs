@@ -16,6 +16,8 @@ namespace LingyueEchoes
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
+        bool fallenArrival;
+        float ArrivalRiseDuration=>fallenArrival?.95f:PixelWorld.Definition("pixel8","sit_rise").duration;
         static int TailStarPoints=>TailRewards.Length;
         static readonly Rect BackpackPortrait=new Rect(35,32,110,112);
         bool backpackOpen,backpackGuideSeen;
@@ -170,6 +172,7 @@ namespace LingyueEchoes
         }
         public void BeginTrial(){
             bool resume=HasMoonGateSave(SaveSlot)||ChapterUnlocked(SaveSlot);
+            fallenArrival=!resume;
             PrepareRoute(resume);
             storyIndex=0;storyTime=0;storyPhase="in";
             SetStage(resume?"FADE_IN":"STORY");
@@ -248,6 +251,7 @@ namespace LingyueEchoes
             WriteSave(PrologueLayout.ProgressKey,1);
             WriteSave(PrologueLayout.FirstVictoryStoryKey,1);WriteSave(WrathRoute.Unlocked,1);PlayerPrefs.Save();
             SetStage("GATE_READY");UpdateShrineEntrance();
+            Say("chapterGuide");
             if(sim.HealUnlocked)healGuideTime=9;
         }
         void SaveCheckpoint(){
@@ -257,7 +261,7 @@ namespace LingyueEchoes
         void UpdateCheckpointLamp(){checkpointLamp.color=checkpointReached?new Color(1,.84f,.53f):new Color(.51f,.59f,.68f);}
         public void Retry(){if(!DeathMenuReady||sim==null)return;
             if(wrath)PrepareWrath(false);
-            else {PrepareRoute(checkpointReached);SetStage("FADE_IN");SetMusic("prologue_stage_1");}
+            else {fallenArrival=true;PrepareRoute(checkpointReached);SetStage("FADE_IN");SetMusic("prologue_stage_1");}
             UiSound("ui_confirm");}
         void EnterDeath(){
             // Only player commands stop. The fixed clock, pending enemy moves, gravity, effects and audio continue.
@@ -283,7 +287,7 @@ namespace LingyueEchoes
                 case WrathDialogue:break;
                 case "FADE_IN":if(stageTime>=.8f)SetStage("CAMERA_REVEAL");break;
                 case "CAMERA_REVEAL":if(stageTime>=3.5f)SetStage("WAKE_UP");break;
-                case "WAKE_UP":if(stageTime>=.95f){SetStage(checkpointReached?"GATE_READY":"TUTORIAL");SetMusic("prologue_stage_1");}break;
+                case "WAKE_UP":if(stageTime>=ArrivalRiseDuration){SetStage(checkpointReached?"GATE_READY":"TUTORIAL");SetMusic("prologue_stage_1");}break;
                 case "GATE_DIALOGUE":if(speech.Cue=="drawBlade")bladeDrawTime+=dt;break;
                 case "TAIL_DIALOGUE":break;
                 case "TAIL_EPILOGUE":break;
@@ -346,11 +350,9 @@ namespace LingyueEchoes
                 guardian.Size=wrathActive==1?.9f:wrathActive==3?1.13f:ChapterBoss?1.22f:1;
             }
             string pose=null;double? poseSeconds=null;
-            if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){pose="dead";poseSeconds=PixelWorld.Definition("pixel8",pose).duration;}
-            else if(stage=="WAKE_UP"&&stageTime<.86f){
-                float t=Ease(Mathf.Clamp01(stageTime/.86f));pose="dead";
-                poseSeconds=PixelWorld.Definition("pixel8",pose).duration*(1-t);
-            }
+            if(stage=="FADE_IN"||stage=="CAMERA_REVEAL")ArrivalPose(-1,out pose,out poseSeconds);
+            else if(stage=="WAKE_UP")ArrivalPose(stageTime,out pose,out poseSeconds);
+            else if(stage==WrathArrive)ArrivalPose(stageTime-.42f,out pose,out poseSeconds);
             else if(stage=="DYING"||stage=="DEATH"){pose="dead";poseSeconds=(sim.frame-deathFrame)/(double)Rules.hz;}
             else if(stage=="GUARDIAN_INTRO"&&stageTime>=.65f&&stageTime<1.65f){
                 pose="parry";poseSeconds=(stageTime-.65f)*PixelWorld.Definition("pixel8",pose).duration;
@@ -365,6 +367,12 @@ namespace LingyueEchoes
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&(!ChapterDialogue||speech.Id=="wrathEnter")?0:1,idleDelta:idleDelta);
         }
         float RouteCameraX()=>wrath?ChapterCameraX():PrologueLayout.ClampViewX(Mathf.Min((float)sim.player.x+100,(float)PrologueLayout.MoonGateX),PrologueLayout.FullViewHalfWidth);
+        void ArrivalPose(float elapsed,out string pose,out double? seconds){
+            pose=fallenArrival?"dead":"sit_rise";
+            float t=Mathf.Clamp01(Mathf.Max(0,elapsed)/ArrivalRiseDuration);
+            seconds=fallenArrival?PixelWorld.Definition("pixel8","dead").duration*(1-Ease(t)):
+                Math.Min(Mathf.Max(0,elapsed),ArrivalRiseDuration);
+        }
         internal const float PrologueTrialView=4.45f;
         void FramePrologue(ref float zoom,ref float focusY){
             if(stage=="GUARDIAN_INTRO"||stage=="GUARDIAN_FIGHT"||stage=="GUARDIAN_DEFEAT"){

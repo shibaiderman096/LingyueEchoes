@@ -50,6 +50,8 @@ public static class ProjectSetup
     }
     [MenuItem("Lingyue/Import tail healing animations")]
     public static void InstallTailHealingClips()=>InstallPixelClips(new[]{"heal","heal_fx"});
+    [MenuItem("Lingyue/Import arrival animation")]
+    public static void InstallArrivalClip()=>InstallPixelClips(new[]{"sit_rise"});
     [MenuItem("Lingyue/Import player combo animations")]
     public static void InstallPlayerComboClips()=>InstallPixelClips(new[]{"idle","run"}.Concat(Enumerable.Range(1,4).SelectMany(i=>new[]{"attack"+i,"cut_fx"+i})));
     [MenuItem("Lingyue/Import player movement and special animations")]
