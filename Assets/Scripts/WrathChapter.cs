@@ -178,6 +178,9 @@ namespace LingyueEchoes
         SpriteRenderer looseBlade;
         WrathGeneralArt generalArt;
         WrathFoeArt[] foeArt;
+        void OnEnable(){SceneParticleSettings.Changed+=SetAmbientParticles;SetAmbientParticles(SceneParticleSettings.Enabled);}
+        void OnDisable(){SceneParticleSettings.Changed-=SetAmbientParticles;}
+        void SetAmbientParticles(bool enabled){if(embers)embers.gameObject.SetActive(enabled);}
         void Awake()
         {
             if(embers)ash=embers.GetComponentsInChildren<SpriteRenderer>();
@@ -249,7 +252,7 @@ namespace LingyueEchoes
             FrameScenery(cam.x,cam.y);
             if(backdrop)backdrop.localPosition=new Vector3((cameraX-520)*.0012f,0,0);
             generalArmor.SetActive(general);
-            if(ash!=null)for(int i=0;i<ash.Length;i++){
+            if(ash!=null&&embers.gameObject.activeSelf)for(int i=0;i<ash.Length;i++){
                 float life=Mathf.Repeat(now*(.12f+(i%5)*.02f)+i*.618f,1);
                 float x=cameraX/100+Mathf.Repeat(i*1.77f+life*1.6f,13)-6.5f;
                 var mote=ash[i];

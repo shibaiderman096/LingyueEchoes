@@ -14,6 +14,7 @@ namespace LingyueEchoes
         static string lastInputDevice;
         static int? pendingSaveSlot;
         Transform world;Camera view;PixelActor hero,guardian;PixelEffects effects;PrologueContent content;
+        SpriteRenderer trialBladeGlint;
         TutorialDirector tutorial;DialogueDirector speech=new DialogueDirector();
         float stageTime,cameraX=-960,nextPadCheck,checkpointToast,bladeDrawTime;string modal="";
         bool fallenArrival;
@@ -37,10 +38,11 @@ namespace LingyueEchoes
         const KeyCode PadConfirm=KeyCode.JoystickButton0,PadBack=KeyCode.JoystickButton1,PadSaveDelete=KeyCode.JoystickButton2;
         static readonly Rect SaveBackButton=new Rect(520,476,240,49);
         static Rect SaveRow(int index)=>new Rect(375,192+index*88,530,72);
-        static readonly Rect[] MenuPanelButtons={new Rect(350,250,580,60),new Rect(350,335,580,60),new Rect(350,420,580,60),new Rect(530,565,220,55)};
+        static readonly Rect[] MenuPanelButtons={new Rect(350,235,580,55),new Rect(350,310,580,55),new Rect(350,385,580,55),new Rect(350,460,580,55),new Rect(530,565,220,55)};
         static readonly Rect[] DeleteSaveButtons={new Rect(385,388,240,52),new Rect(655,388,240,52)};
         static readonly Rect[] DeathButtons={new Rect(430,355,420,58),new Rect(430,435,420,58)};
         static Rect GameSettingButton(int index)=>new Rect(938,166+index*55,282,45);
+        const int GameSettingCount=5;
         static readonly string[] SaveDataKeys=new[]{PrologueLayout.CheckpointKey,PrologueLayout.ProgressKey,PrologueLayout.TailCountKey,PrologueLayout.FirstVictoryStoryKey}.Concat(WrathRoute.SaveKeys).ToArray();
         int menuChoice,menuDirection,menuPanelChoice,saveChoice,deleteSaveSlot,deleteSaveDirection,deleteSaveChoice;
         Vector2 menuPointer;
@@ -106,6 +108,8 @@ namespace LingyueEchoes
                 PlaceShrineEntrance();
             }else view.backgroundColor=new Color(.12f,.07f,.10f);
             hero=new PixelActor(world.Find("Hero").gameObject,true);guardian=new PixelActor(world.Find("Guardian").gameObject,false);effects=new PixelEffects(world);
+            var glint=new GameObject("Trial · blade glint");glint.transform.SetParent(world,false);
+            trialBladeGlint=glint.AddComponent<SpriteRenderer>();trialBladeGlint.sortingOrder=20;glint.SetActive(false);
             keyart=Resources.Load<Texture2D>("ui/main_menu_keyart");
             tailIcons=TailRewards.Select(reward=>reward.SpritePath==null?null:Resources.Load<Texture2D>(reward.SpritePath)).ToArray();
             backpackArt=Resources.Load<Texture2D>("ui/backpack_moon_gate");
@@ -365,6 +369,17 @@ namespace LingyueEchoes
             else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&(!ChapterDialogue||speech.Id=="wrathEnter")?0:1,idleDelta:idleDelta);
+            float glintAge=stageTime-TrialSlashTime;
+            bool bladeFlash=!wrath&&stage=="GUARDIAN_INTRO"&&glintAge>=0&&glintAge<.18f;
+            trialBladeGlint.gameObject.SetActive(bladeFlash);
+            if(bladeFlash){
+                // Blade tips of the two authored opening poses, relative to their planted feet.
+                float tip=glintAge<.125f?.79f:.56f;
+                trialBladeGlint.transform.localPosition=new Vector3((float)b.x/100+b.face*tip,(float)b.y/100-.17f,0);
+                trialBladeGlint.transform.localScale=Vector3.one*.42f;
+                PixelWorld.Sample(trialBladeGlint.gameObject,"pixel8","parry_success",0,0);
+                trialBladeGlint.color=new Color(1,.96f,.9f,Mathf.Sin(glintAge/.18f*Mathf.PI));
+            }
         }
         float RouteCameraX()=>wrath?ChapterCameraX():PrologueLayout.ClampViewX(Mathf.Min((float)sim.player.x+100,(float)PrologueLayout.MoonGateX),PrologueLayout.FullViewHalfWidth);
         void ArrivalPose(float elapsed,out string pose,out double? seconds){
@@ -530,6 +545,7 @@ namespace LingyueEchoes
                 case 0:motion=!motion;PlayerPrefs.SetString("lingyue.menuMotion",motion?"on":"off");PlayerPrefs.Save();break;
                 case 1:ToggleSound();break;
                 case 2:PreviewTouchControls=!previewTouchControls;PlayerPrefs.SetInt("lingyue.touchControls",previewTouchControls?1:0);PlayerPrefs.Save();break;
+                case 3:SceneParticleSettings.Toggle();break;
             }
         }
         void SetGameSettings(bool open){
@@ -553,8 +569,8 @@ namespace LingyueEchoes
         }
         void ReadGameSettings(bool confirm,bool back,Vector2? hover){
             if(back){SetGameSettings(false);return;}
-            if(MoveMenuFocus(ref settingsDirection,out int direction))settingsChoice=(settingsChoice+direction+4)%4;
-            else if(hover.HasValue)for(int i=0;i<4;i++)if(GameSettingButton(i).Contains(hover.Value)){settingsChoice=i;break;}
+            if(MoveMenuFocus(ref settingsDirection,out int direction))settingsChoice=(settingsChoice+direction+GameSettingCount)%GameSettingCount;
+            else if(hover.HasValue)for(int i=0;i<GameSettingCount;i++)if(GameSettingButton(i).Contains(hover.Value)){settingsChoice=i;break;}
             if(confirm)ActivateGameSetting(settingsChoice);
         }
         void ActivateGameSetting(int option){
@@ -562,8 +578,9 @@ namespace LingyueEchoes
             switch(option){
                 case 0:showKeyHints=!showKeyHints;PlayerPrefs.SetInt("lingyue.keyHints",showKeyHints?1:0);PlayerPrefs.Save();break;
                 case 1:ToggleSound();break;
-                case 2:SetGameSettings(false);break;
-                case 3:Home();break;
+                case 2:SceneParticleSettings.Toggle();break;
+                case 3:SetGameSettings(false);break;
+                case 4:Home();break;
             }
         }
         void ToggleSound(){
@@ -663,10 +680,10 @@ namespace LingyueEchoes
                 if(modal=="controls")Text(new Rect(285,160,705,400),ControlPrompts.Summary(device)+$"\n\n弹刀前 {Rules.parryPerfect} 帧完美、共 {Rules.parry} 帧；闪避有效 {Rules.dodgeInvulnFrames} 帧，其中前 {Rules.perfectDodgeFrames} 帧完美。\n闪避 / 跳跃 / 格挡消耗 45 / 30 / 20 气力。\n成功闪避 / 格挡回复 34% 回响；完美成功回复 100% 并回满气力。\n小处决在有效范围内锁定目标，命中消耗 1 回响并使守灯人踉跄。大处决消耗全部回响。\n死亡后从菜单选择重试。",20);
                 else{Text(new Rect(285,170,700,55),"声音、动态和序章进度会保存到本机。",21);
                     for(int i=0;i<MenuPanelButtons.Length-1;i++){
-                        string label=i==0?"樱花动态    "+(motion?"开启":"关闭"):i==1?"声音    "+(muted?"关闭":"开启"):"触屏按键预览    "+(previewTouchControls?"开启":"关闭");
+                        string label=i==0?"主菜单动态    "+(motion?"开启":"关闭"):i==1?"声音    "+(muted?"关闭":"开启"):i==2?"触屏按键预览    "+(previewTouchControls?"开启":"关闭"):"场景粒子    "+(SceneParticleSettings.Enabled?"开启":"关闭");
                         if(MenuButton(MenuPanelButtons[i],label,menuPanelChoice==i))ActivateMenuPanelOption(i);
                     }
-                    Text(new Rect(285,500,700,50),"手机自动显示触屏按键 · 映射 Xbox 布局\n显示目标 60 FPS · 固定战斗 60Hz",17,Gold);}
+                    Text(new Rect(285,520,700,40),"手机自动显示触屏按键 · 映射 Xbox 布局\n显示目标 60 FPS · 固定战斗 60Hz",15,Gold);}
                 int backIndex=MenuPanelButtons.Length-1;
                 if(MenuButton(MenuPanelButtons[backIndex],"返回",menuPanelChoice==backIndex))CloseMenuModal();
                 if(device!="touch")Text(new Rect(355,620,570,26),ControlPrompts.MenuHint(device),14,Gold,TextAnchor.MiddleCenter);}
@@ -711,15 +728,15 @@ namespace LingyueEchoes
             Text(new Rect(375,455,530,28),hint,16,Gold,TextAnchor.MiddleCenter);
         }
         void GameSettingsGUI(){
-            RoundedFill(new Rect(914,96,330,342),Ink,9);
+            RoundedFill(new Rect(914,96,330,397),Ink,9);
             Text(new Rect(934,106,290,37),"游戏设置",22,Gold,TextAnchor.MiddleLeft);
             Fill(new Rect(938,150,282,1),new Color(Gold.r,Gold.g,Gold.b,.6f));
-            for(int i=0;i<4;i++){
+            for(int i=0;i<GameSettingCount;i++){
                 string label=i==0?"按键提示  ·  "+(showKeyHints?"开启":"关闭")
-                    :i==1?"声音  ·  "+(muted?"关闭":"开启"):i==2?"继续游戏":"返回主菜单";
+                    :i==1?"声音  ·  "+(muted?"关闭":"开启"):i==2?"场景粒子  ·  "+(SceneParticleSettings.Enabled?"开启":"关闭"):i==3?"继续游戏":"返回主菜单";
                 if(MenuButton(GameSettingButton(i),label,settingsChoice==i))ActivateGameSetting(i);
             }
-            Text(new Rect(925,392,308,35),ControlPrompts.MenuHint(device),13,Gold,TextAnchor.MiddleCenter);
+            Text(new Rect(925,447,308,35),ControlPrompts.MenuHint(device),13,Gold,TextAnchor.MiddleCenter);
         }
         void BackpackEntryGUI(){
             if(!BackpackAvailable)return;
@@ -945,16 +962,6 @@ namespace LingyueEchoes
         void TrialIntroGUI(){
             float t=stageTime,bars=54*Mathf.Min(Ease(Mathf.Clamp01(t/.3f)),Ease(Mathf.Clamp01((TrialIntroDuration-t)/.28f)));
             Fill(new Rect(0,0,1280,bars),Color.black);Fill(new Rect(0,720-bars,1280,bars),Color.black);
-            float slash=Mathf.Clamp01((t-TrialSlashTime)/.34f);
-            if(slash>0&&slash<1){
-                Vector3 blade=view.WorldToViewportPoint(new Vector3((float)sim.boss.x/100-.65f,-.14f,0));
-                float x=blade.x*1280-200*slash,y=(1-blade.y)*720-28*slash;
-                Matrix4x4 matrix=GUI.matrix;
-                GUIUtility.RotateAroundPivot(-14,new Vector2(x,y));
-                Fill(new Rect(x-140*slash,y-4,140*slash+85,9),new Color(.99f,.53f,.29f,.55f*(1-slash)));
-                Fill(new Rect(x-130*slash,y-1,130*slash+80,3),new Color(1,.94f,.73f,1-slash));
-                GUI.matrix=matrix;
-            }
             float alpha=Mathf.Min(Mathf.Clamp01((t-1.02f)/.2f),Mathf.Clamp01((TrialIntroDuration-t)/.26f));
             if(alpha>0){
                 Fill(new Rect(470,190,340,1),new Color(Gold.r,Gold.g,Gold.b,alpha*.6f));

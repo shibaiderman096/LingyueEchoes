@@ -7,15 +7,19 @@ namespace LingyueEchoes
     {
         public Transform rearLayer,frontLayer;
         public SpriteRenderer[] lanterns;
-        Vector3 rearOrigin,frontOrigin;
-        Camera sceneCamera;
+        public ParticleSystem[] petals;
         float elapsed;
-        void Start(){rearOrigin=rearLayer.localPosition;frontOrigin=frontLayer.localPosition;sceneCamera=Camera.main;}
+        void OnEnable(){SceneParticleSettings.Changed+=SetParticles;SetParticles(SceneParticleSettings.Enabled);}
+        void OnDisable(){SceneParticleSettings.Changed-=SetParticles;SetParticles(false);}
+        void SetParticles(bool enabled){
+            if(petals==null)return;
+            foreach(var system in petals){
+                if(!system)continue;
+                if(enabled){if(!system.isPlaying)system.Play();}
+                else system.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+        }
         void LateUpdate(){
-            if(!sceneCamera)return;
-            float x=sceneCamera.transform.position.x;
-            rearLayer.localPosition=rearOrigin+Vector3.right*(x*.025f);
-            frontLayer.localPosition=frontOrigin-Vector3.right*(x*.035f);
             elapsed+=Mathf.Min(Time.unscaledDeltaTime,.1f);
             for(int i=0;i<lanterns.Length;i++){
                 float light=.96f+.04f*Mathf.Sin(elapsed*1.7f+i*1.3f);
@@ -42,13 +46,44 @@ namespace LingyueEchoes
             Prop(middle,"Incense by the waking tree","incense-altar",-1520,-99,73,101,-2);
             Prop(middle,"Offering beside the moon gate","incense-altar",1960,-99,73,101,-2);
             foreach(float x in new[]{-1825f,-970f,-430f,1430f,1900f,2520f})
-                Prop(middle,"Mossy flower stones","flower-stones",x,-105,110,43,-1);
+                Prop(middle,"Mossy flower stones","flower-stones",x,-95,110,43,-1);
             foreach(float x in new[]{-1650f,-920f,-180f,1190f,1730f,2440f}){
-                var stones=Prop(ambience.frontLayer,"Foreground moss","flower-stones",x,-116,75,29,15);
+                var stones=Prop(ambience.frontLayer,"Foreground moss","flower-stones",x,-95,75,29,15);
                 stones.color=new Color(.79f,.83f,.70f);stones.flipX=x>0;
             }
             Prop(ambience.frontLayer,"Left canopy fringe","hanging-blossoms",-1830,205,182,119,14);
             var branch=Prop(ambience.frontLayer,"Right canopy fringe","hanging-blossoms",2540,260,152,100,14);branch.flipX=true;
+            ambience.InstallPetals();
+        }
+        public void InstallPetals(){
+            petals=new ParticleSystem[2];
+            for(int i=0;i<petals.Length;i++){
+                string name=i==0?"Cherry petals · distant":"Cherry petals · near";
+                var child=transform.Find(name);
+                if(!child){var go=new GameObject(name);go.transform.SetParent(transform,false);child=go.transform;}
+                child.localPosition=new Vector3((PrologueLayout.BackdropLeft+PrologueLayout.BackdropRight)/200f,2,0);
+                var system=child.GetComponent<ParticleSystem>();if(!system)system=child.gameObject.AddComponent<ParticleSystem>();
+                system.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main=system.main;main.duration=12;main.loop=true;main.prewarm=true;main.playOnAwake=false;
+                main.useUnscaledTime=true;main.simulationSpace=ParticleSystemSimulationSpace.World;
+                main.startLifetime=new ParticleSystem.MinMaxCurve(7,11);main.startSpeed=0;
+                main.startSize=new ParticleSystem.MinMaxCurve(i==0?.035f:.055f,i==0?.065f:.10f);
+                main.startRotation=new ParticleSystem.MinMaxCurve(0,Mathf.PI*2);main.maxParticles=i==0?72:36;
+                main.startColor=new ParticleSystem.MinMaxGradient(new Color(1,.68f,.73f,.65f),new Color(1,.88f,.84f,.9f));
+                var emission=system.emission;emission.rateOverTime=i==0?6:3;
+                var shape=system.shape;shape.enabled=true;shape.shapeType=ParticleSystemShapeType.Box;
+                shape.scale=new Vector3((PrologueLayout.BackdropRight-PrologueLayout.BackdropLeft)/100f,4,.01f);
+                var velocity=system.velocityOverLifetime;velocity.enabled=true;velocity.space=ParticleSystemSimulationSpace.World;
+                velocity.x=new ParticleSystem.MinMaxCurve(.05f,.13f);velocity.y=new ParticleSystem.MinMaxCurve(-.43f,-.24f);velocity.z=0;
+                var rotation=system.rotationOverLifetime;rotation.enabled=true;rotation.z=new ParticleSystem.MinMaxCurve(-1.2f,1.2f);
+                var fade=system.colorOverLifetime;fade.enabled=true;
+                var gradient=new Gradient();gradient.SetKeys(new[]{new GradientColorKey(Color.white,0),new GradientColorKey(Color.white,1)},
+                    new[]{new GradientAlphaKey(0,0),new GradientAlphaKey(1,.12f),new GradientAlphaKey(1,.65f),new GradientAlphaKey(0,1)});
+                fade.color=gradient;
+                var renderer=system.GetComponent<ParticleSystemRenderer>();renderer.sharedMaterial=Resources.Load<Material>("prologue_route/warm/cherry-petal");
+                renderer.sortingOrder=i==0?-2:16;renderer.renderMode=ParticleSystemRenderMode.Billboard;
+                petals[i]=system;
+            }
         }
         static Transform Layer(Transform parent,string name){var go=new GameObject(name);go.transform.SetParent(parent,false);return go.transform;}
         static SpriteRenderer Prop(Transform parent,string name,string sprite,float x,float y,float w,float h,int order)=>
