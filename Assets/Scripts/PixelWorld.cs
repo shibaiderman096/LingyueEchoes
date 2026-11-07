@@ -77,10 +77,9 @@ namespace LingyueEchoes
             Sprite(group.transform,"04 · 试炼木亭",WarmArt+"training-pavilion",(float)PrologueLayout.ArenaCenter,-98,TrialPavilionWidth,TrialPavilionHeight,-4,new Vector2(.5f,0));
             var floor=new GameObject("Warm paving · reusable modules").transform;
             floor.SetParent(group.transform,false);
-            const int tileCount=4;
-            // The last slab supports the gate's right foot and ends beneath its overhanging roof.
-            const float pavingEnd=(float)PrologueLayout.MoonGateX+320;
-            const float tileWidth=(pavingEnd-PrologueLayout.BackdropLeft)/tileCount;
+            // Keep the paving under the entire backdrop, including the view beyond the moon gate.
+            const float tileWidth=930;
+            int tileCount=Mathf.CeilToInt(width/tileWidth);
             for(int i=0;i<tileCount;i++){
                 var tile=Sprite(floor,"Paving "+(i+1),WarmArt+"warm-paving",PrologueLayout.BackdropLeft+i*tileWidth,-95,tileWidth+1,310,1,new Vector2(0,1));
                 tile.flipX=i%2==1;
