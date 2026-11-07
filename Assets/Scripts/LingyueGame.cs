@@ -47,7 +47,7 @@ namespace LingyueEchoes
         int storyIndex,soundCursor,voiceIndex,deathChoice,deathFrame;float storyTime,deathAnimationDuration,deathZoomTime,deathCameraSize,guiOpacity=1;
         Vector3 deathCameraPosition;const float DeathZoomDuration=1.2f,DeathMenuFadeDuration=1.2f;
         const float TrialIntroDuration=2.1f,TrialSlashTime=.94f;
-        SpriteRenderer checkpointLamp,leftSeal,rightSeal;
+        SpriteRenderer checkpointLamp;
         bool checkpointReached;
         public int SaveSlot {get;private set;}=1;
         internal bool SavePickerOpen=>stage=="MENU"&&modal==SavePicker;
@@ -101,8 +101,6 @@ namespace LingyueEchoes
                 view.backgroundColor=PixelWorld.PrologueSky;
                 PixelWorld.PlaceBrokenSteps(world.Find("Props"));
                 checkpointLamp=PixelWorld.PlaceCheckpoint(world.Find("Props"));
-                leftSeal=PixelWorld.PlaceArenaSeal(world.Find("Props"),true);
-                rightSeal=PixelWorld.PlaceArenaSeal(world.Find("Props"),false);
                 PlaceShrineEntrance();
             }else view.backgroundColor=new Color(.12f,.07f,.10f);
             hero=new PixelActor(world.Find("Hero").gameObject,true);guardian=new PixelActor(world.Find("Guardian").gameObject,false);effects=new PixelEffects(world);
@@ -191,13 +189,13 @@ namespace LingyueEchoes
         }
         void PrepareRoute(bool fromCheckpoint){
             PrepareCampaignCombat();
-            sim.boundsMin=PrologueLayout.RouteStart;sim.boundsMax=PrologueLayout.ArenaMax;
+            sim.boundsMin=PrologueLayout.RouteStart;sim.boundsMax=PrologueLayout.RouteEnd;
             checkpointReached=fromCheckpoint;checkpointToast=0;tutorial=new TutorialDirector();
             sim.player.x=fromCheckpoint?PrologueLayout.CheckpointX:PrologueLayout.WakeX;
             sim.boss.x=fromCheckpoint?PrologueLayout.GuardianWaitX:PrologueLayout.WakeGuideX;
             if(!fromCheckpoint){tutorial.Begin(sim,PrologueLayout.BrokenSteps());sim.beforeStep=tutorial.Pump;}
             else sim.terrain.Add(PrologueLayout.BrokenSteps());
-            cameraX=RouteCameraX();SetArenaSeals(false);UpdateCheckpointLamp();UpdateShrineEntrance();
+            cameraX=RouteCameraX();UpdateCheckpointLamp();UpdateShrineEntrance();
         }
         public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=backpackOpen=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
         void SetStage(string value){
@@ -216,7 +214,7 @@ namespace LingyueEchoes
             p.state="idle";p.move=null;p.age=p.combo=p.invuln=0;
             sim.ai=sim.enemyActive=false;clock=new FixedClock(sim);effects.Clear();
             phase2Spoken=false;cameraX=(float)PrologueLayout.ArenaCenter;
-            SetStage("GUARDIAN_INTRO");SetArenaSeals(true);
+            SetStage("GUARDIAN_INTRO");
         }
         void BeginGuardianDefeat(){
             mobileControls.Reset();sim.ClearCommands();clock.paused=false;clock.ClearAccumulation();speech.Reset();
@@ -233,8 +231,8 @@ namespace LingyueEchoes
         }
         void FinishGuardianFight(){
             if(wrath){FinishWrathEncounter();return;}
-            StopSounds();SetArenaSeals(false);SetMusic("prologue_stage_1");
-            sim.boundsMin=PrologueLayout.RouteStart;
+            StopSounds();SetMusic("prologue_stage_1");
+            sim.boundsMin=PrologueLayout.RouteStart;sim.boundsMax=PrologueLayout.RouteEnd;
             sim.visuals.Clear();effects.Clear();
             // Older save flags describe progression, not whether this closing scene has played.
             if(FirstVictoryStorySeen){
@@ -324,6 +322,7 @@ namespace LingyueEchoes
                         ?(float)((WrathRoute.Fights[wrathActive].Min+WrathRoute.Fights[wrathActive].Max)*.5):ChapterCameraX();
                     cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"||stage=="TAIL_EPILOGUE"||ChapterDialogue||stage==WrathTransfer?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
+                if(!wrath)FramePrologue(ref zoom,ref focusY);
                 view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
             if(!wrath){
                 var cameraPosition=view.transform.position;
@@ -365,7 +364,19 @@ namespace LingyueEchoes
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&(!ChapterDialogue||speech.Id=="wrathEnter")?0:1,idleDelta:idleDelta);
         }
-        float RouteCameraX()=>wrath?ChapterCameraX():PrologueLayout.ClampViewX((float)sim.player.x+100,PrologueLayout.FullViewHalfWidth);
+        float RouteCameraX()=>wrath?ChapterCameraX():PrologueLayout.ClampViewX(Mathf.Min((float)sim.player.x+100,(float)PrologueLayout.MoonGateX),PrologueLayout.FullViewHalfWidth);
+        internal const float PrologueTrialView=4.45f;
+        void FramePrologue(ref float zoom,ref float focusY){
+            if(stage=="GUARDIAN_INTRO"||stage=="GUARDIAN_FIGHT"||stage=="GUARDIAN_DEFEAT"){
+                zoom*=3.6f/PrologueTrialView;focusY+=112;return;
+            }
+            if(stage!="TUTORIAL"&&stage!="GATE_READY"&&stage!="GATE_DIALOGUE"&&stage!="TAIL_EPILOGUE"&&!ChapterDialogue&&stage!=WrathTransfer)return;
+            float x=(float)sim.player.x,center=(float)PrologueLayout.ArenaCenter,end=(float)PrologueLayout.ArenaMax;
+            float pavilion=Ramp(x,(float)PrologueLayout.ArenaMin-60,center-120)*(1-Ramp(x,center+80,end+20));
+            float gate=Ramp(x,end+20,(float)PrologueLayout.MoonGateX-160);
+            zoom=3.6f/(3.6f+(PrologueTrialView-3.6f)*pavilion+.9f*gate);
+            focusY=112*pavilion+190*gate;
+        }
         static float Ease(float t)=>t<.5f?4*t*t*t:1-Mathf.Pow(-2*t+2,3)/2;
         void Say(string id){var script=Array.Find(content.scripts,s=>s.id==id);if(script!=null){if(stage=="TUTORIAL")tutorial.BeginDialogue(id);speech.Play(script);}}
         string Interaction(){
@@ -387,14 +398,10 @@ namespace LingyueEchoes
                 ClearInput();
                 sim.player.state="idle";sim.player.move=null;sim.player.age=0;
                 sim.player.y=sim.player.vy=0;sim.player.face=sim.boss.x>=sim.player.x?1:-1;
-                sim.boss.face=-sim.player.face;bladeDrawTime=0;SetStage("GATE_DIALOGUE");SetArenaSeals(true);
+                sim.boss.face=-sim.player.face;bladeDrawTime=0;SetStage("GATE_DIALOGUE");
                 if(interaction=="再次挑战")script=Array.Find(content.scripts,s=>s.id=="bossRetry");
             }else{tutorialDialogue=true;tutorial.BeginDialogue(id);if(id=="routeWake")ClearInput();}
             speech.Play(script,false);
-        }
-        void SetArenaSeals(bool active){
-            leftSeal.enabled=active;
-            rightSeal.enabled=active;
         }
         void SetMusic(string name){if(musicKey==name)return;musicKey=name;var clip=Resources.Load<AudioClip>("contentpack_20261104/music/"+name);if(!clip)return;music.Stop();music.clip=clip;music.Play();}
         void StopSounds(){if(voices!=null)foreach(var voice in voices)voice.Stop();}

@@ -6,13 +6,14 @@ namespace LingyueEchoes
     public static class PrologueLayout
     {
         public const double RouteStart=-1390,WakeX=-1190,WakeGuideX=WakeX+165;
-        public const double MoonGateX=WakeX+1775*1.25,ArenaMax=MoonGateX+100,ArenaMin=ArenaMax-1080;
+        public const double ArenaMax=1128.75,ArenaMin=ArenaMax-1080;
         public const double ArenaCenter=(ArenaMin+ArenaMax)/2,GateEntry=-40,CheckpointX=20;
+        public const double MoonGateX=ArenaCenter+1145,RouteEnd=MoonGateX+60;
         public const double GuardianWaitX=ArenaCenter,PlayerFightX=ArenaMin+330,GuardianFightX=ArenaMin+740;
         public const double PracticeDummyX=-345,DummyGuideX=-485,SparGuideX=-170;
         public const double StepsLeft=-850,StepsWidth=112,StepsHeight=36,StepsGuideX=-640;
         public const double WakeEnd=-935,RoadEnd=-465;
-        public const float BackdropLeft=-1940,BackdropRight=1800;
+        public const float BackdropLeft=-1940,BackdropRight=2650;
         public const float CameraPadding=8,FullViewHalfWidth=640;
         public static float ClampViewX(float center,float halfWidth){
             float left=BackdropLeft+halfWidth+CameraPadding,right=BackdropRight-halfWidth-CameraPadding;

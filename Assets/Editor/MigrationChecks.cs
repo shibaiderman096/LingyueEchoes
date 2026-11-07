@@ -100,7 +100,7 @@ public static class MigrationChecks
         for(int i=0;i<400;i++)route.Step();Assert(route.boss.x==PrologueLayout.DummyGuideX&&
             route.boss.x+Combat.BodyWidth(route.boss)/2<route.dummyBox.x,"Guide stops clear of the practice dummy");
         route.axis=1;for(int i=0;i<600;i++)route.Step();Assert(route.player==hero&&route.player.hp==120&&route.terrain.Count==0&&route.player.x>=PrologueLayout.GateEntry&&route.boss.x>=PrologueLayout.ArenaMin,"Continuous optional route without a jump obstacle");
-        Assert(PrologueLayout.MoonGateX-PrologueLayout.WakeX==2218.75&&PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080,"Extended route keeps the trial arena width");
+        Assert(PrologueLayout.ArenaMax-PrologueLayout.ArenaMin==1080&&PrologueLayout.ArenaMax<PrologueLayout.MoonGateX&&PrologueLayout.MoonGateX<PrologueLayout.RouteEnd,"The route ends at the chapter portal past the unchanged trial arena");
     }
     static void CheckTailUpgrades(){
         var c=new Combat{ai=false,enemyActive=false};

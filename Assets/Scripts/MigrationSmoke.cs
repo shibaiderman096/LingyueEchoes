@@ -52,14 +52,16 @@ namespace LingyueEchoes
                     var world=game.transform.Find("World");
                     var scenery=world.Find("SceneryModules");
                     var gate=world.Find("Props/MoonGateExit");
-                    Require(game.sim.terrain.Count==1&&scenery.Find("Shared sunrise backdrop")&&scenery.childCount==5&&gate&&
-                        !world.Find("Props/SevenSinsStele")&&Math.Abs(gate.position.x-PrologueLayout.MoonGateX/100)<.01,
-                        "One shared background, three stand-alone landmarks, paving, and a moon gate replacing the stone at the exit.");
+                    var pavilion=scenery.Find("04 · 试炼木亭").GetComponent<SpriteRenderer>();
+                    Require(game.sim.terrain.Count==1&&scenery.Find("Shared sunrise backdrop")&&gate&&!scenery.Find("03 · 练武庭")&&
+                        Math.Abs(pavilion.bounds.size.x-15.3)<.01&&Math.Abs(pavilion.bounds.size.y-6.24)<.01&&
+                        Math.Abs(gate.position.x-PrologueLayout.MoonGateX/100)<.01&&Math.Abs(gate.GetComponent<SpriteRenderer>().bounds.size.y-7.22)<.01,
+                        "One shared background, a triple-size trial pavilion and a double-size gate at the route's end.");
                     var steps=world.Find("Props/BrokenSteps").GetComponent<SpriteRenderer>();
                     float pad=PixelWorld.RubblePadding/100;
                     Require(steps.sprite&&steps.sprite.name.StartsWith("broken-rubble")&&Math.Abs(steps.bounds.min.x+pad-PrologueLayout.StepsLeft/100)<.01&&
                         Math.Abs(steps.bounds.max.y-pad-(-.95+PrologueLayout.StepsHeight/100))<.01,"The visible rubble aligns with the ground and collision.");
-                    Require(!Seal(game,true).enabled&&!Seal(game,false).enabled,"Trial markers stay hidden during exploration.");
+                    Require(!world.Find("Props/ArenaSealLeft")&&!world.Find("Props/ArenaSealRight")&&!world.Find("Props/SevenSinsStele"),"No stone trial markers remain in the prologue.");
                     originalPlayer=game.sim.player;originalHp=originalPlayer.hp;game.sim.god=true;Next();
                 }
                 if(phase<2)return;
@@ -123,8 +125,8 @@ namespace LingyueEchoes
                     case 8:case 12:
                         if(game.stage=="GUARDIAN_INTRO"){
                             Require(!c.enemyActive&&!c.ai&&c.hits.Count==0,"Opening animation is purely visual.");
-                            Require(Seal(game,true).enabled&&Seal(game,false).enabled,"Both arena edges are marked during the trial.");
-                            if(Camera.main.orthographicSize<3.4f)sawOpeningPose=true;
+                            Require(c.boundsMin==PrologueLayout.ArenaMin&&c.boundsMax==PrologueLayout.ArenaMax,"The trial keeps both combat bounds without stone markers.");
+                            if(Camera.main.orthographicSize<LingyueGame.PrologueTrialView-.12f)sawOpeningPose=true;
                             return;
                         }
                         Require(game.stage=="GUARDIAN_FIGHT"&&c.enemyActive&&c.ai&&sawOpeningPose,"Camera and intro precede active combat.");
@@ -147,14 +149,14 @@ namespace LingyueEchoes
                         if(game.stage=="GUARDIAN_DEFEAT"){
                             if(guardianDefeatStartFrame<0)guardianDefeatStartFrame=c.frame;
                             game.Interact();
-                            Require(!game.BattleOn&&!game.HasActiveDialogue&&Seal(game,true).enabled,
+                            Require(!game.BattleOn&&!game.HasActiveDialogue&&c.boundsMax==PrologueLayout.ArenaMax,
                                 "The defeat animation plays without combat, dialogue, or premature arena exit.");
                             return;
                         }
                         Require(guardianDefeatStartFrame>=0&&c.frame-guardianDefeatStartFrame>=Mathf.CeilToInt(PixelWorld.Definition("guardian8","broken").duration*60),
                             "Victory dialogue waits for the full defeat clip.");
                         guardianDefeatStartFrame=-1;
-                        Require(!Seal(game,true).enabled,"The arena exit opens after a victory.");
+                        Require(c.boundsMin==PrologueLayout.RouteStart&&c.boundsMax==PrologueLayout.RouteEnd,"The full route opens after a victory.");
                         if(phase==9){
                             Require(game.stage=="TAIL_DIALOGUE","First victory automatically starts the tail story.");
                             firstVictoryFrame=c.frame;Next();
@@ -227,7 +229,6 @@ namespace LingyueEchoes
                 }
             }catch(Exception error){Debug.LogError("MIGRATION_RUNTIME_SMOKE_FAILED: "+error);Finish(1);}
         }
-        static SpriteRenderer Seal(LingyueGame game,bool left)=>game.transform.Find(left?"World/Props/ArenaSealLeft":"World/Props/ArenaSealRight").GetComponent<SpriteRenderer>();
     }
 }
 #endif

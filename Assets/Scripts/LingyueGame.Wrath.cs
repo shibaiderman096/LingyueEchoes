@@ -233,7 +233,7 @@ namespace LingyueEchoes
         }
         void ChapterInteractionGUI(string action)
         {
-            var rect=new Rect(396,522,488,44);
+            var rect=new Rect(396,action==ShrineEntrance?608:522,488,44);
             string key=showKeyHints?ControlPrompts.Key("interact",device):null;
             if(Button(rect,action,true,key:key))Interact();
         }
