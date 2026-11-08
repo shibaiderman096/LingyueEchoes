@@ -1,19 +1,13 @@
 {
-  "art_source": "host_image",
-  "route": "image_gen.imagegen",
-  "model": "host default",
-  "estimateUsd": null,
-  "prompt": "EDIT the reference palace door into a game animation spritesheet. Preserve this exact red wood, dark carved frame, gold cloud lintel and gold ring handles, crisp dark fantasy pixel art. IMPORTANT change viewing angle: ALL frames show a true three-quarter SIDE OBLIQUE doorway, like a door installed in the LEFT side wall of a side-scrolling room, its threshold recedes diagonally UP AND RIGHT, vertical posts remain vertical. Clearly visible thick left return jamb, far right jamb smaller, lintel and threshold slope up-right; not a front elevation, not a flat sprite tilted clockwise. Door must be wide enough to walk through. Produce EXACTLY 16 distinct chronological frames, a precise 4 columns by 4 rows grid, row-major. Frame1 firmly closed, 2-4 first release/small gap, 5-8 both solid leaves swing inward about their vertical hinges, 9-12 progressively wider opening, 13-16 settle fully open with the dark empty doorway visibly clear. Both red panels rotate inward with proper foreshortening, NOT slide away, not dissolving. The doorway frame, oblique angle, scale, position, top and ground anchor MUST be absolutely identical in all16 cells; only leaves move. No people. No numbering/text/grid lines. Every cell has identical margins and fixed bottom groundpoint; no object touches cell borders. Truly transparent background outside each doorway, inside doorway dark shadow. No ground plane, cast shadow, white matte or halo. One square 4x4 spritesheet with all16 full doorframes. Stay pixel art, no smoothing, no redesign.",
+  "route": "built-in image_gen",
+  "prompt": "Redraw the DOOR asset to visually belong to the supplied palace EXTERIOR wall, whose doorway is currently an empty dark opening. Image 1 is authoritative for architecture, materials and lighting. Image 2 is the OLD unsuitable standalone door, provided ONLY for sprite projection/animation layout, NOT for its frame design. Make a restrained weathered deep VERMILION red wooden double door matching the same red timber of image 1, its fine dark carved panel borders and aged muted antique-gold medallions. Muted warm lantern light and purple dusk shadows. CRITICAL: discard the old heavy protruding brown/black square frame, huge golden roof lintel, thick freestanding side posts and stone pedestal. The wall image already supplies the lintel and jambs! This new sprite is ONLY the two red door leaves with a VERY SLIM inset redwood liner, no roof or bulky exterior frame. Door leaves sit flush INSIDE a wall opening, seamlessly embedded. No building or wall included. Simple small antique gold ring pulls, decorative panels echo the wall's round flower medallions; no bright yellow gold, no black-and-gold armored frame.\nCreate EXACTLY 16 chronological opening frames in a precise evenly spaced 4x4 square spritesheet, read row-major. Frame1 fully CLOSED. 2-4 narrow growing central gap. 5-8 both leaves visibly hinged INWARD. 9-12 wider and strongly foreshortened. 13-16 final settle fully OPEN, open center transparent so existing dark wall opening shows through. Fixed outline of the thin inset liner and fixed hinges identical in all16 frames, no shifting scale or height, no bent panels, no door morph, each leaf rotates as rigid wood about vertical hinge. Every sprite same near-front 3/4 oblique projection as image 2: its LEFT vertical edge is NEARER, top and threshold rise gently toward the RIGHT. Runtime will mirror this to fit the wall. Very slight projection matching image2, vertical hinges remain vertical.\nPixel art with crisp hand placed small clusters, same detail density as palace wall. True clean RGBA TRANSPARENT outside sprite and through opening. No background, wall, floor, cast shadow, pale fringe, matte, checkerboard, text, grid lines, annotations or glow. 2048x2048 if possible; generous equal transparent gutters; whole thin door liner and all moving leaves within each cell. Door occupies about 76% cell height and 51% cell width. Frame1 and16 same fixed liner. Entire16 frames must share the same vermilion wall-compatible identity.",
   "source": "DoorOpening.png",
+  "reference": "../../Assets/Art/Wrath/Exterior.png",
   "runtime": "../../Assets/Art/Wrath/DoorOpening",
   "frames": 16,
   "layout": [
     4,
     4
   ],
-  "canvas": [
-    320,
-    320
-  ],
-  "packaging": "package_door.py: round 4x4 cell boundaries; alpha>=128, discard islands<12px; register fixed left jamb x68 and ground y315 on 320px canvas. Source RGB unchanged, no resampling."
+  "estimateUsd": null
 }

@@ -18,15 +18,22 @@ public static class WrathChapterChecks
             var chapter=root.GetComponent<WrathChapter>();
             Need(root.GetComponent<LingyueGame>()&&chapter.world&&chapter.world.Find("Hero")&&chapter.world.Find("Guardian")&&
                 chapter.firstLamp&&chapter.secondLamp&&chapter.leftSeal&&chapter.rightSeal&&chapter.returnSeal&&chapter.embers&&
-                chapter.entranceDoor&&chapter.fireMark,"chapter has native scene references");
+                chapter.entranceDoor&&chapter.exteriorScenery&&chapter.fireMark,"chapter has native scene references");
             Need(chapter.firstLamp==chapter.secondLamp,"legacy lamp references share the sole entrance checkpoint");
             Need(chapter.entranceDoorFrames!=null&&chapter.entranceDoorFrames.Length==16&&
                 chapter.entranceDoorFrames.All(sprite=>sprite&&sprite.rect.width==320&&sprite.rect.height==320),
                 "the oblique doorway has sixteen registered opening frames");
+            Need(chapter.entranceDoor.flipX,"the doorway is mirrored toward the arriving hero");
             Need(Quaternion.Angle(chapter.entranceDoor.transform.localRotation,Quaternion.identity)<.01f,
                 "door perspective is authored in the artwork, without tilting its upright posts");
             Need(chapter.scenery!=null&&chapter.scenery.Length==1&&chapter.scenery[0]&&chapter.scenery[0].sprite,
-                "one interior backdrop replaces the exterior route");
+                "one interior backdrop supplies the hall");
+            Need(chapter.exteriorScenery.sprite,"the entrance has an authored exterior backdrop");
+            chapter.SetInside(false);
+            Need(chapter.exteriorScenery.enabled&&chapter.scenery.All(r=>!r.enabled)&&chapter.entranceDoor.enabled,"outside enables only the exterior and door");
+            chapter.SetInside(true);
+            Need(!chapter.exteriorScenery.enabled&&chapter.scenery.All(r=>r.enabled)&&!chapter.entranceDoor.enabled,"inside enables only the interior");
+            Need(WrathRoute.Entrance<chapter.entranceDoor.transform.position.x*100,"arrival begins outside before the physical door threshold");
             Need(WrathRoute.Bridge().Length==0&&!chapter.Terrain().Any(),"the deleted approach has no remaining bridge terrain");
             Need(chapter.UseActorArt(false,0)==null&&chapter.UseActorArt(false,4)==null,"no approach enemy art is available");
             Need(chapter.world.GetComponentsInChildren<SpriteRenderer>(true).All(r=>r.sprite),"all chapter sprites resolve");

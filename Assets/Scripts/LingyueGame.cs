@@ -331,7 +331,7 @@ namespace LingyueEchoes
                 else if(stage=="TAIL_DIALOGUE"){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
                 else if(wrath){float focus=wrathActive>=0&&stage=="GUARDIAN_FIGHT"
                         ?(float)((WrathRoute.Fights[wrathActive].Min+WrathRoute.Fights[wrathActive].Max)*.5):ChapterCameraX();
-                    cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
+                    cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));zoom=wrath.IsInside?1:WrathOutsideZoom;}
                 else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"||stage=="TAIL_EPILOGUE"||ChapterDialogue||stage==WrathTransfer?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 if(!wrath)FramePrologue(ref zoom,ref focusY);
                 view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
@@ -350,6 +350,10 @@ namespace LingyueEchoes
             var p=sim.player;var b=sim.boss;
             if(wrath){
                 guardian.ChapterArt=wrath.UseActorArt(ChapterGeneralVisible,wrathActive);
+                if(guardian.ChapterArt is WrathGeneralArt generalArt){
+                    generalArt.BossStaggerFrames=sim.BossStaggerFrames;
+                    generalArt.CanRecoverFromBreak=!sim.BossDefeated;
+                }
                 guardian.Tint=guardian.ChapterArt!=null?(sim.phase>=2?new Color(1,.82f,.72f):Color.white):
                     wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
                     wrathActive==1?new Color(.84f,.52f,.35f):wrathActive==3?new Color(.65f,.52f,.61f):

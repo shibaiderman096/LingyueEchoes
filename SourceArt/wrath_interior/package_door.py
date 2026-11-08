@@ -19,8 +19,11 @@ for i in range(16):
     counts[0] = 0
     mask &= counts[ids] >= 12
     pixels[:, :, 3] = np.where(mask, 255, 0)
+    pixels[~mask] = 0
     cell = Image.fromarray(pixels)
     bounds = cell.getbbox()
     canvas = Image.new("RGBA", (320, 320))
     canvas.paste(cell, (68 - bounds[0], 315 - bounds[3]))
+    if np.count_nonzero(np.array(canvas)[:, :, 3]) != np.count_nonzero(mask):
+        raise ValueError(f'Frame {i+1} clips its registered canvas')
     canvas.save(out / f"door-{i + 1:02}.png")

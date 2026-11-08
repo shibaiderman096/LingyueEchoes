@@ -28,7 +28,11 @@
     "render_floor": -0.95,
     "entrance": 33.4,
     "entrance_walk_max": 34.2,
-    "door_center": 34.52,
+    "door_center": 34.36,
+    "door_render_size": 3.90,
+    "exterior_artifact": "../../Assets/Art/Wrath/Exterior.png",
+    "exterior_camera_center": 32.5,
+    "exterior_camera_zoom": 1.5,
     "boss": 38.3,
     "combat_bounds": [
       32.1,

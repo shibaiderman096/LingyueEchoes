@@ -14,15 +14,15 @@ HERE = Path(__file__).resolve().parent
 DEST = HERE.parent.parent / 'Assets/Resources/WrathGeneral/frames'
 CANVAS = 384
 ROOT = (round(CANVAS * .60), round(CANVAS * .90))
-SOURCE_ROOT_X = {'idle': 201, 'walk': 195, 'stun': 185}
+SOURCE_ROOT_X = {'idle': 201, 'walk': 195, 'stun': 185, 'hurt': 196}
 
 
 def export(previews=False):
     report = {'canvas': CANVAS, 'root': [ROOT[0], ROOT[1]+1],
               'pivot': [ROOT[0]/CANVAS, (CANVAS-ROOT[1]-1)/CANVAS], 'pixelsPerUnit': 180,
               'alpha': 'binary 0/255; transparent RGB zero', 'resampling': 'none',
-              'frameCount': 48, 'clips': {}}
-    for action, fps in [('idle', 8), ('walk', 16), ('stun', 12)]:
+              'frameCount': 64, 'clips': {}}
+    for action, fps in [('idle', 8), ('walk', 16), ('stun', 24), ('hurt', 32)]:
         source = Image.open(HERE / f'{action}.png').convert('RGBA')
         width, height = source.size
         records, frames = [], []
@@ -76,17 +76,18 @@ def export(previews=False):
                 frames.append(output)
         if len({record['sha256'] for record in records}) != 16:
             raise ValueError(f'{action}: duplicate pose')
-        durations=[round(1000 / 18)]*12+[125]*4 if action=='stun' else round(1000/fps)
+        durations=[round(1000 / 24)]*15+[800] if action=='stun' else round(1000/fps)
         if previews:
             frames[0].save(HERE / f'{action}.webp', save_all=True, append_images=frames[1:],
                            duration=durations, loop=0, lossless=True, method=6)
-        report['clips'][action] = {'fps': fps, 'loop': True,
-                                  'loopStartFrame': 13 if action == 'stun' else 1,
-                                  'entryFps': 18 if action == 'stun' else fps,
+        report['clips'][action] = {'fps': fps, 'loop': action in ('idle', 'walk'),
+                                  'loopStartFrame': 16 if action == 'stun' else 1,
+                                  'entryFps': 24 if action == 'stun' else fps,
                                   'holdFps': 8 if action == 'stun' else fps,
+                                  'recovery': 'reverse entry before configured break ends' if action == 'stun' else 'included' if action == 'hurt' else 'loop',
                                   'frames': records}
     (HERE / 'manifest.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(json.dumps({'frames': 48, 'canvas': CANVAS, 'root': ROOT,
+    print(json.dumps({'frames': 64, 'canvas': CANVAS, 'root': ROOT,
                       'alphaValues': [0, 255], 'uniquePosesPerClip': 16}))
 
 

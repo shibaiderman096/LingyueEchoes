@@ -10,6 +10,9 @@ public static class WrathSceneSetup
     public const string ScenePath="Assets/Scenes/Chapter01_Wrath.unity";
     const string PalettePath="Assets/Scenes/WrathPlaceholderSprites.asset";
     const string ArtPath="Assets/Art/Wrath/";
+    const float ExteriorWidth=14.4f,ExteriorCenterX=31.08f,ExteriorFloorFromTop=.68f;
+    const float InteriorWidth=20f,InteriorCenterX=37.1f,FloorY=-.95f;
+    const float EntranceDoorX=34.36f,EntranceDoorY=1.22f,EntranceDoorSize=3.90f;
     static Color C(int r,int g,int b,int a=255)=>new Color32((byte)r,(byte)g,(byte)b,(byte)a);
     [MenuItem("Lingyue/Create Wrath scene (if missing)")]
     public static void EnsureScene(){
@@ -35,25 +38,29 @@ public static class WrathSceneSetup
     [MenuItem("Lingyue/Rebuild indoor general arena")]
     public static void RebuildIndoor(){
         var interior=LoadArt("Interior");
+        var exterior=LoadArt("Exterior");
         var doors=Enumerable.Range(1,16).Select(i=>LoadArt("DoorOpening/door-"+i.ToString("00"))).ToArray();
         var shapes=AssetDatabase.LoadAllAssetsAtPath(PalettePath).OfType<Sprite>().ToDictionary(x=>x.name);
         var block=shapes["Block"];var flame=shapes["Flame"];
         var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
         var camera=new GameObject("Main Camera");camera.tag="MainCamera";
-        var cam=camera.AddComponent<Camera>();cam.orthographic=true;cam.orthographicSize=3.6f;
-        cam.transform.position=new Vector3(37.3f,0,-10);cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=C(25,19,28);
+        var cam=camera.AddComponent<Camera>();cam.orthographic=true;cam.orthographicSize=3.6f/1.5f;
+        cam.transform.position=new Vector3(32.5f,0,-10);cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=C(25,19,28);
         camera.AddComponent<AudioListener>();
         var root=new GameObject("LingyueEchoes");root.AddComponent<LingyueGame>();
         var chapter=root.AddComponent<WrathChapter>();
         var world=chapter.world=Group(root.transform,"World");
         var room=chapter.backdrop=Group(world,"General hall · enclosed interior");
         // Floor line in the source is authored at 68% from the top; no scrolling plate drift.
-        const float width=20f;float height=width*interior.rect.height/interior.rect.width;
-        chapter.scenery=new[]{Piece(room,"General hall interior",interior,37.1f,-.95f+.18f*height,width,height,-20,Color.white)};
+        float height=InteriorWidth*interior.rect.height/interior.rect.width;
+        chapter.scenery=new[]{Piece(room,"General hall interior",interior,InteriorCenterX,FloorY+.18f*height,InteriorWidth,height,-20,Color.white)};
+        float exteriorHeight=ExteriorWidth*exterior.rect.height/exterior.rect.width;
+        chapter.exteriorScenery=Piece(room,"General hall exterior",exterior,ExteriorCenterX,FloorY+(ExteriorFloorFromTop-.5f)*exteriorHeight,ExteriorWidth,exteriorHeight,-20,Color.white);
         chapter.bridgeStones=Array.Empty<SpriteRenderer>();
         var props=Group(world,"Props");
         chapter.entranceDoorFrames=doors;
-        chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],34.52f,.60f,3.2f,3.2f,6,Color.white);
+        chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],EntranceDoorX,EntranceDoorY,EntranceDoorSize,EntranceDoorSize,6,Color.white);
+        chapter.entranceDoor.flipX=true;
         chapter.firstLamp=chapter.secondLamp=Lantern(props,"Entrance checkpoint",WrathRoute.Entrance-68);
         chapter.leftSeal=PixelWorld.Sprite(props,"Arena seal left","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));
         chapter.rightSeal=PixelWorld.Sprite(props,"Arena seal right","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));
@@ -68,6 +75,7 @@ public static class WrathSceneSetup
         chapter.fireMark.enabled=chapter.fireShadow.enabled=chapter.fireWarning.enabled=false;
         Actor(world,"Hero","pixel8/frames/idle/idle-01",(float)WrathRoute.Entrance/100,1.5f,12);
         Actor(world,"Guardian","guardian8/frames/idle/idle-01",38.3f,1.22f,10);
+        chapter.SetInside(false);
         EditorSceneManager.SaveScene(scene,ScenePath);AssetDatabase.SaveAssets();EnsureScene();
         Debug.Log("WRATH_INDOOR_SCENE_CREATED: single room, entrance checkpoint and sole general");
     }

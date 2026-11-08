@@ -11,7 +11,7 @@
   "pixelsPerUnit": 180,
   "alpha": "binary 0/255; transparent RGB zero",
   "resampling": "none",
-  "frameCount": 48,
+  "frameCount": 64,
   "clips": {
     "idle": {
       "fps": 8,
@@ -19,6 +19,7 @@
       "loopStartFrame": 1,
       "entryFps": 8,
       "holdFps": 8,
+      "recovery": "loop",
       "frames": [
         {
           "frame": 1,
@@ -444,6 +445,7 @@
       "loopStartFrame": 1,
       "entryFps": 16,
       "holdFps": 16,
+      "recovery": "loop",
       "frames": [
         {
           "frame": 1,
@@ -864,11 +866,12 @@
       ]
     },
     "stun": {
-      "fps": 12,
-      "loop": true,
-      "loopStartFrame": 13,
-      "entryFps": 18,
+      "fps": 24,
+      "loop": false,
+      "loopStartFrame": 16,
+      "entryFps": 24,
       "holdFps": 8,
+      "recovery": "reverse entry before configured break ends",
       "frames": [
         {
           "frame": 1,
@@ -1285,6 +1288,432 @@
           ],
           "sha256": "a363d601a3e86997d295462e29fa39cc002251731d3d1d32cd48aa7df4d361b1",
           "visiblePixels": 28113
+        }
+      ]
+    },
+    "hurt": {
+      "fps": 32,
+      "loop": false,
+      "loopStartFrame": 1,
+      "entryFps": 32,
+      "holdFps": 32,
+      "recovery": "included",
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            312,
+            315
+          ],
+          "sourceFoot": [
+            193,
+            290
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            56
+          ],
+          "bounds": [
+            66,
+            64,
+            315,
+            347
+          ],
+          "sha256": "87582de4e523f877bcccf9dcd22ca2adc5bda5edeb67ed0662f5ad0501d21449",
+          "visiblePixels": 29424
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            312,
+            0,
+            624,
+            315
+          ],
+          "sourceFoot": [
+            183,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            57,
+            63,
+            304,
+            347
+          ],
+          "sha256": "6456cf3a3e262051e23b3646db7a0be0ed47fff7fcadd0be761f2670cdc6558e",
+          "visiblePixels": 29526
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            624,
+            0,
+            935,
+            315
+          ],
+          "sourceFoot": [
+            175,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            46,
+            64,
+            297,
+            347
+          ],
+          "sha256": "4639a10e792acbb4eb6f6d08b2b84785ab32a4d2c19fa6511016a68b6ba83626",
+          "visiblePixels": 31443
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            935,
+            0,
+            1247,
+            315
+          ],
+          "sourceFoot": [
+            170,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            42,
+            68,
+            291,
+            347
+          ],
+          "sha256": "5d430449e6f883c1aeeded808f7643aed924b85751079efbaba8fc3a4444d32b",
+          "visiblePixels": 32825
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            315,
+            312,
+            630
+          ],
+          "sourceFoot": [
+            191,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            67,
+            66,
+            316,
+            347
+          ],
+          "sha256": "a60085daf53e8545df4179b09e1f31675d1b39fcbcb67e19794454a002823384",
+          "visiblePixels": 33691
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            312,
+            315,
+            624,
+            630
+          ],
+          "sourceFoot": [
+            182,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            55,
+            66,
+            301,
+            347
+          ],
+          "sha256": "45cb7e03f9781ec08e384c7f1651a9109a649429f4f4ad275a523833afbe26d0",
+          "visiblePixels": 32546
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            624,
+            315,
+            935,
+            630
+          ],
+          "sourceFoot": [
+            175,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            46,
+            65,
+            296,
+            347
+          ],
+          "sha256": "895d3e3756e11005421414ea1cebac48f6790334da8d6fd0d8a37e343973d30f",
+          "visiblePixels": 32068
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            935,
+            315,
+            1247,
+            630
+          ],
+          "sourceFoot": [
+            170,
+            290
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            56
+          ],
+          "bounds": [
+            39,
+            66,
+            287,
+            347
+          ],
+          "sha256": "97d44cfa40203c02a8e33aba224a68711fa0c319e57158e016ee3225ecad3583",
+          "visiblePixels": 31252
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            630,
+            312,
+            946
+          ],
+          "sourceFoot": [
+            194,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            63,
+            65,
+            310,
+            347
+          ],
+          "sha256": "475518255b69b548073de83c83394cbf7cc4ee30f3015b61426035aad449be53",
+          "visiblePixels": 31131
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            312,
+            630,
+            624,
+            946
+          ],
+          "sourceFoot": [
+            184,
+            292
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            54
+          ],
+          "bounds": [
+            55,
+            63,
+            303,
+            347
+          ],
+          "sha256": "e438b0c29bc4e93a79c2fa10ec50a7306676fb8549dbe8dd0a11dc81a36d7e96",
+          "visiblePixels": 30840
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            624,
+            630,
+            935,
+            946
+          ],
+          "sourceFoot": [
+            176,
+            292
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            54
+          ],
+          "bounds": [
+            46,
+            63,
+            296,
+            347
+          ],
+          "sha256": "6fb73fe8c2437afb02cf40925f8e15be6e81806c5072400a0742761848e391f0",
+          "visiblePixels": 30507
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            935,
+            630,
+            1247,
+            946
+          ],
+          "sourceFoot": [
+            170,
+            292
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            54
+          ],
+          "bounds": [
+            39,
+            62,
+            286,
+            347
+          ],
+          "sha256": "635da04c03b13fbbc9f8d9322e1755e9bb70a8a7c00b7240445f61a5ba39d837",
+          "visiblePixels": 30040
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            946,
+            312,
+            1261
+          ],
+          "sourceFoot": [
+            192,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            63,
+            63,
+            310,
+            347
+          ],
+          "sha256": "604e922c924f6ba7ea8da5621905044463eeb5f1b7a54fab89a010c1100adab7",
+          "visiblePixels": 30196
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            312,
+            946,
+            624,
+            1261
+          ],
+          "sourceFoot": [
+            183,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            55,
+            63,
+            301,
+            347
+          ],
+          "sha256": "8fcfbdfeafb5e7b85c0443bfdf0f2e6005ed96c77c5f033709f6c268ddfb5915",
+          "visiblePixels": 30302
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            624,
+            946,
+            935,
+            1261
+          ],
+          "sourceFoot": [
+            175,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            46,
+            63,
+            297,
+            347
+          ],
+          "sha256": "bab6a692e4e9d80e4d0b9c87875b9cbbba0065ee9bec0d10320ca45c0aac95f4",
+          "visiblePixels": 30405
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            935,
+            946,
+            1247,
+            1261
+          ],
+          "sourceFoot": [
+            170,
+            291
+          ],
+          "sourceAnchorX": 196,
+          "offset": [
+            34,
+            55
+          ],
+          "bounds": [
+            39,
+            64,
+            286,
+            347
+          ],
+          "sha256": "be4cab52adafd9f90d994b7e0cd955cf2fc813d8a5c7758d610bede86f19b2ce",
+          "visiblePixels": 30157
         }
       ]
     }

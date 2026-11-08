@@ -46,6 +46,7 @@ namespace LingyueEchoes
         public Transform world,embers,backdrop;
         public SpriteRenderer[] bridgeStones;
         public SpriteRenderer[] scenery;
+        public SpriteRenderer exteriorScenery;
         public SpriteRenderer firstLamp,secondLamp,leftSeal,rightSeal,returnSeal;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
         public Sprite[] entranceDoorFrames;
@@ -59,19 +60,22 @@ namespace LingyueEchoes
         public bool IsInside {get;private set;}
         public void SetInside(bool inside){
             IsInside=inside;
+            if(exteriorScenery)exteriorScenery.enabled=!inside;
+            if(scenery!=null)foreach(var plate in scenery)if(plate)plate.enabled=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;
             if(firstLamp)firstLamp.gameObject.SetActive(!inside);
             if(returnSeal)returnSeal.enabled=!inside;
             if(!inside)SetDoorOpening(0);
+            SetAmbientParticles(SceneParticleSettings.Enabled);
         }
         SpriteRenderer[] ash;
         WrathGeneralArt generalArt;
         void OnEnable(){SceneParticleSettings.Changed+=SetAmbientParticles;SetAmbientParticles(SceneParticleSettings.Enabled);}
         void OnDisable(){SceneParticleSettings.Changed-=SetAmbientParticles;}
-        void SetAmbientParticles(bool enabled){if(embers)embers.gameObject.SetActive(enabled);}
+        void SetAmbientParticles(bool enabled){if(embers)embers.gameObject.SetActive(IsInside&&enabled);}
         void Awake()
         {
-            if(embers)ash=embers.GetComponentsInChildren<SpriteRenderer>();
+            if(embers)ash=embers.GetComponentsInChildren<SpriteRenderer>(true);
             generalArt=new WrathGeneralArt();
         }
         public IWrathPoseSource UseActorArt(bool general,int encounter)=>general?generalArt:null;

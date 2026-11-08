@@ -27,7 +27,7 @@ namespace LingyueEchoes
         public int BossPendingPhase=>phases?.Pending??phase;
         public string BossBehaviorState=>!UsesBossBehavior?"Unmanaged":boss.state=="broken"?(boss.age<18?"Stagger":"Vulnerable"):
             boss.state=="phase"?"PhaseTransition":actionRunner.Running?actionRunner.Stage.ToString():bossRest>0?"Breather":repositionLeft>0?"Reposition":"Decide";
-        int BossStaggerFrames=>bossDefinition?.staggerFrames??150;
+        public int BossStaggerFrames=>bossDefinition?.staggerFrames??150;
         int BossTransitionFrames=>UsesBossBehavior?PhaseSettings.transitionFrames:opponent?.phaseFrames??90;
         BossPhaseDefinition PhaseSettings=>bossDefinition.phases[Math.Max(0,Math.Min(bossDefinition.phases.Length-1,phase-1))];
 
