@@ -188,45 +188,38 @@ namespace LingyueEchoes
     }
     public class PixelEffects
     {
-        class Effect {public GameObject go;public SpriteRenderer renderer;public VisualCue cue;}
+        class Effect {public GameObject go;public SpriteRenderer renderer;public VisualCue cue;public Material originalMaterial;}
         readonly Effect[] pool=new Effect[12];int cursor,next;Combat model;
+        static Material bossAttackMaterial;
+        static readonly Color DangerColor=new Color(1,.12f,.18f),ParryColor=new Color(1,.84f,.12f);
+        static Material BossAttackMaterial {get {if(!bossAttackMaterial){var shader=Resources.Load<Shader>("Shaders/BossAttackTint");if(!shader)throw new InvalidOperationException("Missing BossAttackTint shader");bossAttackMaterial=new Material(shader){name="Boss attack tint (shared)"};}return bossAttackMaterial;}}
+        static void ResetMaterial(Effect e){if(e.originalMaterial)e.renderer.sharedMaterial=e.originalMaterial;}
+        static void SetAttackTint(Effect e,bool attack,bool danger){if(!e.originalMaterial)e.originalMaterial=e.renderer.sharedMaterial;e.renderer.sharedMaterial=attack?BossAttackMaterial:e.originalMaterial;e.renderer.color=attack?(danger?DangerColor:ParryColor):Color.white;}
         public PixelEffects(Transform parent){for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
-        public void Clear(){foreach(var e in pool){e.cue=null;e.go.SetActive(false);}cursor=next=0;model=null;}
+        public void Clear(){foreach(var e in pool){e.cue=null;ResetMaterial(e);e.go.SetActive(false);}cursor=next=0;model=null;}
         public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
             foreach(var e in pool){var cue=e.cue;if(cue==null)continue;bool plunge=cue.kind=="plunge_impact";string clip=plunge?"cut_fx4":cue.IsPlayerCombo?"cut_fx"+(cue.combo+1):cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
                 var actor=cue.owner==1?sim.player:sim.boss;
                 bool bossSlash=cue.owner==2&&cue.kind=="slash";
-                if(bossSlash)clip=BossSlashClip(actor.move);
-                var d=PixelWorld.Definition("pixel8",clip);if(d==null){e.cue=null;e.go.SetActive(false);continue;}
+                if(!cue.TryGetAnchor(actor,out double x,out double y)){e.cue=null;ResetMaterial(e);e.go.SetActive(false);continue;}
+                if(bossSlash)clip=BossAttackGeometry.Clip(actor.move);
+                var d=PixelWorld.Definition("pixel8",clip);if(d==null){e.cue=null;ResetMaterial(e);e.go.SetActive(false);continue;}
                 int source=(int)Math.Round(d.duration*60),life=cue.kind=="charge"?Math.Min(12,source):source,age=sim.frame-cue.frame;
-                if(age>=life||!cue.TryGetAnchor(cue.owner==1?sim.player:sim.boss,out double x,out double y)){e.cue=null;e.go.SetActive(false);continue;}
+                if(bossSlash?(age<0||age>=BossAttackGeometry.Window(actor.move,cue.pulse)):age>=life){e.cue=null;ResetMaterial(e);e.go.SetActive(false);continue;}
                 e.go.SetActive(age>=0);float size=plunge?1.26f:cue.kind=="charge"?(cue.owner==1?.48f:.22f):cue.IsPlayerCombo?1.5f:cue.kind=="slash"?cue.power?2.2f:1.65f:cue.kind=="impact"?1.1f:cue.kind=="heal_fx"?1.5f:1.8f;
+                BossAttackPose attackPose=default(BossAttackPose);
                 if(bossSlash){
-                    // Match the authored blade contact, rather than the damage box's centre.
-                    // Reuse the horizontal cut, thrust, sweep and downward-cut art by move.
-                    Vector2 blade=BossBladeAnchor(actor.move,clip);size=clip=="cut_fx3"?.9f:1.1f;
-                    x=actor.x+cue.face*blade.x;y=actor.y+blade.y;
+                    attackPose=BossAttackGeometry.Pose(actor.move,actor.face,actor.x,actor.y,cue.pulse,age);
+                    x=attackPose.x;y=attackPose.y;
                 }
-                // The reused slash has a center pivot; raise it so its lower edge meets the floor.
+                // The reused plunge slash has a center pivot; raise its lower edge to the floor.
                 float lift=plunge?.40f:0;
-                e.go.transform.localPosition=new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100+lift,0);e.go.transform.localScale=new Vector3(cue.face*size,plunge?size*.72f:size,1);
-                e.renderer.color=cue.owner==2&&cue.kind=="charge"?(cue.danger?new Color(1,.39f,.53f):new Color(1,.87f,.57f)):bossSlash?(cue.danger?new Color(1,.65f,.72f):Color.white):cue.kind=="charge"?new Color(1,.78f,.49f):Color.white;
-                PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1));}
-        }
-        static string BossSlashClip(Move move){
-            string pose=move?.pose;
-            if(pose=="thrust"||move?.name=="突刺")return "cut_fx2";
-            if(pose=="slam"||pose=="leap"||move?.name=="震地"||move?.name=="跃击")return "cut_fx4";
-            if(pose=="spin"||move?.name=="赤月回旋")return "cut_fx3";
-            return "cut_fx1";
-        }
-        static Vector2 BossBladeAnchor(Move move,string clip){
-            switch(clip){
-                case "cut_fx2":return new Vector2(82,52);
-                case "cut_fx3":return new Vector2(0,62);
-                case "cut_fx4":return new Vector2(45,62);
-                default:return new Vector2(58,move?.pose=="double"||move?.name=="双连斩"?60:72);
-            }
+                e.go.transform.localPosition=bossSlash?new Vector3((float)x/100,(float)(y-95)/100,0):new Vector3((float)Math.Floor(x+.5)/100,((float)Math.Floor(y+.5)-95)/100+lift,0);
+                e.go.transform.localScale=bossSlash?new Vector3((float)attackPose.scaleX,(float)attackPose.scaleY,1):new Vector3(cue.face*size,plunge?size*.72f:size,1);
+                bool bossAttack=bossSlash||cue.owner==2&&cue.kind=="charge";
+                SetAttackTint(e,bossAttack,bossSlash?!actor.move.parry:cue.danger);
+                if(!bossAttack&&cue.kind=="charge")e.renderer.color=new Color(1,.78f,.49f);
+                PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1),bossSlash?attackPose.cell:-1);}
         }
     }
 }

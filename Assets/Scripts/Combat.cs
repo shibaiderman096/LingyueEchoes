@@ -59,9 +59,11 @@ namespace LingyueEchoes
         public Box(){} public Box(double x,double y,double w,double h,bool noFoothold=false){this.x=x;this.y=y;this.w=w;this.h=h;this.noFoothold=noFoothold;}
         public static bool Overlaps(Box a,Box b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
     }
-    public class Hitbox:Box {public int owner,attackId,pulse;public Move move;}
+    public class Hitbox:Box {public int owner,attackId,pulse;public Move move;public BossAttackPose pose;
+        public bool Touches(Box target){if(!Box.Overlaps(this,target))return false;return pose==null||pose.Touches(target);}
+    }
     public class VisualCue {
-        public int id,frame,face,combo,owner,attackId;public double x,y,originX,originY;public string kind;public bool power,danger;
+        public int id,frame,face,combo,owner,attackId,pulse;public double x,y,originX,originY;public string kind;public bool power,danger;
         public bool IsPlayerCombo=>kind=="slash"&&owner==1&&!power;
         public bool TryGetAnchor(Fighter actor,out double anchorX,out double anchorY){
             anchorX=x;anchorY=y;
@@ -132,7 +134,7 @@ namespace LingyueEchoes
             (executeWindow>0||BossPostureReady)&&player.energy>=Rules.executeCost&&Math.Abs(boss.x-player.x)<Rules.Execute.reach+BodyWidth(boss)*.5&&
             boss.y<player.y+Rules.Execute.height&&player.y<boss.y+BodyHeight(boss);
         void Log(string text){events.Insert(0,frame+": "+text);if(events.Count>7)events.RemoveAt(7);}
-        void Visual(string kind,double x,double y,Fighter a){visuals.Add(new VisualCue{id=++visualSerial,frame=frame,kind=kind,x=x,y=y,originX=a.x,originY=a.y,attackId=a.attackId,face=a.face,combo=a.id==1&&a.state=="attack"?a.combo:0,power=a.state=="finisher"||a.state=="execute",owner=a.id,danger=a.move!=null&&!a.move.parry});if(visuals.Count>32)visuals.RemoveAt(0);}
+        VisualCue Visual(string kind,double x,double y,Fighter a){var cue=new VisualCue{id=++visualSerial,frame=frame,kind=kind,x=x,y=y,originX=a.x,originY=a.y,attackId=a.attackId,face=a.face,combo=a.id==1&&a.state=="attack"?a.combo:0,power=a.state=="finisher"||a.state=="execute",owner=a.id,danger=a.move!=null&&!a.move.parry};visuals.Add(cue);if(visuals.Count>32)visuals.RemoveAt(0);return cue;}
         void Sound(string name){sounds.Add(new SoundCue{id=++soundSerial,frame=frame,name=name});if(sounds.Count>64)sounds.RemoveAt(0);}
         void Success(string kind){tempoSerial++;successKind=kind;successFrame=frame;hitstop=Rules.hitstop;}
         void Enter(Fighter a,string state,Move move=null){bool changed=a.state!=state;a.state=state;a.age=0;a.move=move;
@@ -198,10 +200,10 @@ namespace LingyueEchoes
             }
             if(p.state=="execute"&&p.move!=null&&p.age<=p.move.wind&&b.x!=p.x)p.face=b.x>p.x?1:-1;
             EmitAttack(p);EmitAttack(b);
-            if(dummyBox!=null)foreach(var h in hits){if(h.owner!=1||p.state=="execute"||!Box.Overlaps(h,dummyBox))continue;string key=h.attackId+":"+h.pulse;if(!dummySeen.Add(key))continue;
+            if(dummyBox!=null)foreach(var h in hits){if(h.owner!=1||p.state=="execute"||!h.Touches(dummyBox))continue;string key=h.attackId+":"+h.pulse;if(!dummySeen.Add(key))continue;
                 dummyHits++;dummyContacts.Add(new DummyContact{id=dummyHits,attackId=h.attackId,combo=p.combo,frame=frame});if(dummyContacts.Count>32)dummyContacts.RemoveAt(0);
                 Visual("impact",dummyBox.x+dummyBox.w*.5,dummyBox.y+dummyBox.h*.5,p);Sound("hit_boss");}
-            foreach(var h in hits){var target=h.owner==1?b:p;if(target.id==2&&!enemyActive)continue;if(Box.Overlaps(h,Hurtbox(target)))Resolve(h,target);}
+            foreach(var h in hits){var target=h.owner==1?b:p;if(target.id==2&&!enemyActive)continue;if(h.Touches(Hurtbox(target)))Resolve(h,target);}
             if(p.state=="heal"&&p.age==Rules.healRelease&&p.hp>0&&p.hp<p.maxHp&&p.energy>=Rules.healCost){
                 p.energy-=Rules.healCost;p.hp=Math.Min(p.maxHp,p.hp+Rules.healAmount);
                 Visual("heal_fx",p.x,p.y,p);Sound("heal");Log("回响疗愈 · 恢复生命");
@@ -231,12 +233,14 @@ namespace LingyueEchoes
             // The target was in reach at startup; resolve the lock at its current position on contact.
             var area=execute?Hurtbox(boss):plunge?new Box(a.x+a.face*20-m.reach,a.y,m.reach*2,m.height):
                 spin?new Box(a.x-m.reach,a.y,m.reach*2,m.height):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
-            hits.Add(new Hitbox{x=area.x,y=area.y,w=area.w,h=area.h,owner=a.id,attackId=a.attackId,pulse=pulse,move=m});
+            var pose=a.id==2?BossAttackGeometry.Pose(m,a.face,a.x,a.y,pulse,t-(hasPulses?m.pulses[pulse]:0)):null;
+            if(a.id==2){if(pose==null)return;area=pose.area;}
+            hits.Add(new Hitbox{x=area.x,y=area.y,w=area.w,h=area.h,pose=pose,owner=a.id,attackId=a.attackId,pulse=pulse,move=m});
             if(t==(hasPulses?m.pulses[pulse]:0)){
                 if(plunge){Visual("plunge_impact",a.x+a.face*20,a.y+10,a);Sound("plunge");return;}
                 double x=normal?(a.combo==0?63:a.combo==1?88:a.combo==2?0:72):m.reach*.45;
                 double y=normal?(a.combo==0?64:a.combo==1?63:a.combo==2?52:79):m.height*.5;
-                Visual("slash",a.x+a.face*x,a.y+y,a);
+                Visual("slash",a.x+a.face*x,a.y+y,a).pulse=pulse;
                 Sound(normal?PlayerSlashSounds[a.combo]:a.id==1?"counter":"boss_swing");
             }
         }

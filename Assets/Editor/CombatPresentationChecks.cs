@@ -46,8 +46,8 @@ public static class CombatPresentationChecks
                 var renderer=effectRoot.GetComponentsInChildren<SpriteRenderer>().SingleOrDefault(r=>r.gameObject.activeSelf&&r.sprite==Resources.Load<Sprite>(expected.frames[0]));
                 Need(renderer,"move resolves its matching contact art "+move+" facing "+face);
                 Need(Math.Sign(renderer.transform.localScale.x)==face,"contact art mirrors with the committed facing");
-                float ground=(float)(c.boss.y-95)/100;
-                Need(renderer.transform.localPosition.y-renderer.sprite.rect.height*.5f/100*Math.Abs(renderer.transform.localScale.y)>ground-1.2f,"effect origin follows the body");
+                Need(renderer.sharedMaterial.shader.name=="LingyueEchoes/BossAttackTint"&&
+                    (cue.danger?renderer.color.g<.2f:renderer.color.g>.8f),"red means unblockable; yellow means parryable");
                 if(sheet)Capture(camera,sheet,2+move*2+(face==1?1:0));
                 var at=renderer.transform.localPosition;var sprite=renderer.sprite;c.hitstop=3;for(int i=0;i<3;i++)c.Step();effects.Draw(c);
                 Need(renderer.sprite==sprite&&renderer.transform.localPosition==at,"hit stop freezes effect pose and anchor");
@@ -62,7 +62,7 @@ public static class CombatPresentationChecks
         try{camera.targetTexture=target;camera.Render();RenderTexture.active=target;sheet.ReadPixels(new Rect(0,0,512,256),panel%2*512,(6-panel/2)*256);}
         finally{camera.targetTexture=null;RenderTexture.active=old;RenderTexture.ReleaseTemporary(target);}
     }
-    public static void RunBatch(){try{ExecutionGateChecks.Run();Run();MigrationChecks.Run();WrathChapterChecks.Run();EditorApplication.Exit(0);}catch(Exception e){Debug.LogException(e);EditorApplication.Exit(1);}}
+    public static void RunBatch(){try{ExecutionGateChecks.Run();Run();BossAttackAlignmentChecks.Run();MigrationChecks.Run();WrathChapterChecks.Run();EditorApplication.Exit(0);}catch(Exception e){Debug.LogException(e);EditorApplication.Exit(1);}}
     public static void PlayBatch(){SessionState.SetBool(PlayKey,true);EditorApplication.EnterPlaymode();}
     static void OnPlayState(PlayModeStateChange state){
         if(state!=PlayModeStateChange.EnteredPlayMode||!SessionState.GetBool(PlayKey,false))return;
@@ -76,7 +76,7 @@ public static class CombatPresentationChecks
             Need(Application.isPlaying,"checks execute in Play mode after advancing frames");
             sheet=new Texture2D(1024,1792,TextureFormat.RGB24,false);Check(sheet);
             string output=Path.Combine(Application.dataPath,"../.utmp/combat-fix/play-contacts.png");Directory.CreateDirectory(Path.GetDirectoryName(output));sheet.Apply();File.WriteAllBytes(output,sheet.EncodeToPNG());
-            ExecutionGateChecks.Run();Debug.Log("COMBAT_PRESENTATION_PLAY_PASSED: actual Play frames advanced and all contact poses rendered");EditorApplication.Exit(0);
+            ExecutionGateChecks.Run();BossAttackAlignmentChecks.Run();Debug.Log("COMBAT_PRESENTATION_PLAY_PASSED: actual Play frames advanced and all contact poses rendered");EditorApplication.Exit(0);
         }catch(Exception e){Debug.LogException(e);EditorApplication.Exit(1);}finally{if(sheet)UnityEngine.Object.DestroyImmediate(sheet);}
     }
 }
