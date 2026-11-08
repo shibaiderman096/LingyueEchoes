@@ -17,7 +17,7 @@ ROOT = (round(CANVAS * .60), round(CANVAS * .90))
 SOURCE_ROOT_X = {'idle': 201, 'walk': 195, 'stun': 185}
 
 
-def export():
+def export(previews=False):
     report = {'canvas': CANVAS, 'root': [ROOT[0], ROOT[1]+1],
               'pivot': [ROOT[0]/CANVAS, (CANVAS-ROOT[1]-1)/CANVAS], 'pixelsPerUnit': 180,
               'alpha': 'binary 0/255; transparent RGB zero', 'resampling': 'none',
@@ -72,12 +72,14 @@ def export():
                             'bounds': list(output.getbbox()),
                             'sha256': hashlib.sha256(output.tobytes()).hexdigest(),
                             'visiblePixels': int(solid.sum())})
-            frames.append(output)
+            if previews:
+                frames.append(output)
         if len({record['sha256'] for record in records}) != 16:
             raise ValueError(f'{action}: duplicate pose')
         durations=[round(1000 / 18)]*12+[125]*4 if action=='stun' else round(1000/fps)
-        frames[0].save(HERE / f'{action}.webp', save_all=True, append_images=frames[1:],
-                       duration=durations, loop=0, lossless=True, method=6)
+        if previews:
+            frames[0].save(HERE / f'{action}.webp', save_all=True, append_images=frames[1:],
+                           duration=durations, loop=0, lossless=True, method=6)
         report['clips'][action] = {'fps': fps, 'loop': True,
                                   'loopStartFrame': 13 if action == 'stun' else 1,
                                   'entryFps': 18 if action == 'stun' else fps,
@@ -89,4 +91,7 @@ def export():
 
 
 if __name__ == '__main__':
-    export()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--previews', action='store_true', help='Also export optional animated WebP previews.')
+    export(previews=parser.parse_args().previews)
