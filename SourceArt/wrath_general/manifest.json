@@ -1,0 +1,1292 @@
+{
+  "canvas": 384,
+  "root": [
+    230,
+    347
+  ],
+  "pivot": [
+    0.5989583333333334,
+    0.09635416666666667
+  ],
+  "pixelsPerUnit": 180,
+  "alpha": "binary 0/255; transparent RGB zero",
+  "resampling": "none",
+  "frameCount": 48,
+  "clips": {
+    "idle": {
+      "fps": 8,
+      "loop": true,
+      "loopStartFrame": 1,
+      "entryFps": 8,
+      "holdFps": 8,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            72,
+            316,
+            347
+          ],
+          "sha256": "3c4a3021e3972cef333e9a76061cd45781d25be03de325fed3d0cd1e89031937",
+          "visiblePixels": 28948
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            56,
+            71,
+            316,
+            347
+          ],
+          "sha256": "03b4fc1905431fe3d8793817783463840d7263e6d4ac3e8fad1bf0fbb8a35ac0",
+          "visiblePixels": 28958
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            940,
+            314
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            68,
+            321,
+            347
+          ],
+          "sha256": "b7df67bd353e97574bd5ead5c2728a19dbe47027ac7b492832340cbe68e2bed0",
+          "visiblePixels": 29376
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            940,
+            0,
+            1254,
+            314
+          ],
+          "sourceFoot": [
+            202,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            68,
+            321,
+            347
+          ],
+          "sha256": "19af065b1499e294b1c468ff0c6f135c501a58ba42d0b5fae116848daa1982a6",
+          "visiblePixels": 29510
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            68,
+            322,
+            347
+          ],
+          "sha256": "8c70d232722abc8216589a9dc809ee2e08d44666b560eb3c877c45742cb33b0e",
+          "visiblePixels": 29464
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            56,
+            65,
+            326,
+            347
+          ],
+          "sha256": "874619a82b206297e0d63d87479f26a4ca4463b346021660d192753ea30c33fd",
+          "visiblePixels": 29827
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            940,
+            627
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            61,
+            327,
+            347
+          ],
+          "sha256": "64004e0eff8db7db10faa9b0027b074f098c72bfe0852cad9cdd40af4ae0297c",
+          "visiblePixels": 29997
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            940,
+            314,
+            1254,
+            627
+          ],
+          "sourceFoot": [
+            202,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            59,
+            328,
+            347
+          ],
+          "sha256": "0d14aeea9baa2add5dfc607cb190df794a31f76c23b66afa469c485c81c7b061",
+          "visiblePixels": 30395
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            940
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            64,
+            327,
+            347
+          ],
+          "sha256": "83d4157f3c40326a607a87579872f58c0490de82ad8c6022116cb0496653e6d2",
+          "visiblePixels": 30210
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            940
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            56,
+            67,
+            326,
+            347
+          ],
+          "sha256": "1e1628d68a237c25ac1e5b81f1f66e54a0ef2438c4f63f244d15d319c8b99ba1",
+          "visiblePixels": 30109
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            940,
+            940
+          ],
+          "sourceFoot": [
+            201,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            69,
+            324,
+            347
+          ],
+          "sha256": "cc311e2d407e87b0af0543dbd1e967d1e851fcb01e48f6ea45e4f4c427a14357",
+          "visiblePixels": 29941
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            940,
+            627,
+            1254,
+            940
+          ],
+          "sourceFoot": [
+            202,
+            296
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            50
+          ],
+          "bounds": [
+            57,
+            69,
+            323,
+            347
+          ],
+          "sha256": "bf9a789b72ad4fbd0912f3ad92b68cb40a8d0e7d2854af26c1e0d2f277e6850c",
+          "visiblePixels": 29669
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            940,
+            314,
+            1254
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            73,
+            319,
+            347
+          ],
+          "sha256": "65776c9c1684bfb386e117c51c38efacb4510dab16c671773018f8dcae96f29e",
+          "visiblePixels": 29475
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            940,
+            627,
+            1254
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            56,
+            74,
+            316,
+            347
+          ],
+          "sha256": "5309170c7877ea56636e58e04dbf5b6f5c844905a1de9cfad0ffb895d5750e10",
+          "visiblePixels": 28959
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            940,
+            940,
+            1254
+          ],
+          "sourceFoot": [
+            201,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            74,
+            316,
+            347
+          ],
+          "sha256": "0c08e7b9719dab523960d9ff13a10691c05167b64ab30aafbfd7bd868cddfbe1",
+          "visiblePixels": 28767
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            940,
+            940,
+            1254,
+            1254
+          ],
+          "sourceFoot": [
+            202,
+            297
+          ],
+          "sourceAnchorX": 201,
+          "offset": [
+            29,
+            49
+          ],
+          "bounds": [
+            57,
+            74,
+            317,
+            347
+          ],
+          "sha256": "4209ada6ef9d64cc9330682689e53f90d4aba5993471691ee90a2d280856df1c",
+          "visiblePixels": 28799
+        }
+      ]
+    },
+    "walk": {
+      "fps": 16,
+      "loop": true,
+      "loopStartFrame": 1,
+      "entryFps": 16,
+      "holdFps": 16,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceFoot": [
+            217,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            48,
+            72,
+            307,
+            347
+          ],
+          "sha256": "9197e8474a2d85fde8717578a6bc0c2cfae92b029dec144970f8209621e3ab20",
+          "visiblePixels": 30174
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceFoot": [
+            196,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            47,
+            72,
+            307,
+            347
+          ],
+          "sha256": "8cfd8943060ea1a9be1e92070075b18c2805d2b92633d73462d4866406744e54",
+          "visiblePixels": 30315
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            940,
+            314
+          ],
+          "sourceFoot": [
+            193,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            47,
+            72,
+            307,
+            347
+          ],
+          "sha256": "5624d2aa4f5a8b0febc17d228d15c340f0a53e1e1d990967cb863c6ff11d86d2",
+          "visiblePixels": 29631
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            940,
+            0,
+            1254,
+            314
+          ],
+          "sourceFoot": [
+            191,
+            287
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            59
+          ],
+          "bounds": [
+            48,
+            76,
+            308,
+            347
+          ],
+          "sha256": "779785bb092b0d8f409898d7924ec3f86fc5821654580d30f44827d467b35a7e",
+          "visiblePixels": 29372
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceFoot": [
+            197,
+            284
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            62
+          ],
+          "bounds": [
+            48,
+            79,
+            307,
+            347
+          ],
+          "sha256": "de541c2646bbbe40b149f8f79db6801e2c12ee41161f29b801fbd0936fb4e364",
+          "visiblePixels": 29186
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceFoot": [
+            213,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            47,
+            73,
+            307,
+            347
+          ],
+          "sha256": "dd0fbf206dbcd76e457a006126920f5fca61d0126ee126b8dcfc28c781b77be9",
+          "visiblePixels": 29712
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            940,
+            627
+          ],
+          "sourceFoot": [
+            192,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            47,
+            73,
+            307,
+            347
+          ],
+          "sha256": "f6216ace2635b042339b790a0bf5214e2fffa0aa15081a43370fb54d9058e763",
+          "visiblePixels": 29352
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            940,
+            314,
+            1254,
+            627
+          ],
+          "sourceFoot": [
+            176,
+            291
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            55
+          ],
+          "bounds": [
+            48,
+            73,
+            308,
+            347
+          ],
+          "sha256": "ad2851c8ceda267d726fab91cfb09e2c5a6a08fd6c9ee882ce808b81bc415080",
+          "visiblePixels": 29415
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            940
+          ],
+          "sourceFoot": [
+            165,
+            290
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            56
+          ],
+          "bounds": [
+            48,
+            74,
+            307,
+            347
+          ],
+          "sha256": "ba7b663d80af58adea74e0806c7691eb65490e63a357f6722a7c54b31ca58254",
+          "visiblePixels": 29686
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            940
+          ],
+          "sourceFoot": [
+            182,
+            290
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            56
+          ],
+          "bounds": [
+            47,
+            74,
+            307,
+            347
+          ],
+          "sha256": "8d42b7f6ae60e7297f75a4e19eed3265d2f7d34f73d36bd014b7eebe0226a4cf",
+          "visiblePixels": 28823
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            940,
+            940
+          ],
+          "sourceFoot": [
+            184,
+            288
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            58
+          ],
+          "bounds": [
+            48,
+            76,
+            307,
+            347
+          ],
+          "sha256": "e34da2b1712f05090e78996fdeb83d2aff4e52f041109a8dd9d2c88773449b23",
+          "visiblePixels": 28885
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            940,
+            627,
+            1254,
+            940
+          ],
+          "sourceFoot": [
+            176,
+            287
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            59
+          ],
+          "bounds": [
+            48,
+            77,
+            308,
+            347
+          ],
+          "sha256": "61ab31781cf95645ed7f7611e8452c622ede9da0d0ea2ce1b0249b54b7018c3b",
+          "visiblePixels": 28821
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            940,
+            314,
+            1254
+          ],
+          "sourceFoot": [
+            166,
+            288
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            58
+          ],
+          "bounds": [
+            48,
+            77,
+            307,
+            347
+          ],
+          "sha256": "bc22c06b8e9be97f7b9ad2f8b7eb1c48a8c0ec723965e40e340da88e590c00b3",
+          "visiblePixels": 29413
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            940,
+            627,
+            1254
+          ],
+          "sourceFoot": [
+            184,
+            290
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            56
+          ],
+          "bounds": [
+            47,
+            75,
+            307,
+            347
+          ],
+          "sha256": "728040270ef1b4d8d322b1c74849b8452e94ebe9ffe132707ef01fdb347aec4f",
+          "visiblePixels": 29289
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            940,
+            940,
+            1254
+          ],
+          "sourceFoot": [
+            176,
+            290
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            56
+          ],
+          "bounds": [
+            48,
+            75,
+            307,
+            347
+          ],
+          "sha256": "e40f83738f5dabf50a68830aec58cb5759cd73f2a281b7fc2a614999e46ba51d",
+          "visiblePixels": 29701
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            940,
+            940,
+            1254,
+            1254
+          ],
+          "sourceFoot": [
+            194,
+            292
+          ],
+          "sourceAnchorX": 195,
+          "offset": [
+            35,
+            54
+          ],
+          "bounds": [
+            48,
+            73,
+            308,
+            347
+          ],
+          "sha256": "60ee245681f7a81ed91c1c72cf8a2633d45290be677a18dbb272e2b8ecb45800",
+          "visiblePixels": 30108
+        }
+      ]
+    },
+    "stun": {
+      "fps": 12,
+      "loop": true,
+      "loopStartFrame": 13,
+      "entryFps": 18,
+      "holdFps": 8,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceFoot": [
+            186,
+            296
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            50
+          ],
+          "bounds": [
+            66,
+            60,
+            311,
+            347
+          ],
+          "sha256": "928d86f674bca63ad7347f485f9ef56de248a4e6ac555f7e5e9e2ff7745729ff",
+          "visiblePixels": 29469
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceFoot": [
+            186,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            52,
+            64,
+            313,
+            347
+          ],
+          "sha256": "c17bf255c9648a2d255ac621d620cbbd5b55dcdbe02082e37046a35bfaec21c7",
+          "visiblePixels": 29910
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            940,
+            314
+          ],
+          "sourceFoot": [
+            186,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            51,
+            71,
+            313,
+            347
+          ],
+          "sha256": "1ec8769547b9674849c5376a7c9968b86ecb288b3ed6ba88a44f09b7f7499c83",
+          "visiblePixels": 29686
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            940,
+            0,
+            1254,
+            314
+          ],
+          "sourceFoot": [
+            187,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            50,
+            77,
+            314,
+            347
+          ],
+          "sha256": "dbb65f184ded225544f29d0f30ee12fc07ad97b64cff3740d0588d9877d4b041",
+          "visiblePixels": 29066
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceFoot": [
+            186,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            56,
+            81,
+            314,
+            347
+          ],
+          "sha256": "19541873a094d66089f30662ccb57c30c939203b7cb7a1934f5d4593660b61c7",
+          "visiblePixels": 29061
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceFoot": [
+            185,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            52,
+            88,
+            314,
+            347
+          ],
+          "sha256": "9b78b02bd56f10f27682e69a9f8677e5928aa9773a9e25a1fdac5b7d77e6cc6a",
+          "visiblePixels": 28649
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            940,
+            627
+          ],
+          "sourceFoot": [
+            183,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            54,
+            97,
+            314,
+            347
+          ],
+          "sha256": "f6880ede479c346a79d489a66c473a0e195372d8a049af8cf6a81e8f3baed954",
+          "visiblePixels": 28141
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            940,
+            314,
+            1254,
+            627
+          ],
+          "sourceFoot": [
+            184,
+            295
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            51
+          ],
+          "bounds": [
+            63,
+            91,
+            302,
+            347
+          ],
+          "sha256": "23253c05f09e099fe399e55d2801d6bb87139d0c520ee88a450d15d986e4d625",
+          "visiblePixels": 27462
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            940
+          ],
+          "sourceFoot": [
+            182,
+            294
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            52
+          ],
+          "bounds": [
+            82,
+            73,
+            301,
+            347
+          ],
+          "sha256": "af7be9e93f2e6818000be72807db4c6166561e8d91d377b08ad7a03e4eb6cc96",
+          "visiblePixels": 27914
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            940
+          ],
+          "sourceFoot": [
+            187,
+            293
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            53
+          ],
+          "bounds": [
+            94,
+            65,
+            299,
+            347
+          ],
+          "sha256": "0e6ad9c5f70b8250d82aa8ac53758b2bdc9a2888d5ec34548f1352ec82cbc1ff",
+          "visiblePixels": 29124
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            940,
+            940
+          ],
+          "sourceFoot": [
+            189,
+            293
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            53
+          ],
+          "bounds": [
+            91,
+            61,
+            294,
+            348
+          ],
+          "sha256": "cacdedbb1a523265c4e8a6d9111ca7b1e52c3e5d781990f679faf4f17b40ce70",
+          "visiblePixels": 29928
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            940,
+            627,
+            1254,
+            940
+          ],
+          "sourceFoot": [
+            191,
+            293
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            53
+          ],
+          "bounds": [
+            100,
+            58,
+            295,
+            348
+          ],
+          "sha256": "9b43083a8e33ed6441cbf4af54cb58460e9a5cd8360c8e5b76142e3bb1268ce5",
+          "visiblePixels": 30530
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            940,
+            314,
+            1254
+          ],
+          "sourceFoot": [
+            192,
+            294
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            52
+          ],
+          "bounds": [
+            102,
+            57,
+            296,
+            348
+          ],
+          "sha256": "48ec9e5d51b0bcc2f304fcc5560be44af5006b0be22d2f28d73b28d7d0452a6d",
+          "visiblePixels": 30706
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            940,
+            627,
+            1254
+          ],
+          "sourceFoot": [
+            191,
+            294
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            52
+          ],
+          "bounds": [
+            102,
+            57,
+            295,
+            348
+          ],
+          "sha256": "d9f589114cc9fcc9a86ef3c3273eec56102ffb30b42687e2eb3b2729b9048d5f",
+          "visiblePixels": 29558
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            940,
+            940,
+            1254
+          ],
+          "sourceFoot": [
+            192,
+            294
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            52
+          ],
+          "bounds": [
+            104,
+            58,
+            296,
+            348
+          ],
+          "sha256": "f2373301c6c394065d3b00b7e8f4f1e05556526da8acd672a0fc570bf07c10c8",
+          "visiblePixels": 28737
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            940,
+            940,
+            1254,
+            1254
+          ],
+          "sourceFoot": [
+            192,
+            294
+          ],
+          "sourceAnchorX": 185,
+          "offset": [
+            45,
+            52
+          ],
+          "bounds": [
+            104,
+            57,
+            296,
+            348
+          ],
+          "sha256": "a363d601a3e86997d295462e29fa39cc002251731d3d1d32cd48aa7df4d361b1",
+          "visiblePixels": 28113
+        }
+      ]
+    }
+  }
+}

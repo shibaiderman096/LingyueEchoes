@@ -120,12 +120,14 @@ namespace LingyueEchoes
         public SpriteRenderer fireMark,fireShadow,fireWarning,weaponGlow,armorGlow;
         SpriteRenderer[] ash,weapon;
         WrathFoeArt[] foeArt;
+        WrathGeneralArt generalArt;
         void OnEnable(){SceneParticleSettings.Changed+=SetAmbientParticles;SetAmbientParticles(SceneParticleSettings.Enabled);}
         void OnDisable(){SceneParticleSettings.Changed-=SetAmbientParticles;}
         void SetAmbientParticles(bool enabled){if(embers)embers.gameObject.SetActive(enabled);}
         void Awake()
         {
             if(embers)ash=embers.GetComponentsInChildren<SpriteRenderer>();
+            generalArt=new WrathGeneralArt();
             var foes=Resources.Load<Texture2D>(WrathFoeArt.Resource);
             var motion=Resources.Load<Texture2D>(WrathFoeArt.MotionResource);
             if(foes&&foes.width==1254&&foes.height==1254&&motion&&motion.width==1254&&motion.height==1254)
@@ -137,7 +139,7 @@ namespace LingyueEchoes
         }
         void OnDestroy(){if(foeArt!=null)foreach(var foe in foeArt)foe.Dispose();}
         public IWrathPoseSource UseActorArt(bool general,int encounter){
-            if(general)return null;
+            if(general)return generalArt;
             return foeArt!=null&&encounter>=0&&encounter<4?foeArt[encounter==1?1:encounter==3?2:0]:null;
         }
         public System.Collections.Generic.IEnumerable<Box> Terrain()
@@ -185,7 +187,7 @@ namespace LingyueEchoes
             float cameraX=cam.x*100;
             FrameScenery(cam.x,cam.y);
             if(backdrop)backdrop.localPosition=new Vector3((cameraX-520)*.0012f,0,0);
-            generalArmor.SetActive(general);
+            generalArmor.SetActive(general&&generalArt==null);
             if(ash!=null&&embers.gameObject.activeSelf)for(int i=0;i<ash.Length;i++){
                 float life=Mathf.Repeat(now*(.12f+(i%5)*.02f)+i*.618f,1);
                 float x=cameraX/100+Mathf.Repeat(i*1.77f+life*1.6f,13)-6.5f;
@@ -194,7 +196,7 @@ namespace LingyueEchoes
                 mote.color=new Color(1,.49f+i%4*.10f,.24f,Mathf.Sin(life*Mathf.PI)*(.42f+.30f*heat));
             }
             float pulse=.62f+.27f*Mathf.Sin(now*11);
-            weaponGlow.enabled=armorGlow.enabled=heat>0;
+            weaponGlow.enabled=armorGlow.enabled=heat>0&&generalArt==null;
             if(heat>0){
                 weaponGlow.color=new Color(1,.29f,.07f,pulse*heat);
                 armorGlow.color=new Color(1,.51f,.15f,pulse*.85f*heat);

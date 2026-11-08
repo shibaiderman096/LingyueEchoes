@@ -143,7 +143,7 @@ namespace LingyueEchoes
             double seconds=poseSeconds??(clip=="idle"?idleSeconds:(clip=="run"||clip=="dead"||clip=="victory"?frame-started:sampleAge)/60d+1e-7);
             if(ChapterArt!=null){
                 var animator=go.GetComponent<Animator>();if(animator)animator.enabled=false;
-                renderer.sprite=ChapterArt.Pose(a,pose,poseCell,poseSeconds);
+                renderer.sprite=ChapterArt.Pose(a,pose,poseCell,ChapterArt is WrathGeneralArt&&pose==null?seconds:poseSeconds);
             }else{
                 var animator=go.GetComponent<Animator>();if(animator&&!animator.enabled)animator.enabled=true;
                 PixelWorld.Sample(go,folder,clip,seconds,cell);
