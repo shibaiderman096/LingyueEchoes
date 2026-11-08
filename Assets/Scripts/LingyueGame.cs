@@ -289,6 +289,7 @@ namespace LingyueEchoes
                 case "STORY":UpdateStory(dt);break;
                 case WrathTransfer:UpdateTransfer();break;
                 case WrathArrive:UpdateWrathArrival();break;
+                case WrathEnter:UpdateWrathEntrance();break;
                 case WrathDialogue:break;
                 case "FADE_IN":if(stageTime>=.8f)SetStage("CAMERA_REVEAL");break;
                 case "CAMERA_REVEAL":if(stageTime>=3.5f)SetStage("WAKE_UP");break;
@@ -325,6 +326,7 @@ namespace LingyueEchoes
                 var target=new Vector3((float)p.x/100,((float)p.y-55)/100,-10);view.orthographicSize=Mathf.Lerp(deathCameraSize,3.6f/2.2f,t);view.transform.position=Vector3.Lerp(deathCameraPosition,target,t);}
             else{if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){float t=stage=="FADE_IN"?0:Mathf.Clamp01((stageTime-.7f)/2.8f),ease=Ease(t);zoom=Mathf.Lerp(2.2f,1,ease);cameraX=Mathf.Lerp((float)p.x,RouteCameraX(),ease);focusY=Mathf.Lerp((float)p.y+40,0,ease);}
                 else if(stage=="GUARDIAN_INTRO"){float t=stageTime/TrialIntroDuration;zoom=1+.17f*Mathf.Sin(t*Mathf.PI);focusY=12*Mathf.Sin(t*Mathf.PI);}
+                else if(stage==WrathEnter)WrathEntranceCamera(out zoom,out focusY);
                 else if(stage=="FIRST_TAIL")TailCamera(out zoom,out focusY);
                 else if(stage=="TAIL_DIALOGUE"){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
                 else if(wrath){float focus=wrathActive>=0&&stage=="GUARDIAN_FIGHT"
@@ -347,7 +349,7 @@ namespace LingyueEchoes
         void DrawActors(double? idleDelta){
             var p=sim.player;var b=sim.boss;
             if(wrath){
-                guardian.ChapterArt=wrath.UseActorArt(ChapterBoss||ChapterDialogue&&speech.Id!="wrathEnter",wrathActive);
+                guardian.ChapterArt=wrath.UseActorArt(ChapterGeneralVisible,wrathActive);
                 guardian.Tint=guardian.ChapterArt!=null?(sim.phase>=2?new Color(1,.82f,.72f):Color.white):
                     wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
                     wrathActive==1?new Color(.84f,.52f,.35f):wrathActive==3?new Color(.65f,.52f,.61f):
@@ -358,6 +360,7 @@ namespace LingyueEchoes
             if(stage=="FADE_IN"||stage=="CAMERA_REVEAL")ArrivalPose(-1,out pose,out poseSeconds);
             else if(stage=="WAKE_UP")ArrivalPose(stageTime,out pose,out poseSeconds);
             else if(stage==WrathArrive)ArrivalPose(stageTime-.42f,out pose,out poseSeconds);
+            else if(stage==WrathEnter){pose=stageTime>=WrathWalkStart&&stageTime<WrathWalkEnd?"run":"idle";poseSeconds=Mathf.Max(0,stageTime-WrathWalkStart);}
             else if(stage=="DYING"||stage=="DEATH"){pose="dead";poseSeconds=(sim.frame-deathFrame)/(double)Rules.hz;}
             else if(stage=="GUARDIAN_INTRO"&&stageTime>=.65f&&stageTime<1.65f){
                 pose="parry";poseSeconds=(stageTime-.65f)*PixelWorld.Definition("pixel8",pose).duration;
@@ -369,7 +372,7 @@ namespace LingyueEchoes
             }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
             else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
-            else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&(!ChapterDialogue||speech.Id=="wrathEnter")?0:1,idleDelta:idleDelta);
+            else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&!ChapterGeneralVisible?0:1,idleDelta:idleDelta);
             float glintAge=stageTime-TrialSlashTime;
             bool bladeFlash=!wrath&&stage=="GUARDIAN_INTRO"&&glintAge>=0&&glintAge<.18f;
             trialBladeGlint.gameObject.SetActive(bladeFlash);
@@ -447,7 +450,7 @@ namespace LingyueEchoes
             Vector2 pointer=Input.mousePosition;
             Vector2? hover=pointer!=menuPointer&&!TouchControlsVisible?UiPoint(pointer):null;
             menuPointer=pointer;
-            if(stage=="DYING"||stage=="GUARDIAN_DEFEAT"||stage==WrathTransfer)return;if(stage=="DEATH"){ReadDeathInput(confirm,padB,hover);return;}
+            if(stage=="DYING"||stage=="GUARDIAN_DEFEAT"||stage==WrathTransfer||stage==WrathEnter)return;if(stage=="DEATH"){ReadDeathInput(confirm,padB,hover);return;}
             if(TailStory||ChapterDialogue){
                 if(stage!="FIRST_TAIL"&&(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5)))speech.Confirm();
                 return;

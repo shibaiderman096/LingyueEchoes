@@ -20,6 +20,11 @@ public static class WrathChapterChecks
                 chapter.firstLamp&&chapter.secondLamp&&chapter.leftSeal&&chapter.rightSeal&&chapter.returnSeal&&chapter.embers&&
                 chapter.entranceDoor&&chapter.fireMark,"chapter has native scene references");
             Need(chapter.firstLamp==chapter.secondLamp,"legacy lamp references share the sole entrance checkpoint");
+            Need(chapter.entranceDoorFrames!=null&&chapter.entranceDoorFrames.Length==16&&
+                chapter.entranceDoorFrames.All(sprite=>sprite&&sprite.rect.width==320&&sprite.rect.height==320),
+                "the oblique doorway has sixteen registered opening frames");
+            Need(Quaternion.Angle(chapter.entranceDoor.transform.localRotation,Quaternion.identity)<.01f,
+                "door perspective is authored in the artwork, without tilting its upright posts");
             Need(chapter.scenery!=null&&chapter.scenery.Length==1&&chapter.scenery[0]&&chapter.scenery[0].sprite,
                 "one interior backdrop replaces the exterior route");
             Need(WrathRoute.Bridge().Length==0&&!chapter.Terrain().Any(),"the deleted approach has no remaining bridge terrain");

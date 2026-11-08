@@ -1,0 +1,19 @@
+{
+  "art_source": "host_image",
+  "route": "image_gen.imagegen",
+  "model": "host default",
+  "estimateUsd": null,
+  "prompt": "EDIT the reference palace door into a game animation spritesheet. Preserve this exact red wood, dark carved frame, gold cloud lintel and gold ring handles, crisp dark fantasy pixel art. IMPORTANT change viewing angle: ALL frames show a true three-quarter SIDE OBLIQUE doorway, like a door installed in the LEFT side wall of a side-scrolling room, its threshold recedes diagonally UP AND RIGHT, vertical posts remain vertical. Clearly visible thick left return jamb, far right jamb smaller, lintel and threshold slope up-right; not a front elevation, not a flat sprite tilted clockwise. Door must be wide enough to walk through. Produce EXACTLY 16 distinct chronological frames, a precise 4 columns by 4 rows grid, row-major. Frame1 firmly closed, 2-4 first release/small gap, 5-8 both solid leaves swing inward about their vertical hinges, 9-12 progressively wider opening, 13-16 settle fully open with the dark empty doorway visibly clear. Both red panels rotate inward with proper foreshortening, NOT slide away, not dissolving. The doorway frame, oblique angle, scale, position, top and ground anchor MUST be absolutely identical in all16 cells; only leaves move. No people. No numbering/text/grid lines. Every cell has identical margins and fixed bottom groundpoint; no object touches cell borders. Truly transparent background outside each doorway, inside doorway dark shadow. No ground plane, cast shadow, white matte or halo. One square 4x4 spritesheet with all16 full doorframes. Stay pixel art, no smoothing, no redesign.",
+  "source": "DoorOpening.png",
+  "runtime": "../../Assets/Art/Wrath/DoorOpening",
+  "frames": 16,
+  "layout": [
+    4,
+    4
+  ],
+  "canvas": [
+    320,
+    320
+  ],
+  "packaging": "package_door.py: round 4x4 cell boundaries; alpha>=128, discard islands<12px; register fixed left jamb x68 and ground y315 on 320px canvas. Source RGB unchanged, no resampling."
+}

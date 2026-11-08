@@ -48,12 +48,21 @@ namespace LingyueEchoes
         public SpriteRenderer[] scenery;
         public SpriteRenderer firstLamp,secondLamp,leftSeal,rightSeal,returnSeal;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
+        public Sprite[] entranceDoorFrames;
+        public float DoorOpening {get;private set;}
+        public void SetDoorOpening(float progress){
+            DoorOpening=Mathf.Clamp01(progress);
+            if(entranceDoor&&entranceDoorFrames!=null&&entranceDoorFrames.Length>0)
+                entranceDoor.sprite=entranceDoorFrames[Mathf.Min(entranceDoorFrames.Length-1,
+                    Mathf.FloorToInt(DoorOpening*entranceDoorFrames.Length))];
+        }
         public bool IsInside {get;private set;}
         public void SetInside(bool inside){
             IsInside=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;
             if(firstLamp)firstLamp.gameObject.SetActive(!inside);
             if(returnSeal)returnSeal.enabled=!inside;
+            if(!inside)SetDoorOpening(0);
         }
         SpriteRenderer[] ash;
         WrathGeneralArt generalArt;

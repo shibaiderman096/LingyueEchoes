@@ -34,7 +34,8 @@ public static class WrathSceneSetup
     public static void ApplyArt()=>RebuildIndoor();
     [MenuItem("Lingyue/Rebuild indoor general arena")]
     public static void RebuildIndoor(){
-        var interior=LoadArt("Interior");var door=LoadArt("EntranceDoor");
+        var interior=LoadArt("Interior");
+        var doors=Enumerable.Range(1,16).Select(i=>LoadArt("DoorOpening/door-"+i.ToString("00"))).ToArray();
         var shapes=AssetDatabase.LoadAllAssetsAtPath(PalettePath).OfType<Sprite>().ToDictionary(x=>x.name);
         var block=shapes["Block"];var flame=shapes["Flame"];
         var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
@@ -51,7 +52,8 @@ public static class WrathSceneSetup
         chapter.scenery=new[]{Piece(room,"General hall interior",interior,37.1f,-.95f+.18f*height,width,height,-20,Color.white)};
         chapter.bridgeStones=Array.Empty<SpriteRenderer>();
         var props=Group(world,"Props");
-        chapter.entranceDoor=Piece(props,"General hall · entrance door",door,34.52f,.65f,1.6f,3.2f,6,Color.white);
+        chapter.entranceDoorFrames=doors;
+        chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],34.52f,.60f,3.2f,3.2f,6,Color.white);
         chapter.firstLamp=chapter.secondLamp=Lantern(props,"Entrance checkpoint",WrathRoute.Entrance-68);
         chapter.leftSeal=PixelWorld.Sprite(props,"Arena seal left","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));
         chapter.rightSeal=PixelWorld.Sprite(props,"Arena seal right","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));

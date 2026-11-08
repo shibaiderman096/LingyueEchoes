@@ -4,8 +4,36 @@
   "model": "host default",
   "estimateUsd": null,
   "reference": "reference.png",
-  "interior": {"artifact": "../../Assets/Art/Wrath/Interior.png", "prompt": "A completely enclosed Chinese dark fantasy manor interior for a side scrolling pixel art boss battle. Dark carved wood rear wall, vermilion columns, restrained gold carvings, weathered red banners, distant empty throne and dim amber lanterns. No exterior, sky, moon, characters or UI. Broad empty horizontal continuous stone floor, crisp pixel clusters, dark red purple palette matching reference.", "measured_floor_y_from_top": 0.68},
-  "door": {"artifact": "../../Assets/Art/Wrath/EntranceDoor.png", "prompt": "One standalone tall closed ancient Chinese palace double door sprite, dark fantasy pixel art, front elevation. Vermilion wood, iron studs, aged gold ring handles, carved dark frame, stone sill. Transparent background, no ground shadow, text, glow or white matte."},
-  "layout": {"viewport": [1280,720], "camera_orthographic_size": 3.6, "world_bounds": [32.1,42.9], "simulation_floor": 0, "render_floor": -0.95, "entrance": 33.4, "entrance_walk_max": 34.2, "door_center": 34.52, "boss": 38.3, "combat_bounds": [32.1,41.3]},
+  "interior": {
+    "artifact": "../../Assets/Art/Wrath/Interior.png",
+    "prompt": "A completely enclosed Chinese dark fantasy manor interior for a side scrolling pixel art boss battle. Dark carved wood rear wall, vermilion columns, restrained gold carvings, weathered red banners, distant empty throne and dim amber lanterns. No exterior, sky, moon, characters or UI. Broad empty horizontal continuous stone floor, crisp pixel clusters, dark red purple palette matching reference.",
+    "measured_floor_y_from_top": 0.68
+  },
+  "door": {
+    "artifact": "../../Assets/Art/Wrath/DoorOpening/door-01.png",
+    "prompt": "One standalone tall closed ancient Chinese palace double door sprite, dark fantasy pixel art, front elevation. Vermilion wood, iron studs, aged gold ring handles, carved dark frame, stone sill. Transparent background, no ground shadow, text, glow or white matte.",
+    "superseded_by": "door-opening-prompt.json"
+  },
+  "layout": {
+    "viewport": [
+      1280,
+      720
+    ],
+    "camera_orthographic_size": 3.6,
+    "world_bounds": [
+      32.1,
+      42.9
+    ],
+    "simulation_floor": 0,
+    "render_floor": -0.95,
+    "entrance": 33.4,
+    "entrance_walk_max": 34.2,
+    "door_center": 34.52,
+    "boss": 38.3,
+    "combat_bounds": [
+      32.1,
+      41.3
+    ]
+  },
   "native_scene": "../../Assets/Scenes/Chapter01_Wrath.unity"
 }
