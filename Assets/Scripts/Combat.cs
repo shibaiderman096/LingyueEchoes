@@ -221,7 +221,9 @@ namespace LingyueEchoes
             bool normal=a.id==1&&a.state=="attack";
             if(normal&&a.combo==3&&t==-12)Visual("charge",a.x-a.face*15,a.y+132,a);
             if(t<0||t>=m.active)return;
-            int pulse=m.pulses==null?0:Array.FindIndex(m.pulses,s=>t>=s&&t<s+4);
+            // Unity JSON may turn null arrays into empty arrays; both mean one hit window.
+            bool hasPulses=m.pulses!=null&&m.pulses.Length>0;
+            int pulse=hasPulses?Array.FindIndex(m.pulses,s=>t>=s&&t<s+4):0;
             if(pulse<0)return;
             bool execute=a.id==1&&a.state=="execute",plunge=a.id==1&&a.state=="plungeLand";
             bool spin=normal&&a.combo==2;
@@ -229,7 +231,7 @@ namespace LingyueEchoes
             var area=execute?Hurtbox(boss):plunge?new Box(a.x+a.face*20-m.reach,a.y,m.reach*2,m.height):
                 spin?new Box(a.x-m.reach,a.y,m.reach*2,m.height):new Box(a.face>0?a.x:a.x-m.reach,a.y,m.reach,m.height);
             hits.Add(new Hitbox{x=area.x,y=area.y,w=area.w,h=area.h,owner=a.id,attackId=a.attackId,pulse=pulse,move=m});
-            if(t==(m.pulses==null?0:m.pulses[pulse])){
+            if(t==(hasPulses?m.pulses[pulse]:0)){
                 if(plunge){Visual("plunge_impact",a.x+a.face*20,a.y+10,a);Sound("plunge");return;}
                 double x=normal?(a.combo==0?63:a.combo==1?88:a.combo==2?0:72):m.reach*.45;
                 double y=normal?(a.combo==0?64:a.combo==1?63:a.combo==2?52:79):m.height*.5;
