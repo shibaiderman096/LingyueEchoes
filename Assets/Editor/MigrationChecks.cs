@@ -8,7 +8,12 @@ using LingyueEchoes;
 
 public static class MigrationChecks
 {
-    [Serializable] class Snapshot {public Fighter player,boss;public int frame,tick,hitstop,phase,moveIndex,tempoSerial,successFrame,executeWindow,deflectSerial,dummyHits,dodgeEvades,visuals,sounds;public string successKind;}
+    [Serializable] class ActorSnapshot {
+        public int id,face,age,attackId,combo,invuln,energy;public double x,y,vy,hp,maxHp,posture,stamina,echo;public string state;
+        public ActorSnapshot(){}
+        public ActorSnapshot(Fighter actor){foreach(var field in typeof(ActorSnapshot).GetFields())field.SetValue(this,typeof(Fighter).GetField(field.Name).GetValue(actor));}
+    }
+    [Serializable] class Snapshot {public ActorSnapshot player,boss;public int frame,tick,hitstop,phase,moveIndex,tempoSerial,successFrame,executeWindow,deflectSerial,dummyHits,dodgeEvades,visuals,sounds;public string successKind;}
     [Serializable] class Case {public string name,kind,state;public int age,steps;public Snapshot[] expected;}
     [Serializable] class ClockCase {public int hz;public Snapshot expected;}
     [Serializable] class Golden {public Case[] cases;public ClockCase[] clocks;}
@@ -55,7 +60,7 @@ public static class MigrationChecks
                         if(clip.folder=="pixel8"&&clip.name=="attack3")Assert(PixelActor.DrawnAttackCell(clip,move,move.chainAt)>=12,"Spin returns to its starting direction before the chain can cut it off");
                     }
                 }}}finally{UnityEngine.Object.DestroyImmediate(go);}
-        if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: new defense rewards and interactive route; independent rule checks passed.");}
+        if(update){File.WriteAllText("Assets/Editor/Tests/combat-golden.json",JsonUtility.ToJson(data));AssetDatabase.Refresh();Debug.Log("COMBAT_EXPECTATIONS_UPDATED: shared Boss decision/execution behavior; independent combat checks passed.");}
         else Debug.Log("MIGRATION_CHECKS_PASSED: "+compared+" configured snapshots; 30/60/120/144 Hz clocks; defense boundaries/rewards/cap/dedup; tail healing; V2 content, reading hold, broken steps and optional route; death aftermath; "+manifest.clips.Length+" native animations");}
     static void CheckTailHealing(){
         Combat Setup(int tails,int energy,double missing){var c=new Combat{ai=false,enemyActive=false};c.ApplyTailUpgrades(tails);
@@ -79,7 +84,7 @@ public static class MigrationChecks
         interrupted.Step();Assert(interrupted.player.state=="hurt"&&interrupted.player.hp==72&&interrupted.player.energy==1&&
             !interrupted.visuals.Any(c=>c.kind=="heal_fx"),"Hit on the release frame interrupts without spending");
     }
-    static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=c.player,boss=c.boss,visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return JsonUtility.FromJson<Snapshot>(JsonUtility.ToJson(snapshot));}
+    static Snapshot Capture(Combat c){var snapshot=new Snapshot{player=new ActorSnapshot(c.player),boss=new ActorSnapshot(c.boss),visuals=c.visuals.Count,sounds=c.sounds.Count};foreach(var f in typeof(Snapshot).GetFields()){var source=typeof(Combat).GetField(f.Name);if(source!=null&&source.FieldType==f.FieldType)f.SetValue(snapshot,source.GetValue(c));}return snapshot;}
     static Combat Contact(string state,int age,int energy=0,double echo=0){var c=new Combat{ai=false};c.player.x=0;c.player.state=state;c.player.age=age;c.player.energy=energy;c.player.echo=echo;c.boss.x=90;c.boss.state="attack";c.boss.move=Rules.Boss[0].Copy();c.boss.age=30;c.boss.attackId=55;return c;}
     static void CheckDefenseAndTutorial(){
         foreach(string state in new[]{"parry","dodge"})for(int age=0;age<22;age++){
@@ -118,7 +123,7 @@ public static class MigrationChecks
     }
     static void CheckExecutionAndEffects(){
         var c=new Combat{ai=false};var p=c.player;var b=c.boss;p.x=0;p.face=-1;b.x=80;b.posture=80;p.energy=1;c.executeWindow=30;
-        c.DebugBoss(0);b.age=b.move.wind-Rules.Execute.wind;
+        c.DebugBoss(0);AdvanceBossTo(c,b.move.wind-Rules.Execute.wind);c.executeWindow=30;
         c.Press("attack");c.Step();
         Assert(p.state=="execute"&&p.face==1&&p.energy==1,"Execution faces the target and pays on contact");
         b.x=-70;b.y=180;b.vy=1;
@@ -127,7 +132,7 @@ public static class MigrationChecks
             "Execution tracks a crossing, airborne target and interrupts even when posture fills");
         Assert(p.hp==p.maxHp&&c.hitstop==Rules.executeHitstop,"The interrupted boss attack cannot land on the same frame");
         var trade=new Combat{ai=false};trade.player.x=0;trade.boss.x=80;trade.player.energy=1;trade.executeWindow=30;
-        trade.DebugBoss(0);trade.boss.age=trade.boss.move.wind-Rules.Execute.wind;
+        trade.DebugBoss(0);AdvanceBossTo(trade,trade.boss.move.wind-Rules.Execute.wind);trade.executeWindow=30;
         trade.Press("attack");for(int i=0;i<=Rules.Execute.wind;i++)trade.Step();
         Assert(trade.player.hp==trade.player.maxHp&&trade.boss.state=="stagger","Execution wins the same-frame clash");
         var far=new Combat{ai=false};far.player.energy=1;far.executeWindow=30;far.Press("attack");far.Step();
@@ -135,13 +140,14 @@ public static class MigrationChecks
         var turn=new Combat{ai=false,enemyActive=false};turn.axis=-1;turn.player.y=90;turn.player.vy=3;turn.Press("attack");turn.Step();
         Assert(turn.player.face==-1,"Turning and attacking on the same airborne frame uses the new direction");
         var edge=new Combat{ai=false,god=true};edge.player.x=560;edge.boss.x=559;edge.boss.y=65;edge.boss.vy=-2;
-        edge.DebugBoss(2);edge.player.x=500;edge.boss.age=edge.boss.move.wind;edge.Step();
+        edge.DebugBoss(2);edge.player.x=500;AdvanceBossTo(edge,edge.boss.move.wind);edge.boss.x=559;edge.boss.y=65;edge.boss.vy=-2;edge.Step();
         var slash=edge.visuals.First(v=>v.kind=="slash");var hit=edge.hits.First(h=>h.owner==2);
         Assert(edge.boss.x==560&&hit.x==560&&slash.originX==560&&slash.originY==edge.boss.y,"Airborne attack contact and effects share the clamped pose");
         edge.Step();Assert(slash.TryGetAnchor(edge.boss,out double x,out double y)&&edge.boss.y!=slash.originY&&Math.Abs(y-slash.y-edge.boss.y+slash.originY)<1e-7&&x==slash.x,"The slash follows the moving attack pose");
         edge.boss.face=-1;Assert(!slash.TryGetAnchor(edge.boss,out _,out _),"An old slash is hidden when the actor turns");
         Assert(new VisualCue{kind="slash",owner=1,combo=1,face=-1}.IsPlayerCombo&&!new VisualCue{kind="slash",owner=1,power=true}.IsPlayerCombo,"Normal combo uses authored arcs; executions retain the shared effect");
     }
+    static void AdvanceBossTo(Combat combat,int age){for(int i=0;i<age+1&&combat.BossAction.Running&&combat.BossAction.Age<age;i++)combat.Step();Assert(combat.BossAction.Running&&combat.BossAction.Age==age,"Boss fixture advances the owning action clock");}
     static void CheckPlungeCombo(){
         var c=new Combat{ai=false};var p=c.player;var b=c.boss;p.x=0;b.x=68;
         c.Press("jump");
@@ -283,25 +289,29 @@ public static class MigrationChecks
             "Skipping the wood dummy and sparring still reaches the required boss dialogue");
     }
     static void CheckDeathAftermath(){var c=new Combat{continueAfterDeath=true};c.player.x=0;c.player.y=65;c.player.vy=3;c.player.hp=0;c.player.state="dead";c.boss.x=100;c.DebugBoss(2);
+        int started=c.moveIndex,attack=c.boss.attackId;
         c.axis=1;c.Press("attack");c.Press("jump");for(int i=0;i<180;i++)c.Step();
         Assert(c.frame==180&&c.player.hp==0&&c.player.x==0&&c.player.y==0&&c.player.move==null&&c.player.state=="dead","Death keeps gravity running without player control or revival");
-        Assert(c.boss.move==null&&c.boss.state=="idle"&&c.moveIndex==0,"Enemy completes its pending move but does not start new attacks on a corpse");
+        Assert(c.boss.move==null&&c.boss.state=="idle"&&c.moveIndex==started&&c.boss.attackId==attack,"Enemy completes its pending move but does not start new attacks on a corpse");
         Assert(c.sounds.Exists(s=>s.name=="boss_swing")&&!c.sounds.Exists(s=>s.name=="hit_player")&&c.visuals.Exists(v=>v.kind=="slash"),"Enemy sounds and effects continue without hitting the dead player");
     }
     static void Compare(Combat c,Snapshot expected,string label){CompareActor(c.player,expected.player,label+" player");CompareActor(c.boss,expected.boss,label+" boss");
         foreach(var f in typeof(Snapshot).GetFields()){if(f.Name=="player"||f.Name=="boss")continue;object actual=f.Name=="visuals"?(object)c.visuals.Count:f.Name=="sounds"?c.sounds.Count:typeof(Combat).GetField(f.Name).GetValue(c);if(!actual.Equals(f.GetValue(expected)))throw new Exception(label+" "+f.Name+": "+actual+" != "+f.GetValue(expected));}compared++;}
-    static void CompareActor(Fighter actual,Fighter expected,string label){foreach(var f in typeof(Fighter).GetFields()){if(f.Name=="move")continue;object a=f.GetValue(actual),b=f.GetValue(expected);if(a is double){if(Math.Abs((double)a-(double)b)>1e-7)throw new Exception(label+" "+f.Name+": "+a+" != "+b);}else if(!Equals(a,b))throw new Exception(label+" "+f.Name+": "+a+" != "+b);}}
+    static void CompareActor(Fighter actual,ActorSnapshot expected,string label){foreach(var f in typeof(ActorSnapshot).GetFields()){object a=typeof(Fighter).GetField(f.Name).GetValue(actual),b=f.GetValue(expected);if(a is double){if(Math.Abs((double)a-(double)b)>1e-7)throw new Exception(label+" "+f.Name+": "+a+" != "+b);}else if(!Equals(a,b))throw new Exception(label+" "+f.Name+": "+a+" != "+b);}}
     static void CheckGuardianTuning(){
-        var c=new Combat{god=true,boundsMin=-2000,boundsMax=2000};c.player.x=600;
+        var c=new Combat{god=true,boundsMin=-2000,boundsMax=2000};c.player.x=1000;
+        var definition=BossBehaviorCatalog.Guardian;c.ConfigureDefaultBoss(definition);
         foreach(int phase in new[]{1,2}){
-            c.ResetBoss(0,Rules.guardianHp,walkScale:Rules.guardianWalkScale);c.phase=phase;c.Step();
+            c.ResetBoss(0,Rules.guardianHp,walkScale:Rules.guardianWalkScale);c.phase=phase;
+            for(int i=0;i<definition.initialWait+3;i++)c.Step();
             Assert(c.boss.hp==Rules.guardianHp&&c.boss.maxHp==950,"Guardian starts with increased full HP");
-            Assert(Math.Abs(c.boss.x-(phase==1?2.6:3.9))<1e-9&&c.boss.state=="run","Guardian walk increase in phase "+phase);
+            double speed=definition.phases[phase-1].approachSpeed;
+            Assert(c.boss.x>=speed*.85&&c.boss.x<=speed*2.3&&c.boss.state=="run","Guardian uses configured positioning speed in phase "+phase);
         }
         c.ResetBoss(0,140);c.Step();
-        Assert(Math.Abs(c.boss.x-2)<1e-9,"Reset clears previous guardian walk multiplier");
+        Assert(c.boss.x==0&&c.BossAction.Current==null,"Reset restores the initial observation pause and clears committed action");
         c.ResetBoss(0,595,WrathRoute.General);c.Step();
-        Assert(Math.Abs(c.boss.x-WrathRoute.General.pace)<1e-9,"Chapter boss keeps its own movement configuration");
+        Assert(c.UsesBossBehavior&&c.BossBehaviorState=="Breather","Chapter boss enters its own configured opening pause");
     }
     static void Assert(bool value,string label){if(!value)throw new Exception(label);}
 }

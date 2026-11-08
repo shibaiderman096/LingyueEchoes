@@ -195,8 +195,9 @@ namespace LingyueEchoes
         static Material BossAttackMaterial {get {if(!bossAttackMaterial){var shader=Resources.Load<Shader>("Shaders/BossAttackTint");if(!shader)throw new InvalidOperationException("Missing BossAttackTint shader");bossAttackMaterial=new Material(shader){name="Boss attack tint (shared)"};}return bossAttackMaterial;}}
         static void ResetMaterial(Effect e){if(e.originalMaterial)e.renderer.sharedMaterial=e.originalMaterial;}
         static void SetAttackTint(Effect e,bool attack,bool danger){if(!e.originalMaterial)e.originalMaterial=e.renderer.sharedMaterial;e.renderer.sharedMaterial=attack?BossAttackMaterial:e.originalMaterial;e.renderer.color=attack?(danger?DangerColor:ParryColor):Color.white;}
-        public PixelEffects(Transform parent){for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
-        public void Clear(){foreach(var e in pool){e.cue=null;ResetMaterial(e);e.go.SetActive(false);}cursor=next=0;model=null;}
+        readonly List<Effect> projectilePool=new List<Effect>();readonly Transform parent;
+        public PixelEffects(Transform parent){this.parent=parent;for(int i=0;i<pool.Length;i++){var go=new GameObject("Effect-"+i);go.transform.SetParent(parent,false);pool[i]=new Effect{go=go,renderer=go.AddComponent<SpriteRenderer>()};pool[i].renderer.sortingOrder=20;go.SetActive(false);}}
+        public void Clear(){foreach(var e in pool){e.cue=null;ResetMaterial(e);e.go.SetActive(false);}foreach(var e in projectilePool){ResetMaterial(e);e.go.SetActive(false);}cursor=next=0;model=null;}
         public void Draw(Combat sim){if(model!=sim){Clear();model=sim;}foreach(var cue in sim.visuals){if(cue.id<=cursor)continue;cursor=cue.id;pool[next++%pool.Length].cue=cue;}
             foreach(var e in pool){var cue=e.cue;if(cue==null)continue;bool plunge=cue.kind=="plunge_impact";string clip=plunge?"cut_fx4":cue.IsPlayerCombo?"cut_fx"+(cue.combo+1):cue.kind=="charge"?"impact":cue.kind=="parry"?"parry_success":cue.kind=="perfectDodge"?"perfect_dodge":cue.kind;
                 var actor=cue.owner==1?sim.player:sim.boss;
@@ -220,6 +221,15 @@ namespace LingyueEchoes
                 SetAttackTint(e,bossAttack,bossSlash?!actor.move.parry:cue.danger);
                 if(!bossAttack&&cue.kind=="charge")e.renderer.color=new Color(1,.78f,.49f);
                 PixelWorld.Sample(e.go,"pixel8",clip,age/60d*(cue.kind=="charge"?(double)source/life:1),bossSlash?attackPose.cell:-1);}
+            DrawProjectiles(sim);
+        }
+        void DrawProjectiles(Combat sim){
+            var projectiles=sim.BossProjectiles;
+            while(projectilePool.Count<projectiles.Count){var go=new GameObject("Boss projectile");go.transform.SetParent(parent,false);var r=go.AddComponent<SpriteRenderer>();r.sortingOrder=21;projectilePool.Add(new Effect{go=go,renderer=r});}
+            for(int i=0;i<projectilePool.Count;i++){var e=projectilePool[i];e.go.SetActive(i<projectiles.Count);if(i>=projectiles.Count){ResetMaterial(e);continue;}
+                var p=projectiles[i];e.go.transform.localPosition=new Vector3((float)p.x/100,(float)(p.y-95)/100,0);e.go.transform.localScale=Vector3.one*(float)(p.radius/36);
+                SetAttackTint(e,true,!p.move.parry);var d=PixelWorld.Definition("pixel8","impact");if(d!=null)PixelWorld.Sample(e.go,"pixel8","impact",(p.age/60d)%d.duration);
+            }
         }
     }
 }

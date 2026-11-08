@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,9 +17,13 @@ namespace LingyueEchoes
         public readonly Move[] opening,rage;
         public readonly int wait,rageWait,phaseFrames;
         public readonly double pace,engage;
-        public OpponentPattern(Move[] opening,int wait,double pace,double engage,Move[] rage=null,int rageWait=0,int phaseFrames=54){
-            this.opening=opening;this.wait=wait;this.pace=pace;this.engage=engage;this.rage=rage;this.rageWait=rageWait;this.phaseFrames=phaseFrames;
+        public readonly bool isBoss;
+        public readonly BossDefinition behavior;
+        public OpponentPattern(Move[] opening,int wait,double pace,double engage,Move[] rage=null,int rageWait=0,int phaseFrames=54,bool isBoss=true,BossDefinition behavior=null){
+            this.opening=opening??Array.Empty<Move>();this.wait=wait;this.pace=pace;this.engage=engage;this.rage=rage;this.rageWait=rageWait;this.phaseFrames=phaseFrames;
+            this.isBoss=isBoss;this.behavior=behavior?.Copy();
         }
+        public static OpponentPattern FromBoss(BossDefinition definition){definition.Validate();var d=definition.Copy();var moves=d.moves.Select(m=>m.move).ToArray();return new OpponentPattern(moves,d.initialWait,d.phases[0].approachSpeed,d.phases[0].preferredRange,d.phases.Length>1?moves:null,0,d.phases[0].transitionFrames,true,d);}
         public Move[] Moves(int phase)=>phase==2&&rage!=null?rage:opening;
     }
     public static class Rules
@@ -59,7 +63,7 @@ namespace LingyueEchoes
         public Box(){} public Box(double x,double y,double w,double h,bool noFoothold=false){this.x=x;this.y=y;this.w=w;this.h=h;this.noFoothold=noFoothold;}
         public static bool Overlaps(Box a,Box b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
     }
-    public class Hitbox:Box {public int owner,attackId,pulse;public Move move;public BossAttackPose pose;
+    public class Hitbox:Box {public int owner,attackId,pulse;public Move move;public bool released;public double sourceX;public BossAttackPose pose;
         public bool Touches(Box target){if(!Box.Overlaps(this,target))return false;return pose==null||pose.Touches(target);}
     }
     public class VisualCue {
@@ -74,7 +78,7 @@ namespace LingyueEchoes
     }
     public class SoundCue {public int id,frame;public string name;}
     public class DummyContact {public int id,attackId,combo,frame;}
-    public class Combat
+    public partial class Combat
     {
         static readonly string[] PlayerSlashSounds={"slash1","slash2","slash3","slash4"};
         public Fighter player=new Fighter(1,-250,Rules.playerMaxHp),boss=new Fighter(2,250,Rules.guardianHp);
@@ -111,12 +115,14 @@ namespace LingyueEchoes
         public static double BodyWidth(Fighter a)=>a.id==1?54:78;
         public static double BodyHeight(Fighter a)=>a.id==1?117:146;
         public void TuneBoss(double hp,int open=90,int wait=46,int wait2=24){boss.maxHp=boss.hp=hp;aiOpenWait=open;aiWaitPhase1=wait;aiWaitPhase2=wait2;aiWait=open;}
-        public void ResetBoss(double x,double hp,OpponentPattern pattern=null,double walkScale=1){
+        public Combat(){ResetBossBehavior(null,1);}
+        public void ResetBoss(double x,double hp,OpponentPattern pattern=null,double walkScale=1,int seed=1){
             boss=new Fighter(2,x,hp);TuneBoss(hp);
             bossWalkScale=walkScale;
             opponent=pattern;fireAttack=0;if(pattern!=null)aiWait=30;
             BossDefeated=false;phase=1;moveIndex=0;lastChoice=-1;
             hitstop=executeWindow=0;successFrame=-100;successKind="";hits.Clear();visuals.Clear();
+            ResetBossBehavior(pattern,seed);
         }
         public void Press(string action){
             var m=player.move;
@@ -129,7 +135,7 @@ namespace LingyueEchoes
         public void ClearCommands(){queue.Clear();comboBuffered=false;axis=0;}
         public Box Hurtbox(Fighter a)=>new Box(a.x-BodyWidth(a)/2,a.y,BodyWidth(a),BodyHeight(a));
         public bool CanFinish=>enemyActive&&boss.hp>0&&boss.state=="broken"&&player.energy>=1&&Math.Abs(player.x-boss.x)<=Rules.finisherReach&&Math.Abs(player.y-boss.y)<45;
-        public bool BossPostureReady=>enemyActive&&boss.hp>0&&boss.posture>=100&&boss.state!="broken";
+        public bool BossPostureReady=>enemyActive&&boss.hp>0&&boss.posture>=BossPostureLimit&&boss.state!="broken";
         public bool CanExecute=>enemyActive&&boss.hp>0&&boss.state!="broken"&&boss.state!="phase"&&boss.invuln<=Rules.Execute.wind+1&&
             (executeWindow>0||BossPostureReady)&&player.energy>=Rules.executeCost&&Math.Abs(boss.x-player.x)<Rules.Execute.reach+BodyWidth(boss)*.5&&
             boss.y<player.y+Rules.Execute.height&&player.y<boss.y+BodyHeight(boss);
@@ -137,7 +143,7 @@ namespace LingyueEchoes
         VisualCue Visual(string kind,double x,double y,Fighter a){var cue=new VisualCue{id=++visualSerial,frame=frame,kind=kind,x=x,y=y,originX=a.x,originY=a.y,attackId=a.attackId,face=a.face,combo=a.id==1&&a.state=="attack"?a.combo:0,power=a.state=="finisher"||a.state=="execute",owner=a.id,danger=a.move!=null&&!a.move.parry};visuals.Add(cue);if(visuals.Count>32)visuals.RemoveAt(0);return cue;}
         void Sound(string name){sounds.Add(new SoundCue{id=++soundSerial,frame=frame,name=name});if(sounds.Count>64)sounds.RemoveAt(0);}
         void Success(string kind){tempoSerial++;successKind=kind;successFrame=frame;hitstop=Rules.hitstop;}
-        void Enter(Fighter a,string state,Move move=null){bool changed=a.state!=state;a.state=state;a.age=0;a.move=move;
+        void Enter(Fighter a,string state,Move move=null){if(a.id==2)OnBossStateChanged(state);bool changed=a.state!=state;a.state=state;a.age=0;a.move=move;
             if(a.id==1)comboBuffered=false;
             if(a.id==1&&state=="dodge"){dodgeRewarded=false;Sound("dodge");}if(a.id==1&&state=="parry")Sound("guard");
             if(changed&&state=="broken")Sound("break");if(changed&&state=="phase")Sound("phase");if(changed&&state=="dead")Sound(a.id==1?"death":"victory");
@@ -164,10 +170,11 @@ namespace LingyueEchoes
         public void Step()
         {
             tick++;if(hitstop>0){hitstop--;return;}frame++;hits.Clear();if(executeWindow>0)executeWindow--;queue.RemoveAll(q=>q.until<frame);
-            if(player.hp<=0&&!continueAfterDeath||(enemyActive&&boss.hp<=0))return;
+            if(player.hp<=0&&!continueAfterDeath||(enemyActive&&boss.hp<=0)){if(boss.hp<=0)InterruptBoss(BossInterrupt.Death);return;}
             var p=player;var b=boss;double oldPX=p.x,oldBX=b.x;beforeStep?.Invoke(this);
             if(continueAfterDeath&&p.hp<=0&&p.state!="dead")Enter(p,"dead");
-            bool phaseThreshold=opponent==null?b.hp<=b.maxHp*.5:opponent.rage!=null&&b.hp<b.maxHp*.5;
+            BeginBossStep();
+            bool phaseThreshold=!UsesBossBehavior&&(opponent==null?b.hp<=b.maxHp*.5:opponent.rage!=null&&b.hp<b.maxHp*.5);
             if(p.hp>0&&enemyActive&&!nonlethal&&phase==1&&phaseThreshold&&b.state!="broken"&&b.state!="stagger"&&p.state!="finisher"&&p.state!="execute"){phase=2;Enter(b,"phase");Log("第二阶段：节奏加速");}
             if(p.hp>0)ControlPlayer();ControlBoss();
             foreach(var a in new[]{p,b}){
@@ -179,7 +186,7 @@ namespace LingyueEchoes
                 if(a.id==1&&a.state=="run"&&a.age%20==0)Sound("step");if(a.state=="dodge")a.x+=a.face*Rules.dodgeSpeed;
                 var move=a.move;
                 bool stepping=move!=null&&a.age>=move.wind&&a.age<move.wind+move.active;
-                if(stepping&&a.id==1)a.x+=a.face*move.speed; // Player lunges go through the normal terrain collision.
+                if(stepping&&(a.id==1||UsesBossBehavior))a.x+=a.face*move.speed; // Committed lunges use the normal terrain collision.
                 double radius=BodyWidth(a)/2,floor=0,oldX=a.id==1?oldPX:oldBX;
                 foreach(var slab in terrain){double top=slab.y+slab.h;
                     if(a.y<top&&oldY<top){if(oldX+radius<=slab.x&&a.x+radius>slab.x)a.x=slab.x-radius;if(oldX-radius>=slab.x+slab.w&&a.x-radius<slab.x+slab.w)a.x=slab.x+slab.w+radius;}
@@ -195,11 +202,11 @@ namespace LingyueEchoes
                 if(a.y<=floor){a.y=floor;a.vy=0;
                     if(plunging)StartAttack(a,Rules.PlungeImpact,"plungeLand");
                     else if(airborne&&a.id==1)Sound("land");}
-                if(stepping&&a.id==2)a.x+=a.face*move.speed;
+                if(stepping&&a.id==2&&!UsesBossBehavior)a.x+=a.face*move.speed;
                 a.x=Math.Max(boundsMin,Math.Min(boundsMax,a.x));
             }
             if(p.state=="execute"&&p.move!=null&&p.age<=p.move.wind&&b.x!=p.x)p.face=b.x>p.x?1:-1;
-            EmitAttack(p);EmitAttack(b);
+            EmitAttack(p);EmitAttack(b);AdvanceBossProjectiles();
             if(dummyBox!=null)foreach(var h in hits){if(h.owner!=1||p.state=="execute"||!h.Touches(dummyBox))continue;string key=h.attackId+":"+h.pulse;if(!dummySeen.Add(key))continue;
                 dummyHits++;dummyContacts.Add(new DummyContact{id=dummyHits,attackId=h.attackId,combo=p.combo,frame=frame});if(dummyContacts.Count>32)dummyContacts.RemoveAt(0);
                 Visual("impact",dummyBox.x+dummyBox.w*.5,dummyBox.y+dummyBox.h*.5,p);Sound("hit_boss");}
@@ -208,9 +215,9 @@ namespace LingyueEchoes
                 p.energy-=Rules.healCost;p.hp=Math.Min(p.maxHp,p.hp+Rules.healAmount);
                 Visual("heal_fx",p.x,p.y,p);Sound("heal");Log("回响疗愈 · 恢复生命");
             }
-            foreach(var a in new[]{p,b}){a.age++;if(a.hp<=0){if(!continueAfterDeath||a.state!="dead")Enter(a,"dead");continue;}
+            foreach(var a in new[]{p,b}){if(a.id==2&&AdvanceBossAction())continue;a.age++;if(a.hp<=0){if(!continueAfterDeath||a.state!="dead")Enter(a,"dead");continue;}
                 if(a.move!=null&&a.age>=a.move.wind+a.move.active+a.move.recovery)Enter(a,a.y>0?"air":"idle");
-                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=(opponent?.phaseFrames??90))){
+                else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=(a.id==2?BossStaggerFrames:150)&&p.state!="finisher")||(a.state=="phase"&&a.age>=(a.id==2?BossTransitionFrames:90))){
                     if(a.state=="broken")a.posture=0;Enter(a,a.y>0?"air":"idle");}
                 if(a.id==2&&(a.state=="idle"||a.state=="run")&&a.age%30==0&&!BossPostureReady)a.posture=Math.Max(0,a.posture-3);
                 if(a.id==1&&(a.state=="idle"||a.state=="run")&&a.stamina<PlayerMaxStamina)a.stamina=Math.Min(PlayerMaxStamina,a.stamina+Rules.staminaRegen);
@@ -218,6 +225,7 @@ namespace LingyueEchoes
         }
         void EmitAttack(Fighter a){
             var m=a.move;if(m==null)return;
+            if(a.id==2&&TryEmitBossProjectile())return;
             int t=a.age-m.wind;
             if(a.id==2&&m.fireDelay>0)EmitDelayedFire(a,m,t);
             if(a.id==2&&t==-12){var pt=WeaponPoint(m.name);Visual("charge",a.x+a.face*pt.Item1,a.y+pt.Item2,a);}
@@ -273,8 +281,11 @@ namespace LingyueEchoes
                 else if(canChain&&ConsumeAttack(true)){p.combo=p.state=="plungeLand"?2:p.combo+1;if(axis!=0)p.face=Math.Sign(axis);StartAttack(p,Rules.Player[p.combo]);}}
             if(Free(p.state)){p.x+=axis*5;if(axis!=0)p.face=Math.Sign(axis);string next=p.y>0||p.vy>0?"air":axis!=0?"run":"idle";if(p.state!=next)Enter(p,next);}}
         void ControlBoss(){var b=boss;var p=player;if(!enemyActive||!ai||(b.state!="idle"&&b.state!="run"))return;
+            if(UsesBossBehavior){ControlBossBehavior();return;}
             if(p.hp<=0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}b.face=p.x>=b.x?1:-1;
             if(opponent!=null){
+                var moves=opponent.Moves(phase);
+                if(moves.Length==0){if(b.state=="run")Enter(b,b.y>0?"air":"idle");return;}
                 double gap=Math.Abs(p.x-b.x);
                 if(aiWait>0)aiWait--;
                 if(aiWait>0||gap>opponent.engage){
@@ -282,7 +293,6 @@ namespace LingyueEchoes
                     if(approach)b.x+=b.face*opponent.pace*(phase==2?1.15:1);
                     string state=approach?"run":"idle";if(b.state!=state)Enter(b,state);return;
                 }
-                var moves=opponent.Moves(phase);
                 var move=moves[moveIndex++%moves.Length];
                 StartAttack(b,move);
                 aiWait=phase==2?opponent.rageWait:opponent.wait;
@@ -291,24 +301,24 @@ namespace LingyueEchoes
             if(--aiWait>0){bool moving=Math.Abs(p.x-b.x)>215;if(moving)b.x+=b.face*(phase==2?3:2)*bossWalkScale;string next=moving?"run":"idle";if(b.state!=next)Enter(b,next);return;}
             double distance=Math.Abs(p.x-b.x);int choice=moveIndex++%6;if(distance>330&&choice<2)choice=2;if(choice==lastChoice)choice=(choice+1)%6;lastChoice=choice;var m=Rules.Boss[choice].Copy();
             if(phase==2){m.wind=(int)Math.Ceiling(m.wind*.75);m.recovery=(int)Math.Ceiling(m.recovery*.75);}StartAttack(b,m);aiWait=phase==2?aiWaitPhase2:aiWaitPhase1;Log(m.name+(m.parry?" · 可弹反":" · 危险招式"));}
-        public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;boss.face=player.x>=boss.x?1:-1;var moves=opponent?.Moves(phase)??Rules.Boss;StartAttack(boss,moves[index%moves.Length].Copy());}
+        public void DebugBoss(int index){if(!enemyActive||boss.hp<=0)return;if(UsesBossBehavior){DebugBossBehavior(index);return;}var moves=opponent==null?Rules.Boss:opponent.Moves(phase);if(moves.Length==0)return;boss.face=player.x>=boss.x?1:-1;StartAttack(boss,moves[(index%moves.Length+moves.Length)%moves.Length].Copy());}
         void Resolve(Hitbox h,Fighter t){string key=h.attackId+":"+h.pulse+":"+t.id;if(!seen.Add(key))return;if(t.hp<=0||t.state=="phase"||t.invuln>0)return;
-            var attacker=h.owner==1?player:boss;if(attacker.attackId!=h.attackId||attacker.move==null)return;
+            var attacker=h.owner==1?player:boss;if(attacker.hp<=0||!h.released&&(attacker.attackId!=h.attackId||attacker.move==null))return;
             if(t.state=="dodge"&&t.age>=Rules.invulnStart&&t.age<Rules.invulnEnd){if(t.id==1){dodgeEvades++;if(!dodgeRewarded){dodgeRewarded=true;bool perfect=t.age<Rules.perfectDodgeEnd;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoDodge);
                         if(perfect){t.stamina=PlayerMaxStamina;Visual("perfectDodge",t.x,t.y+42,t);Sound("perfect_dodge");Success("perfectDodge");executeWindow=30;Log("极限闪避 · 回响充满 · 气力回满");}else Log("闪避成功 · 回复回响");}}return;}
-            if(t.id==1&&t.state=="parry"&&t.age<Rules.parry&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<Rules.parryPerfect;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,t);Sound("parry");attacker.posture=Math.Min(100,attacker.posture+32);GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
+            if(t.id==1&&t.state=="parry"&&t.age<Rules.parry&&h.move.parry&&t.face*((h.released?h.sourceX:attacker.x)-t.x)>=0){bool perfect=t.age<Rules.parryPerfect;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,t);Sound("parry");if(attacker.state!="phase")attacker.posture=Math.Min(BossPostureLimit,attacker.posture+32);GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
                 if(perfect){t.stamina=PlayerMaxStamina;executeWindow=30;Success("perfectParry");Log("完美弹刀 · 气力回满");}else Log("弹刀成功");if(BossPostureReady)Log("Boss 架势已满 · 小处决可击溃");Enter(t,t.y>0?"air":"idle");return;}
             bool finisher=attacker.state=="finisher",small=attacker.state=="execute";
-            bool postureReady=t.id==2&&t.posture>=100&&t.state!="broken";
+            bool postureReady=t.id==2&&t.posture>=BossPostureLimit&&t.state!="broken";
             bool heavySlash=attacker.id==1&&attacker.state=="attack"&&attacker.combo==3;
             double dealt=h.move.damage*(t.state=="broken"&&!finisher?1.5:1);
             if(small)attacker.energy-=Rules.executeCost;
             if(!(t.id==1&&(god||nonlethal)))t.hp=Math.Max(nonlethal?1:0,t.hp-dealt);
             if(attacker.id==1&&!finisher)GainEcho(attacker,dealt*.9);Visual("impact",t.x,t.y+Hurtbox(t).h*.55,attacker);Sound(t.id==1?"hit_player":"hit_boss");t.invuln=10;
-            if(t.id==2)t.posture=finisher?0:Math.Min(100,t.posture+h.move.posture);
+            if(t.id==2)t.posture=finisher?0:Math.Min(BossPostureLimit,t.posture+h.move.posture);
             if(t.hp==0&&t.id==2&&bossYields){
                 t.hp=1;BossDefeated=true;enemyActive=ai=false;Enter(t,"broken");
-            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small&&t.state!="broken"){Enter(t,postureReady?"broken":"stagger");}else if(t.id==2&&(finisher||t.state!="broken"&&heavySlash))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
+            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small&&t.state!="broken"){Enter(t,postureReady?"broken":"stagger");}else if(t.id==2&&(finisher||t.state!="broken"&&heavySlash&&!BossHyperArmor))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
             hitstop=small||finisher?8:3;Log((t.id==1?"玩家":"Boss")+" 受击 "+h.move.damage);
         }
     }

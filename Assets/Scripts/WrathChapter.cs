@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 
@@ -31,36 +31,25 @@ namespace LingyueEchoes
             =>new Move{name=name,pose=pose,wind=wind,active=active,recovery=rest,reach=reach,height=height,damage=hp,posture=posture,parry=parry,speed=rush,pulses=pulses,fireDelay=fire};
         static readonly OpponentPattern Soldier=new OpponentPattern(new[]{
             Move("焦刃横斩","slash",36,5,33,147,103,14,22)
-        },32,2.1,138);
+        },32,2.1,138,isBoss:false);
         static readonly OpponentPattern Hunter=new OpponentPattern(new[]{
             Move("赤焰突进","thrust",35,10,34,143,86,19,26,true,10),
             Move("掠火回刃","slash",23,5,32,130,98,13,18)
-        },25,4.7,231);
+        },25,4.7,231,isBoss:false);
         static readonly OpponentPattern Elite=new OpponentPattern(new[]{
             Move("禁卫双连斩","double",28,27,36,159,110,16,24,true,pulses:new[]{0,22}),
             Move("焚石重踏","slam",47,7,47,208,48,24,35,false)
-        },25,3.0,163);
-        public static readonly OpponentPattern General=new OpponentPattern(new[]{
-            Move("断垣横扫","slash",29,6,29,179,111,19,23),
-            Move("破军突刺","thrust",35,9,30,160,96,22,28,true,8.5),
-            Move("残城双斩","double",25,26,36,164,110,15,21,true,pulses:new[]{0,21}),
-            Move("裂阶重踏","slam",43,7,43,226,45,24,34,false),
-            Move("燎城跃击","leap",40,7,38,172,165,24,31),
-            Move("焚关重斩","spin",49,7,43,197,142,28,37,true)
-        },19,3.4,191,new[]{
-            Move("余焰横扫","slash",26,6,35,179,111,19,23,fire:30),
-            Move("追火突刺","thrust",28,9,31,166,96,22,28,true,9),
-            Move("连烽斩","double",23,26,34,164,110,15,21,true,pulses:new[]{0,21}),
-            Move("地火重踏","slam",36,7,47,226,45,24,34,false,fire:33),
-            Move("浴火跃击","leap",34,7,36,172,165,24,31),
-            Move("焚城重斩","spin",43,7,49,197,142,28,37,true,fire:32)
-        },10);
-        public static readonly Encounter[] Fights={
+        },25,3.0,163,isBoss:false);
+        static OpponentPattern general;
+        public static OpponentPattern General=>general??(general=BossBehaviorCatalog.Pattern("wrath-general"));
+        static Encounter[] fights;
+        public static Encounter[] Fights=>fights??(fights=CreateFights());
+        static Encounter[] CreateFights()=>new[]{
             new Encounter("焦土残兵","刀抬起后再弹反。它的第一刀并不快。",310,215,795,686,64,Soldier),
             new Encounter("赤焰游猎","留意突进前的停顿，闪开刀锋后再反击。",1515,1440,1835,1745,86,Hunter),
             new Encounter("焦土残兵","趁横斩收刀时贴近。",2030,1910,2370,2290,67,Soldier),
             new Encounter("焚城禁卫","双连斩之间还有一刀；重踏可跳过或闪开。",2540,2400,2970,2840,158,Elite),
-            new Encounter("焚城将军 · 赤绫","地面亮起火纹时，余焰还未爆发。",3475,3210,4130,3830,870,General)
+            new Encounter("焚城将军 · 赤绫","横扫之后留意停顿，突进落空后正是反击的机会。",3475,3210,4130,3830,870,General)
         };
     }
 
@@ -120,51 +109,6 @@ namespace LingyueEchoes
         public void Dispose(){foreach(var pose in poses)UnityEngine.Object.Destroy(pose);}
     }
 
-    public sealed class WrathGeneralArt:IWrathPoseSource
-    {
-        public const string Resource="WrathGeneral";
-        const float PixelsPerUnit=352;
-        // Atlas coordinates are top-down. Each frame is anchored between the boots.
-        static readonly Vector2Int[] Anchors={new(279,487),new(781,487),new(1207,487),new(223,975),new(766,975),new(1270,975)};
-        static readonly Vector2Int[] Blades={new(176,448),new(560,107),new(1485,258),new(505,753),new(970,736),new(1493,957)};
-        static readonly Vector2Int[] Armor={new(291,184),new(801,190),new(1234,216),new(260,725),new(790,657),new(1264,803)};
-        static readonly Vector2Int AshCut=new(1368,977);
-        readonly Sprite[] poses;
-        public readonly Sprite LooseBlade;
-        int current;
-        public WrathGeneralArt(Texture2D atlas){
-            poses=new[]{Slice(atlas,41,3,375,491,0),Slice(atlas,507,2,921,491,1),Slice(atlas,977,100,1534,491,2),
-                Slice(atlas,4,635,550,981,3),Slice(atlas,550,519,1010,981,4),Slice(atlas,1010,682,1368,981,5)};
-            LooseBlade=Slice(atlas,AshCut.x,924,1533,981,5,AshCut);
-        }
-        static Sprite Slice(Texture2D t,int left,int top,int right,int bottom,int pose,Vector2Int? origin=null){
-            Vector2Int foot=origin??Anchors[pose];float w=right-left,h=bottom-top;
-            return Sprite.Create(t,new Rect(left,t.height-bottom,w,h),new Vector2((foot.x-left)/w,(bottom-foot.y)/h),PixelsPerUnit,0,SpriteMeshType.FullRect);
-        }
-        public Sprite Pose(Fighter fighter,string scripted,int cell,double? seconds){
-            var move=fighter.move;int tick=Math.Max(0,fighter.age-1);
-            if(scripted=="broken")current=seconds>=.26?5:4;
-            else if(scripted=="slash")current=cell<4?1:cell<6?2:4;
-            else if(fighter.hp<=0||fighter.state=="broken")current=5;
-            else if(move!=null){
-                int strike=move.pose=="thrust"?3:2;
-                current=tick<move.wind?1:tick<move.wind+move.active?strike:4;
-                if(move.pulses!=null&&move.pulses.Length>1){
-                    int follow=move.wind+move.pulses[1];
-                    if(tick>=follow)current=tick<follow+5?strike:4;
-                    else if(tick>=move.wind+5)current=1;
-                }
-            }else current=fighter.state=="phase"?1:fighter.state=="run"||fighter.state=="stagger"?4:0;
-            return poses[current];
-        }
-        public bool Kneeling=>current==5;
-        public Vector2 BladePosition=>Position(Blades[current]);
-        public Vector2 ArmorPosition=>Position(Armor[current]);
-        public Vector2 LooseBladePosition=>Position(AshCut);
-        Vector2 Position(Vector2Int p)=>new Vector2(p.x-Anchors[current].x,Anchors[current].y-p.y)/PixelsPerUnit;
-        public void Dispose(){foreach(var pose in poses)UnityEngine.Object.Destroy(pose);UnityEngine.Object.Destroy(LooseBlade);}
-    }
-
     // Scene references are serialized so the level can be edited without rebuilding runtime geometry.
     public sealed class WrathChapter:MonoBehaviour
     {
@@ -175,8 +119,6 @@ namespace LingyueEchoes
         public SpriteRenderer firstLamp,secondLamp,leftSeal,rightSeal,returnSeal;
         public SpriteRenderer fireMark,fireShadow,fireWarning,weaponGlow,armorGlow;
         SpriteRenderer[] ash,weapon;
-        SpriteRenderer looseBlade;
-        WrathGeneralArt generalArt;
         WrathFoeArt[] foeArt;
         void OnEnable(){SceneParticleSettings.Changed+=SetAmbientParticles;SetAmbientParticles(SceneParticleSettings.Enabled);}
         void OnDisable(){SceneParticleSettings.Changed-=SetAmbientParticles;}
@@ -191,19 +133,11 @@ namespace LingyueEchoes
             if(generalArmor){
                 weapon=generalArmor.GetComponentsInChildren<SpriteRenderer>(true)
                     .Where(r=>r.name.StartsWith("Polearm",StringComparison.Ordinal)).ToArray();
-                var atlas=Resources.Load<Texture2D>(WrathGeneralArt.Resource);
-                if(atlas&&atlas.width==1536&&atlas.height==1024){
-                    generalArt=new WrathGeneralArt(atlas);
-                    var blade=new GameObject("赤绫 · 将军刀灰烬");blade.transform.SetParent(generalArmor.transform,false);
-                    looseBlade=blade.AddComponent<SpriteRenderer>();looseBlade.sprite=generalArt.LooseBlade;looseBlade.sortingOrder=11;looseBlade.enabled=false;
-                    foreach(var r in generalArmor.GetComponentsInChildren<SpriteRenderer>(true))
-                        if(r!=armorGlow&&r!=weaponGlow)r.enabled=false;
-                }
             }
         }
-        void OnDestroy(){generalArt?.Dispose();if(foeArt!=null)foreach(var foe in foeArt)foe.Dispose();}
+        void OnDestroy(){if(foeArt!=null)foreach(var foe in foeArt)foe.Dispose();}
         public IWrathPoseSource UseActorArt(bool general,int encounter){
-            if(general)return generalArt;
+            if(general)return null;
             return foeArt!=null&&encounter>=0&&encounter<4?foeArt[encounter==1?1:encounter==3?2:0]:null;
         }
         public System.Collections.Generic.IEnumerable<Box> Terrain()
@@ -265,12 +199,7 @@ namespace LingyueEchoes
                 weaponGlow.color=new Color(1,.29f,.07f,pulse*heat);
                 armorGlow.color=new Color(1,.51f,.15f,pulse*.85f*heat);
             }
-            if(general&&generalArt!=null){
-                weaponGlow.transform.localPosition=generalArt.BladePosition;
-                armorGlow.transform.localPosition=generalArt.ArmorPosition;
-                looseBlade.enabled=generalArt.Kneeling&&weaponAsh<1;
-                if(looseBlade.enabled){looseBlade.transform.localPosition=generalArt.LooseBladePosition;looseBlade.color=new Color(1,1,1,1-weaponAsh);}
-            }else if(weapon!=null)foreach(var piece in weapon){
+            if(weapon!=null)foreach(var piece in weapon){
                 var tint=piece.color;tint.a=1-weaponAsh;piece.color=tint;
             }
             ClearFireMark();

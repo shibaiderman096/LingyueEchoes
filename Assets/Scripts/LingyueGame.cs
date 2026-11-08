@@ -184,6 +184,7 @@ namespace LingyueEchoes
         }
         void PrepareCampaignCombat(){
             sim=new Combat{continueAfterDeath=true,bossYields=true,ai=false,enemyActive=false};
+            sim.ConfigureDefaultBoss(BossBehaviorCatalog.Guardian);
             sim.ApplyTailUpgrades(SavedTailCount(SaveSlot));
             backpackOpen=false;
             healGuideTime=healFeedbackTime=0;
@@ -309,7 +310,7 @@ namespace LingyueEchoes
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
                         else if(stage=="GUARDIAN_FIGHT"&&sim.BossDefeated)BeginGuardianDefeat();
                         else if(stage==WrathRoam)UpdateWrathRoute(dt);
-                        else if(stage=="GUARDIAN_FIGHT"&&sim.phase==2&&!phase2Spoken){phase2Spoken=true;if(wrath)ChapterSay("wrathPhase2");else Say("bossPhase2");}}
+                        else if(stage=="GUARDIAN_FIGHT"&&sim.phase>=2&&!phase2Spoken){phase2Spoken=true;if(wrath)ChapterSay("wrathPhase2");else Say("bossPhase2");}}
                     break;}
             if(speech.Active)speech.Update(dt);
             if(stage!="MENU"){UpdateStatusTrails(dt);DrawWorld(dt);}
@@ -347,11 +348,11 @@ namespace LingyueEchoes
             var p=sim.player;var b=sim.boss;
             if(wrath){
                 guardian.ChapterArt=wrath.UseActorArt(ChapterBoss||ChapterDialogue&&speech.Id!="wrathEnter",wrathActive);
-                guardian.Tint=guardian.ChapterArt!=null?(sim.phase==2?new Color(1,.82f,.72f):Color.white):
+                guardian.Tint=guardian.ChapterArt!=null?(sim.phase>=2?new Color(1,.82f,.72f):Color.white):
                     wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
                     wrathActive==1?new Color(.84f,.52f,.35f):wrathActive==3?new Color(.65f,.52f,.61f):
-                    sim.phase==2?new Color(1,.43f,.30f):new Color(.91f,.61f,.54f);
-                guardian.Size=wrathActive==1?.9f:wrathActive==3?1.13f:ChapterBoss?1.22f:1;
+                    sim.phase>=2?new Color(1,.43f,.30f):new Color(.91f,.61f,.54f);
+                guardian.Size=wrathActive==1?.9f:wrathActive==3?1.13f:1;
             }
             string pose=null;double? poseSeconds=null;
             if(stage=="FADE_IN"||stage=="CAMERA_REVEAL")ArrivalPose(-1,out pose,out poseSeconds);
@@ -619,7 +620,7 @@ namespace LingyueEchoes
         }
         double ReadAxis(){if(scriptedAxis.HasValue)return scriptedAxis.Value;float pad=Input.GetAxisRaw("PadX"),dpad=Input.GetAxisRaw("PadDpad");if(Math.Abs(pad)>.2f)return pad;if(Math.Abs(dpad)>.2f)return dpad;
             bool left=Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow),right=Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow);int keys=(right?1:0)-(left?1:0);return keys!=0?keys:mobileControls.Axis;}
-        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun"){sim.boss.state="broken";sim.boss.age=0;sim.boss.move=null;sim.boss.posture=100;}else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
+        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun")sim.BreakBossPosture();else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
         void OnApplicationPause(bool pause){if(pause)ClearInput();}
@@ -1058,7 +1059,7 @@ namespace LingyueEchoes
             echoPointsTrail.Update(Mathf.Clamp01(p.energy/3f),dt);
             if(stage=="GUARDIAN_FIGHT"||stage=="GUARDIAN_DEFEAT"){
                 bossHealthTrail.Update(sim.BossDefeated?0:Mathf.Clamp01((float)(b.hp/b.maxHp)),dt);
-                postureTrail.Update(Mathf.Clamp01((float)(b.posture/100)),dt);
+                postureTrail.Update(Mathf.Clamp01((float)(b.posture/sim.BossPostureLimit)),dt);
             }
         }
         void BossHud(){
@@ -1074,7 +1075,7 @@ namespace LingyueEchoes
             float health=defeat?0:Mathf.Clamp01((float)(b.hp/b.maxHp))*fill;
             var healthRect=new Rect(326,649,628,13);
             Bar(healthRect,health,intro?health:bossHealthTrail.Width,new Color(.74f,.32f,.37f));
-            Bar(new Rect(326,669,628,6),defeat?0:Mathf.Clamp01((float)(b.posture/100)),defeat?0:postureTrail.Width,MoonGold);
+            Bar(new Rect(326,669,628,6),defeat?0:Mathf.Clamp01((float)(b.posture/sim.BossPostureLimit)),defeat?0:postureTrail.Width,MoonGold);
             if(intro&&fill>0&&fill<1)
                 Fill(new Rect(328+624*health-2,649,2,13),WithAlpha(MoonIvory,.8f*Mathf.Sin(fill*Mathf.PI)));
             guiOpacity=previous;

@@ -208,7 +208,7 @@ namespace LingyueEchoes
         void DrawWrathAtmosphere(float dt)
         {
             bool general=ChapterBoss||ChapterDialogue&&speech.Id!="wrathEnter";
-            float heat=ChapterBoss&&sim.phase==2
+            float heat=ChapterBoss&&sim.phase>=2
                 ?stage=="GUARDIAN_FIGHT"?1:stage=="GUARDIAN_DEFEAT"?1-Ramp(stageTime,0,.85f):0
                 :0;
             if(speech.Cue=="weaponAsh"||wrathWeaponAsh>0)
