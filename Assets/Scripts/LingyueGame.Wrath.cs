@@ -24,7 +24,7 @@ namespace LingyueEchoes
         bool WrathCompleted=>ChapterCompleted(SaveSlot);
         static int SavedTailCount(int slot)=>Math.Max(ChapterCompleted(slot)?2:StorySeen(slot)?1:0,SaveValue(PrologueLayout.TailCountKey,slot));
         string EncounterName=>wrath&&wrathActive>=0?WrathRoute.Fights[wrathActive].Name:"守门人 · 残月的守灯者";
-        float ChapterCameraX()=>Mathf.Clamp((float)sim.player.x+118,520,3820);
+        float ChapterCameraX()=>Mathf.Clamp((float)sim.player.x+118,(float)WrathRoute.BoundsMin+520,(float)WrathRoute.BoundsMax-470);
         void PlaceShrineEntrance()
         {
             shrineGate=PixelWorld.PlacePrologueGate(world.Find("Props"));
@@ -77,10 +77,9 @@ namespace LingyueEchoes
             }
             if(stage!=WrathRoam)return null;
             double x=sim.player.x;
-            if(WrathCompleted&&(Math.Abs(x-WrathRoute.Portal)<106||x<180))return ShrineReturn;
-            if(wrathNext>=WrathRoute.Fights.Length-1&&x>=WrathRoute.Fights[WrathRoute.Fights.Length-1].Trigger-90&&x<4040)
+            if(x<=WrathRoute.Portal-70)return ShrineReturn;
+            if(Math.Abs(x-WrathRoute.DoorX)<=130)
                 return WrathCompleted?"再次挑战赤绫":"进入将军府 · 与赤绫交谈";
-            if(Math.Abs(x-WrathRoute.FirstLamp)<84||Math.Abs(x-WrathRoute.SecondLamp)<84)return "点亮存档灯";
             return null;
         }
         bool HandleChapterInteraction(string action)
@@ -91,14 +90,13 @@ namespace LingyueEchoes
             if(action==ShrineReturn){TransferTo("Prologue");return true;}
             if(action=="再次挑战赤绫"||action=="进入将军府 · 与赤绫交谈"){
                 ClearInput();
+                wrath.SetInside(true);
+                sim.boundsMax=WrathRoute.BoundsMax;
                 wrathWeaponAsh=0;
                 var general=WrathRoute.Fights[WrathRoute.Fights.Length-1];
                 sim.ResetBoss(general.EnemyX,general.Hp,general.Pattern);sim.boss.face=-1;
                 sim.player.face=1;sim.player.state="idle";sim.player.move=null;sim.player.age=0;
                 SetStage(WrathDialogue);ChapterSay(WrathCompleted?"wrathRetry":"wrathBossPre");return true;
-            }
-            if(wrath&&action=="点亮存档灯"){
-                SaveWrathLamp(Math.Abs(sim.player.x-WrathRoute.SecondLamp)<84?2:1);return true;
             }
             return false;
         }
@@ -106,18 +104,20 @@ namespace LingyueEchoes
         {
             fallenArrival=!onEntry;
             int saved=Mathf.Clamp(SaveValue(WrathRoute.Checkpoint,SaveSlot),0,2);
-            wrathCheckpoint=WrathCompleted?2:saved;
+            wrathCheckpoint=saved;
             wrathNext=WrathRoute.EncounterAfter(wrathCheckpoint);
             wrathActive=-1;
             PrepareCampaignCombat();
             sim.terrain.AddRange(wrath.Terrain());
-            sim.boundsMin=0;sim.boundsMax=WrathCompleted?WrathRoute.End:4020;
+            sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.DoorX+80;
             sim.player.x=WrathRoute.Spawn(wrathCheckpoint);
             sim.boss.x=WrathRoute.Fights[wrathNext].EnemyX;
             cameraX=ChapterCameraX();
             wrathArea=WrathRoute.Area(sim.player.x);wrathAreaTime=0;wrathHintTime=0;wrathWeaponAsh=0;checkpointToast=0;
             wrath.ResetLook(wrathCheckpoint,WrathCompleted);
+            wrath.SetInside(false);
             wrathShowOpening=onEntry&&wrathCheckpoint==0;
+            SaveWrathLamp(2);
             SetStage(WrathArrive);SetMusic("pilgrim_stage_2");
         }
         void UpdateWrathArrival()
@@ -140,15 +140,8 @@ namespace LingyueEchoes
         }
         void UpdateWrathRoute(float dt)
         {
-            double x=sim.player.x;
-            if(x>=WrathRoute.FirstLamp-45&&wrathNext>=1)SaveWrathLamp(1);
-            if(x>=WrathRoute.SecondLamp-45&&wrathNext>=4)SaveWrathLamp(2);
-            int area=WrathRoute.Area(x);
-            if(wrathArea!=area){wrathArea=area;wrathAreaTime=2.3f;}
-            else wrathAreaTime=Mathf.Max(0,wrathAreaTime-dt);
-            if(wrathNext>=WrathRoute.Fights.Length)return;
-            var next=WrathRoute.Fights[wrathNext];
-            if(wrathNext<4&&x>=next.Trigger)StartWrathEncounter(wrathNext);
+            // The entrance is the sole checkpoint; combat begins only through its interaction.
+            wrathAreaTime=Mathf.Max(0,wrathAreaTime-dt);
         }
         void StartWrathEncounter(int index)
         {
@@ -165,26 +158,18 @@ namespace LingyueEchoes
             bossHealthTrail.Reset(1);postureTrail.Reset(0);phase2Spoken=false;wrathWeaponAsh=0;
             wrath.Seal(true,e.Min,e.Max);effects.Clear();
             clock=new FixedClock(sim);
-            sim.enemyActive=sim.ai=!ChapterBoss;
-            wrathHintTime=ChapterBoss?0:4.4f;
-            if(ChapterBoss){cameraX=(float)((e.Min+e.Max)*.5);SetStage("GUARDIAN_INTRO");}
-            else SetStage("GUARDIAN_FIGHT");
+            sim.enemyActive=sim.ai=false;
+            wrathHintTime=0;
+            cameraX=(float)((e.Min+e.Max)*.5);SetStage("GUARDIAN_INTRO");
         }
         void FinishWrathEncounter()
         {
-            bool boss=ChapterBoss;
             StopSounds();wrath.Seal(false);
-            sim.boundsMin=0;sim.boundsMax=WrathCompleted?WrathRoute.End:4020;
+            sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.BoundsMax;
             sim.visuals.Clear();effects.Clear();
             wrathNext=wrathActive+1;
-            if(!boss){
-                wrathActive=-1;
-                var next=WrathRoute.Fights[wrathNext];
-                sim.ResetBoss(next.EnemyX,next.Hp,next.Pattern);
-                SetStage(WrathRoam);return;
-            }
             SetMusic("pilgrim_stage_2");
-            if(WrathCompleted){wrathActive=-1;SetStage(WrathRoam);ChapterSay("wrathRematch");return;}
+            if(WrathCompleted){ReturnToWrathEntrance();ChapterSay("wrathRematch");return;}
             var p=sim.player;var b=sim.boss;
             p.state="idle";p.move=null;p.age=0;p.y=p.vy=0;b.y=b.vy=0;
             p.face=b.x>=p.x?1:-1;b.face=-p.face;
@@ -199,10 +184,21 @@ namespace LingyueEchoes
             WriteSave(WrathRoute.Defeated,1);
             WriteSave(WrathRoute.Completed,1);
             PlayerPrefs.Save();
-            wrathCheckpoint=2;wrathActive=-1;
+            wrathCheckpoint=2;
+            ReturnToWrathEntrance();
             wrath.returnSeal.enabled=true;
-            sim.boundsMax=WrathRoute.End;
             wrathAreaTime=0;
+            SetStage(WrathRoam);
+        }
+        void ReturnToWrathEntrance()
+        {
+            wrathActive=-1;wrathNext=0;
+            wrath.SetInside(false);
+            sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.DoorX+80;
+            sim.player.x=WrathRoute.Entrance;sim.player.y=sim.player.vy=0;
+            sim.player.state="idle";sim.player.move=null;sim.player.age=0;sim.player.face=1;
+            sim.enemyActive=sim.ai=false;
+            cameraX=ChapterCameraX();
             SetStage(WrathRoam);
         }
         void DrawWrathAtmosphere(float dt)
@@ -255,9 +251,9 @@ namespace LingyueEchoes
                 RoundedFill(new Rect(394,198,492,39),Ink,7);
                 Text(new Rect(404,198,472,39),WrathRoute.Fights[wrathActive].Hint,17,Ivory,TextAnchor.MiddleCenter);
             }
-            if(WrathCompleted&&stage==WrathRoam&&sim.player.x>3360){
+            if(WrathCompleted&&stage==WrathRoam){
                 Text(new Rect(375,135,530,38),"第一章完成 · 焚心余烬",22,MoonGold,TextAnchor.MiddleCenter);
-                Text(new Rect(403,174,474,28),"沿将军府向东 · 返回残月神社",16,Ivory,TextAnchor.MiddleCenter);
+                Text(new Rect(403,174,474,28),"门前可再次挑战 · 向左走返回残月神社",16,Ivory,TextAnchor.MiddleCenter);
             }
         }
     }

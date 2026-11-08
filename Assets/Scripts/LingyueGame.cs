@@ -65,7 +65,7 @@ namespace LingyueEchoes
         }
         bool FirstVictoryStorySeen=>StorySeen(SaveSlot);
         internal static string SaveStatus(int slot)=>ContinueWrath(slot)
-            ?ChapterCompleted(slot)?"焚心之城 · 已完成":SaveValue(WrathRoute.Checkpoint,slot)==2?"焚心之城 · 将军府灯":SaveValue(WrathRoute.Checkpoint,slot)==1?"焚心之城 · 城郊灯":"焚心之城 · 城郊"
+            ?ChapterCompleted(slot)?"焚心之城 · 已完成":"焚心之城 · 将军府门前"
             :ChapterCompleted(slot)?"残月神社 · 焚心已完成":StorySeen(slot)?"序章已完成 · 从月门灯继续":HasMoonGateSave(slot)?"月门灯 · 继续游戏":HasSaveData(slot)?"旧存档 · 从序幕开始":"空档 · 从序幕开始";
         void WriteSave(string key,int value)=>PlayerPrefs.SetInt(PrologueLayout.SaveKey(key,SaveSlot),value);
         string storyPhase="in";bool tutorialDialogue,phase2Spoken;int deathDirection;

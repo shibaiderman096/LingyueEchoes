@@ -227,7 +227,13 @@ namespace LingyueEchoes
                         if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!=WrathRoute.Scene){game.Interact();return;}
                         Require(game.SaveSlot==TestSlot&&PlayerPrefs.GetInt(TestKey(WrathRoute.Current))==1&&c.TailUpgrades==1,
                             "The final moon gate enters the first chapter with the same slot and tail progression.");
-                        Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker, checkpoint retry, first victory, tail upgrades and backpack, rematch, reload and moon gate chapter transfer.");
+                        Require(WrathRoute.Fights.Length==1&&WrathRoute.Fights[0].Pattern==WrathRoute.General&&
+                            Enumerable.Range(0,3).All(checkpoint=>WrathRoute.EncounterAfter(checkpoint)==0&&WrathRoute.Spawn(checkpoint)==WrathRoute.Entrance),
+                            "Legacy chapter checkpoints all resume at the sole general encounter.");
+                        Require(Math.Abs(p.x-WrathRoute.Entrance)<1&&c.boundsMin==WrathRoute.BoundsMin&&
+                            c.boundsMax==WrathRoute.DoorX+80&&!c.enemyActive&&PlayerPrefs.GetInt(TestKey(WrathRoute.Checkpoint))==2,
+                            "Moon gate arrival records the entrance without starting the boss fight.");
+                        Debug.Log("MIGRATION_RUNTIME_SMOKE_PASSED: save picker, checkpoint retry, first victory, tail upgrades and backpack, rematch, reload and moon gate chapter transfer to the general entrance.");
                         Finish(0);break;
                 }
             }catch(Exception error){Debug.LogError("MIGRATION_RUNTIME_SMOKE_FAILED: "+error);Finish(1);}

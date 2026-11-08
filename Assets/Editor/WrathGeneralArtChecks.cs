@@ -70,8 +70,11 @@ public static class WrathGeneralArtChecks
             Need(Application.isPlaying,"Play mode is advancing");Run();
             var chapter=UnityEngine.Object.FindAnyObjectByType<WrathChapter>();
             var game=chapter.GetComponent<LingyueGame>();game.enabled=false;
-            var art=chapter.UseActorArt(true,4);
-            Need(art is WrathGeneralArt&&chapter.UseActorArt(false,3) is WrathFoeArt,"only final boss uses the new art");
+            var art=chapter.UseActorArt(true,WrathRoute.Fights.Length-1);
+            Need(art is WrathGeneralArt&&chapter.UseActorArt(false,0)==null&&chapter.UseActorArt(false,3)==null,
+                "the sole boss uses general art and deleted approach encounters have none");
+            chapter.SetInside(false);Need(!chapter.IsInside,"arrival and retry show the entrance");
+            chapter.SetInside(true);Need(chapter.IsInside,"door interaction switches to the interior");
             var actorObject=chapter.world.Find("Guardian").gameObject;
             actorObject.layer=31;actorObject.SetActive(true);
             var renderer=actorObject.GetComponent<SpriteRenderer>();

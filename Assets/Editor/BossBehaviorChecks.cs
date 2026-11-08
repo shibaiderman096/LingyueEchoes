@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using LingyueEchoes;
 using UnityEngine;
@@ -29,7 +29,7 @@ public static class BossBehaviorChecks
         var copy=BossBehaviorCatalog.Guardian;copy.moves[0].move.wind=999;Need(BossBehaviorCatalog.Guardian.moves[0].move.wind==30,"resource loads isolate mutable configuration");
         Need(new Combat().UsesBossBehavior,"default and future combat bosses automatically use the shared pipeline");
         var single=Definition();single.phases=new[]{single.phases[0]};var c=Fight(single);Need(c.UsesBossBehavior,"single-phase future bosses use the shared pipeline");
-        c.ResetBoss(0,64,WrathRoute.Fights[0].Pattern);Need(!c.UsesBossBehavior,"regular enemies explicitly retain their existing controller");
+        c.ResetBoss(0,64,new OpponentPattern(new[]{Rules.Boss[0]},30,2,180,isBoss:false));Need(!c.UsesBossBehavior,"regular enemies explicitly retain their existing controller");
         c.ResetBoss(0,600,new OpponentPattern(new[]{Rules.Boss[0]},30,2,180));Need(c.UsesBossBehavior,"future Move-based boss patterns automatically enter the shared pipeline");
         var invalid=Definition();invalid.moves[0].followUps=new[]{"missing"};bool rejected=false;try{invalid.Validate();}catch(ArgumentException){rejected=true;}Need(rejected,"unknown follow-ups fail authoring validation");
         invalid=Definition();invalid.moves[0].move.wind=1;rejected=false;try{invalid.Validate();}catch(ArgumentException){rejected=true;}Need(rejected,"unreadable windups fail authoring validation");

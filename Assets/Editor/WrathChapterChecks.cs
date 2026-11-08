@@ -18,16 +18,23 @@ public static class WrathChapterChecks
             var chapter=root.GetComponent<WrathChapter>();
             Need(root.GetComponent<LingyueGame>()&&chapter.world&&chapter.world.Find("Hero")&&chapter.world.Find("Guardian")&&
                 chapter.firstLamp&&chapter.secondLamp&&chapter.leftSeal&&chapter.rightSeal&&chapter.returnSeal&&chapter.embers&&
-                chapter.generalArmor&&chapter.weaponGlow&&chapter.armorGlow&&chapter.fireMark,"chapter has native scene references");
-            var expected=WrathRoute.Bridge();var actual=chapter.Terrain().ToArray();
-            Need(actual.Length==expected.Length&&actual.Zip(expected,(a,b)=>Math.Abs(a.x-b.x)<.1&&Math.Abs(a.h-b.h)<.1&&Math.Abs(a.w-b.w)<.1).All(x=>x),"three physical footholds match their artwork");
+                chapter.entranceDoor&&chapter.fireMark,"chapter has native scene references");
+            Need(chapter.firstLamp==chapter.secondLamp,"legacy lamp references share the sole entrance checkpoint");
+            Need(chapter.scenery!=null&&chapter.scenery.Length==1&&chapter.scenery[0]&&chapter.scenery[0].sprite,
+                "one interior backdrop replaces the exterior route");
+            Need(WrathRoute.Bridge().Length==0&&!chapter.Terrain().Any(),"the deleted approach has no remaining bridge terrain");
+            Need(chapter.UseActorArt(false,0)==null&&chapter.UseActorArt(false,4)==null,"no approach enemy art is available");
             Need(chapter.world.GetComponentsInChildren<SpriteRenderer>(true).All(r=>r.sprite),"all chapter sprites resolve");
         }finally{EditorSceneManager.ClosePreviewScene(scene);}
         var text=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/wrath-content").text);
         var ids=new[]{"stele","wrathEnter","wrathBossPre","wrathPhase2","wrathBossAfter","wrathEpilogue","wrathRetry","wrathRematch"};
         Need(ids.All(id=>text.scripts.Count(s=>s.id==id&&s.lines.Length>0&&s.lines.All(l=>!string.IsNullOrWhiteSpace(l.text)))==1),"all progression dialogue IDs are unique");
-        Need(WrathRoute.EncounterAfter(0)==0&&WrathRoute.EncounterAfter(1)==1&&WrathRoute.EncounterAfter(2)==4,"each lamp restarts at the correct encounter");
-        Need(WrathRoute.Fights.Select(f=>f.Trigger).SequenceEqual(WrathRoute.Fights.Select(f=>f.Trigger).OrderBy(x=>x)),"encounters are ordered along the route");
+        Need(Enumerable.Range(0,3).All(checkpoint=>WrathRoute.EncounterAfter(checkpoint)==0&&WrathRoute.Spawn(checkpoint)==WrathRoute.Entrance),
+            "every legacy checkpoint resumes at the general entrance");
+        Need(WrathRoute.Fights.Length==1&&WrathRoute.Fights[0].Pattern==WrathRoute.General,"the chapter contains only the general boss");
+        var general=WrathRoute.Fights[0];
+        Need(general.Trigger==3475&&general.Min==3210&&general.Max==4130&&general.EnemyX==3830&&general.Hp==870,
+            "the general's combat position, arena and health remain unchanged");
         foreach(var e in WrathRoute.Fights){
             Need(e.Min<e.Trigger&&e.Trigger<e.EnemyX&&e.EnemyX<e.Max,"encounter start and enemy stand inside the arena");
             foreach(var move in e.Pattern.opening.Concat(e.Pattern.rage??Array.Empty<Move>())){
@@ -36,7 +43,7 @@ public static class WrathChapterChecks
                 Need(move.fireDelay==0||move.fireDelay>=move.active&&move.fireDelay+5<=move.active+move.recovery,"a delayed flame resolves inside its owning move");
             }
         }
-        var regular=new Combat{ai=false};regular.ResetBoss(90,64,WrathRoute.Fights[0].Pattern);
+        var regular=new Combat{ai=false};regular.ResetBoss(90,64,new OpponentPattern(new[]{Rules.Boss[0]},30,2,180,isBoss:false));
         regular.boss.hp=20;regular.Step();Need(regular.phase==1,"a regular enemy never enters the boss phase");
         var c=new Combat{ai=false};c.ResetBoss(0,600,WrathRoute.General);
         c.player.x=400;c.boss.hp=391;c.Step();
