@@ -295,7 +295,7 @@ public static class MigrationChecks
         var c=new Combat{god=true,boundsMin=-2000,boundsMax=2000};c.player.x=600;
         foreach(int phase in new[]{1,2}){
             c.ResetBoss(0,Rules.guardianHp,walkScale:Rules.guardianWalkScale);c.phase=phase;c.Step();
-            Assert(c.boss.hp==650&&c.boss.maxHp==650,"Guardian starts with increased full HP");
+            Assert(c.boss.hp==Rules.guardianHp&&c.boss.maxHp==950,"Guardian starts with increased full HP");
             Assert(Math.Abs(c.boss.x-(phase==1?2.6:3.9))<1e-9&&c.boss.state=="run","Guardian walk increase in phase "+phase);
         }
         c.ResetBoss(0,140);c.Step();

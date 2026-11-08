@@ -28,11 +28,11 @@ namespace LingyueEchoes
             invulnStart=2, dodgeInvulnFrames=12, perfectDodgeFrames=8, invulnEnd=invulnStart+dodgeInvulnFrames, perfectDodgeEnd=invulnStart+perfectDodgeFrames,
             parryFrames=30, hurtFrames=28, successSlowFrames=24, executeWindow=30, executeCost=1, executeHitstop=8, staggerFrames=36, tailStatBonus=10,
             healCost=1, healRelease=18, healFrames=42, healAmount=15;
-        public const double playerMaxHp=120, speed=5, jump=13, gravity=.6, dodgeSpeed=9, successSlowRate=.25, finisherReach=195, finisherBase=45,
-            finisherPerEnergy=75, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
+        public const double playerMaxHp=120, speed=5, jump=13, gravity=.6, dodgeSpeed=9, successSlowRate=.25, finisherReach=195, finisherBase=35,
+            finisherPerEnergy=25, staminaMax=100, staminaDodge=45, staminaGuard=20, staminaJump=30, staminaRegen=.4,
             echoMax=100, echoPerDamage=.9, echoParry=34, echoDodge=34, echoPerfect=100;
         public const double plungeMinHeight=72, plungeFallSpeed=18, plungeDrift=3.5;
-        public const double guardianHp=650, guardianWalkScale=1.3;
+        public const double guardianHp=950, guardianWalkScale=1.3;
         public static readonly Move[] Player={
             M("横斩",8,4,18,100,90,18,12,true,chainAt:14), M("踏步突刺",10,6,20,115,70,22,15,true,5,chainAt:18),
             M("回旋斩",12,8,28,140,110,35,26,true,chainAt:29), M("蓄力下斩",27,5,30,115,125,42,30,true)};
@@ -75,7 +75,7 @@ namespace LingyueEchoes
     public class Combat
     {
         static readonly string[] PlayerSlashSounds={"slash1","slash2","slash3","slash4"};
-        public Fighter player=new Fighter(1,-250,Rules.playerMaxHp),boss=new Fighter(2,250,650);
+        public Fighter player=new Fighter(1,-250,Rules.playerMaxHp),boss=new Fighter(2,250,Rules.guardianHp);
         public int TailUpgrades {get;private set;}
         public bool HealUnlocked=>TailUpgrades>0;
         public double PlayerMaxStamina=>Rules.staminaMax+TailUpgrades*Rules.tailStatBonus;
@@ -127,8 +127,9 @@ namespace LingyueEchoes
         public void ClearCommands(){queue.Clear();comboBuffered=false;axis=0;}
         public Box Hurtbox(Fighter a)=>new Box(a.x-BodyWidth(a)/2,a.y,BodyWidth(a),BodyHeight(a));
         public bool CanFinish=>enemyActive&&boss.hp>0&&boss.state=="broken"&&player.energy>=1&&Math.Abs(player.x-boss.x)<=Rules.finisherReach&&Math.Abs(player.y-boss.y)<45;
-        public bool CanExecute=>enemyActive&&boss.hp>0&&boss.state!="phase"&&boss.invuln<=Rules.Execute.wind+1&&
-            executeWindow>0&&player.energy>=Rules.executeCost&&Math.Abs(boss.x-player.x)<Rules.Execute.reach+BodyWidth(boss)*.5&&
+        public bool BossPostureReady=>enemyActive&&boss.hp>0&&boss.posture>=100&&boss.state!="broken";
+        public bool CanExecute=>enemyActive&&boss.hp>0&&boss.state!="broken"&&boss.state!="phase"&&boss.invuln<=Rules.Execute.wind+1&&
+            (executeWindow>0||BossPostureReady)&&player.energy>=Rules.executeCost&&Math.Abs(boss.x-player.x)<Rules.Execute.reach+BodyWidth(boss)*.5&&
             boss.y<player.y+Rules.Execute.height&&player.y<boss.y+BodyHeight(boss);
         void Log(string text){events.Insert(0,frame+": "+text);if(events.Count>7)events.RemoveAt(7);}
         void Visual(string kind,double x,double y,Fighter a){visuals.Add(new VisualCue{id=++visualSerial,frame=frame,kind=kind,x=x,y=y,originX=a.x,originY=a.y,attackId=a.attackId,face=a.face,combo=a.id==1&&a.state=="attack"?a.combo:0,power=a.state=="finisher"||a.state=="execute",owner=a.id,danger=a.move!=null&&!a.move.parry});if(visuals.Count>32)visuals.RemoveAt(0);}
@@ -209,7 +210,7 @@ namespace LingyueEchoes
                 if(a.move!=null&&a.age>=a.move.wind+a.move.active+a.move.recovery)Enter(a,a.y>0?"air":"idle");
                 else if((a.state=="parry"&&a.age>=Rules.parryFrames)||(a.state=="dodge"&&a.age>=Rules.dodgeFrames)||(a.state=="heal"&&a.age>=Rules.healFrames)||(a.state=="hurt"&&a.age>=Rules.hurtFrames)||(a.state=="stagger"&&a.age>=Rules.staggerFrames)||(a.state=="broken"&&a.age>=150&&p.state!="finisher")||(a.state=="phase"&&a.age>=(opponent?.phaseFrames??90))){
                     if(a.state=="broken")a.posture=0;Enter(a,a.y>0?"air":"idle");}
-                if(a.id==2&&(a.state=="idle"||a.state=="run")&&a.age%30==0)a.posture=Math.Max(0,a.posture-3);
+                if(a.id==2&&(a.state=="idle"||a.state=="run")&&a.age%30==0&&!BossPostureReady)a.posture=Math.Max(0,a.posture-3);
                 if(a.id==1&&(a.state=="idle"||a.state=="run")&&a.stamina<PlayerMaxStamina)a.stamina=Math.Min(PlayerMaxStamina,a.stamina+Rules.staminaRegen);
             }
         }
@@ -256,7 +257,7 @@ namespace LingyueEchoes
             bool canAct=free||recovering||p.state=="parry"||p.state=="dodge";
             bool canPlunge=CanPlunge;
             bool normalOnly=canPlunge||p.state=="plungeLand";
-            if(!normalOnly&&CanFinish&&canAct&&ConsumeAttack(canChain)){double charge=p.energy+p.echo/100;p.energy=0;p.echo=0;executeWindow=0;p.face=boss.x>=p.x?1:-1;var m=Rules.Finisher;m.damage=Math.Floor(45+75*charge+.5);StartAttack(p,m,"finisher");Log("铃月终结 · 消耗全部回响");}
+            if(!normalOnly&&CanFinish&&canAct&&ConsumeAttack(canChain)){double charge=p.energy+p.echo/100;p.energy=0;p.echo=0;executeWindow=0;p.face=boss.x>=p.x?1:-1;var m=Rules.Finisher;m.damage=Math.Floor(Rules.finisherBase+Rules.finisherPerEnergy*charge+.5);StartAttack(p,m,"finisher");Log("铃月终结 · 消耗全部回响");}
             else if(!normalOnly&&CanExecute&&canAct&&ConsumeAttack(canChain)){executeWindow=0;StartAttack(p,Rules.Execute,"execute");Log("回响处决");}
             else if(free||recovering){if(Consume("dodge")){if(Spend(p,45)){if(axis!=0)p.face=Math.Sign(axis);Enter(p,"dodge");}else Log("气力不足 · 无法闪避");}
                 else if(free){if(Consume("parry")){if(Spend(p,20))Enter(p,"parry");else Log("气力不足 · 无法格挡");}
@@ -291,18 +292,19 @@ namespace LingyueEchoes
             var attacker=h.owner==1?player:boss;if(attacker.attackId!=h.attackId||attacker.move==null)return;
             if(t.state=="dodge"&&t.age>=Rules.invulnStart&&t.age<Rules.invulnEnd){if(t.id==1){dodgeEvades++;if(!dodgeRewarded){dodgeRewarded=true;bool perfect=t.age<Rules.perfectDodgeEnd;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoDodge);
                         if(perfect){t.stamina=PlayerMaxStamina;Visual("perfectDodge",t.x,t.y+42,t);Sound("perfect_dodge");Success("perfectDodge");executeWindow=30;Log("极限闪避 · 回响充满 · 气力回满");}else Log("闪避成功 · 回复回响");}}return;}
-            if(t.id==1&&t.state=="parry"&&t.age<Rules.parry&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<Rules.parryPerfect;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,t);Sound("parry");attacker.posture+=32;GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
-                if(perfect){t.stamina=PlayerMaxStamina;executeWindow=30;Success("perfectParry");Log("完美弹刀 · 气力回满");}else Log("弹刀成功");if(attacker.posture>=100){Enter(attacker,"broken");Log("Boss 架势崩解");}Enter(t,t.y>0?"air":"idle");return;}
+            if(t.id==1&&t.state=="parry"&&t.age<Rules.parry&&h.move.parry&&t.face*(attacker.x-t.x)>=0){bool perfect=t.age<Rules.parryPerfect;deflectSerial++;Visual("parry",t.x+t.face*18,t.y+48,t);Sound("parry");attacker.posture=Math.Min(100,attacker.posture+32);GainEcho(t,perfect?Rules.echoPerfect:Rules.echoParry);
+                if(perfect){t.stamina=PlayerMaxStamina;executeWindow=30;Success("perfectParry");Log("完美弹刀 · 气力回满");}else Log("弹刀成功");if(BossPostureReady)Log("Boss 架势已满 · 小处决可击溃");Enter(t,t.y>0?"air":"idle");return;}
             bool finisher=attacker.state=="finisher",small=attacker.state=="execute";
+            bool postureReady=t.id==2&&t.posture>=100&&t.state!="broken";
             bool heavySlash=attacker.id==1&&attacker.state=="attack"&&attacker.combo==3;
             double dealt=h.move.damage*(t.state=="broken"&&!finisher?1.5:1);
             if(small)attacker.energy-=Rules.executeCost;
             if(!(t.id==1&&(god||nonlethal)))t.hp=Math.Max(nonlethal?1:0,t.hp-dealt);
             if(attacker.id==1&&!finisher)GainEcho(attacker,dealt*.9);Visual("impact",t.x,t.y+Hurtbox(t).h*.55,attacker);Sound(t.id==1?"hit_player":"hit_boss");t.invuln=10;
-            if(t.id==2)t.posture=finisher?0:t.posture+h.move.posture;
+            if(t.id==2)t.posture=finisher?0:Math.Min(100,t.posture+h.move.posture);
             if(t.hp==0&&t.id==2&&bossYields){
                 t.hp=1;BossDefeated=true;enemyActive=ai=false;Enter(t,"broken");
-            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small){t.posture=Math.Min(100,t.posture);Enter(t,"stagger");}else if(t.id==2&&t.posture>=100){t.posture=100;Enter(t,"broken");}else if(t.id==2&&(finisher||heavySlash))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
+            }else if(t.hp==0)Enter(t,"dead");else if(t.id==2&&small&&t.state!="broken"){Enter(t,postureReady?"broken":"stagger");}else if(t.id==2&&(finisher||t.state!="broken"&&heavySlash))Enter(t,"stagger");else if(t.id==1)Enter(t,"hurt");
             hitstop=small||finisher?8:3;Log((t.id==1?"玩家":"Boss")+" 受击 "+h.move.damage);
         }
     }

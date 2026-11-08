@@ -845,7 +845,7 @@ namespace LingyueEchoes
                     if(stage=="GUARDIAN_FIGHT")BossHud();
                     if(showKeyHints&&!gameSettings&&!TouchControlsVisible&&!speech.Active)RightControlHints();
                     bool plungeCombo=sim.CanPlunge||sim.player.state=="plungeLand";
-                    string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":!plungeCombo&&sim.CanFinish?ControlPrompts.Format("架势崩解 · {attack} 消耗全部回响处决",device):!plungeCombo&&sim.CanExecute?ControlPrompts.Format("{attack} 回响小处决",device):sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
+                    string status=clock.paused?"暂停":sim.player.state=="finisher"?"铃月终结":sim.player.state=="execute"?"回响小处决":!plungeCombo&&sim.CanFinish?ControlPrompts.Format("眩晕 · {attack} 消耗全部回响处决",device):!plungeCombo&&sim.CanExecute?ControlPrompts.Format(sim.BossPostureReady?"架势已满 · {attack} 小处决击晕":"{attack} 回响小处决",device):sim.BossPostureReady?sim.player.energy<Rules.executeCost?"架势已满 · 需要一格回响发动小处决":"架势已满 · 靠近发动小处决":sim.boss.state=="stagger"?"守灯人踉跄":sim.frame-sim.successFrame<24?sim.successKind=="perfectDodge"?"极限闪避 · 气力回满":"完美弹刀 · 气力回满":"";
                     if(status!="")Text(new Rect(330,Mathf.Max(lessonBottom,TouchControlsVisible?195:155),620,44),status,25,Gold,TextAnchor.MiddleCenter);}
                 string interaction=Interaction();
                 if(interaction==ShrineEntrance||interaction==ShrineReturn||interaction=="进入将军府 · 与赤绫交谈")
