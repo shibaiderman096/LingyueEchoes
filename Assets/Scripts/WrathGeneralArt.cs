@@ -9,7 +9,8 @@ namespace LingyueEchoes
         public const string ResourceRoot="WrathGeneral/frames/";
         public const string Phase2ResourceRoot="WrathGeneral/phase2/frames/";
         public const int FrameCount=16;
-        public const int PhaseEngulfFrameCount=9,PhaseRiseFrameCount=7;
+        public const int PhaseEngulfFrameCount=16,PhaseRiseFrameCount=16;
+        public const int PhaseTransitionFrameCount=PhaseEngulfFrameCount+PhaseRiseFrameCount;
         public const int StunLoopStart=15,StunEntryFps=24,StunHoldFps=8;
         // Shared import calibration, measured from the bottom-left of each square canvas.
         public const int CanvasPixels=384;
@@ -38,9 +39,9 @@ namespace LingyueEchoes
             if(state=="phase"||state=="phase-engulf"||state=="phase-rise"){
                 if(phaseEngulf==null)phaseEngulf=Load("phase-engulf",Phase2ResourceRoot,PhaseEngulfFrameCount);
                 if(phaseRise==null)phaseRise=Load("phase-rise",Phase2ResourceRoot,PhaseRiseFrameCount);
-                // Combat keeps its original sixteen-frame clock across the two clips.
+                // Combat keeps its configured duration across both sixteen-frame clips.
                 if(state=="phase"){
-                    int globalFrame=ReactionFrame(elapsed,PhaseTransitionFrames);
+                    int globalFrame=ReactionFrame(elapsed,PhaseTransitionFrames,PhaseTransitionFrameCount);
                     return globalFrame<PhaseEngulfFrameCount?phaseEngulf[globalFrame]:phaseRise[globalFrame-PhaseEngulfFrameCount];
                 }
                 var clip=state=="phase-engulf"?phaseEngulf:phaseRise;

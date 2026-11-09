@@ -11,9 +11,9 @@
     230,
     347
   ],
-  "frameCount": 80,
+  "frameCount": 96,
   "alpha": "binary 0/255; transparent RGB zero",
-  "registration": "fixed hip X and one scale per action; grounded boot baseline",
+  "registration": "one scale per action; grounded boot baseline; transition front boot X=260, other clips fixed hip X",
   "clips": {
     "idle": {
       "fps": 8,
@@ -1523,10 +1523,10 @@
         }
       ]
     },
-    "phase": {
+    "phase-engulf": {
       "fps": null,
       "loop": false,
-      "scale": 0.9615384615384616,
+      "scale": 1.2008733624454149,
       "sourceRootX": 201,
       "recovery": null,
       "frames": [
@@ -1537,90 +1537,90 @@
           "sourceRect": [
             0,
             0,
-            314,
-            314
+            315,
+            312
           ],
-          "sourceBootY": 297,
+          "sourceBootY": 291,
           "offset": [
-            36,
-            60
+            -13,
+            -3
           ],
           "bounds": [
-            54,
-            72,
-            309,
-            349
+            63,
+            73,
+            307,
+            354
           ],
-          "sha256": "17c06580c5ea0e9225336ba3457c16cc6c58d2b7d78f1d2658f67fa8ecbf6ab4"
+          "sha256": "5a35c10dae4cedc5ef15db7590a5e43290377681ff6400c7d9542b119bfc4cad"
         },
         {
           "frame": 2,
           "clip": "phase-engulf",
           "clipFrame": 2,
           "sourceRect": [
-            314,
+            315,
             0,
-            627,
-            314
+            631,
+            312
           ],
-          "sourceBootY": 297,
+          "sourceBootY": 291,
           "offset": [
-            37,
-            60
+            -3,
+            -3
           ],
           "bounds": [
-            49,
-            84,
-            306,
-            348
+            61,
+            82,
+            309,
+            354
           ],
-          "sha256": "cbd09649a37af8962a23fd3f6931a663cd49ab2afc93496706e84abd41b4657e"
+          "sha256": "666307b8a0091cfa3c3d4f9639d964649d378b852ae0ac01f5bf92edb49df850"
         },
         {
           "frame": 3,
           "clip": "phase-engulf",
           "clipFrame": 3,
           "sourceRect": [
-            627,
+            631,
             0,
-            941,
-            314
+            946,
+            312
           ],
-          "sourceBootY": 294,
+          "sourceBootY": 292,
           "offset": [
-            36,
-            63
+            19,
+            -5
           ],
           "bounds": [
-            46,
-            111,
-            299,
+            57,
+            96,
+            308,
             351
           ],
-          "sha256": "bd12122acd053e67bc39600e853c78959591f5c70ce2388387d9cd894611aced"
+          "sha256": "a7ec4f7bd2afafbe736a1d7bf7d166b7c9a526547eb7a43e5b43a190f3ac4b3f"
         },
         {
           "frame": 4,
           "clip": "phase-engulf",
           "clipFrame": 4,
           "sourceRect": [
-            941,
+            946,
             0,
-            1254,
-            314
+            1261,
+            312
           ],
-          "sourceBootY": 296,
+          "sourceBootY": 292,
           "offset": [
             37,
-            61
+            -5
           ],
           "bounds": [
-            45,
-            141,
-            275,
-            350
+            57,
+            114,
+            300,
+            352
           ],
-          "sha256": "cc2c89178cd89358d6a7bdef32d22a154b5ab6f8223337017e553ee8b43246a9"
+          "sha256": "ba821fcc615e06307db691b0f5e42aea8387eab1ddf520befe02059a4adfbc46"
         },
         {
           "frame": 5,
@@ -1628,91 +1628,91 @@
           "clipFrame": 5,
           "sourceRect": [
             0,
-            314,
-            314,
-            627
+            312,
+            315,
+            624
           ],
-          "sourceBootY": 296,
+          "sourceBootY": 274,
           "offset": [
-            36,
-            61
+            -18,
+            17
           ],
           "bounds": [
-            47,
-            143,
+            53,
+            113,
             295,
-            349
+            354
           ],
-          "sha256": "cebdce79e3a1fe88f7e457ffef37f09029fc870c40314fe26749a1843362b29e"
+          "sha256": "e1784eaaef37b3185aba8967899f73539d946d88942362d874e4ee0306aa38d9"
         },
         {
           "frame": 6,
           "clip": "phase-engulf",
           "clipFrame": 6,
           "sourceRect": [
-            314,
-            314,
-            627,
-            627
+            315,
+            312,
+            631,
+            624
           ],
-          "sourceBootY": 296,
+          "sourceBootY": 275,
           "offset": [
-            37,
-            61
+            -15,
+            16
           ],
           "bounds": [
-            50,
-            145,
-            301,
-            349
+            40,
+            122,
+            281,
+            353
           ],
-          "sha256": "f9c32d8b1e879f193231c8d6145eb7d3a8e1bca9f17444d79938a369656911a3"
+          "sha256": "f8a14fb1a1fd8b6003ca0f12dd9cc8d6a5cc490c32dd1ecb10dd04e9c797c4bc"
         },
         {
           "frame": 7,
           "clip": "phase-engulf",
           "clipFrame": 7,
           "sourceRect": [
-            627,
-            314,
-            941,
-            627
+            631,
+            312,
+            946,
+            624
           ],
-          "sourceBootY": 296,
+          "sourceBootY": 275,
           "offset": [
-            36,
-            61
+            1,
+            16
           ],
           "bounds": [
-            49,
-            129,
-            310,
-            349
+            36,
+            131,
+            273,
+            351
           ],
-          "sha256": "06df6e91136e6ca828ff1401b2938c49cd8a56e1da58a15b1579c12d372c01dd"
+          "sha256": "dd9307b6291e37b9fba4a860c63ab943187723de2945a819ba76dc97237fa367"
         },
         {
           "frame": 8,
           "clip": "phase-engulf",
           "clipFrame": 8,
           "sourceRect": [
-            941,
-            314,
-            1254,
-            627
+            946,
+            312,
+            1261,
+            624
           ],
-          "sourceBootY": 295,
+          "sourceBootY": 274,
           "offset": [
-            37,
-            62
+            14,
+            17
           ],
           "bounds": [
-            53,
-            120,
-            320,
-            350
+            25,
+            138,
+            280,
+            354
           ],
-          "sha256": "43f0084bde8a583ce9a2ef499eb732ab7890553edcca9db2edda2ca99fd45652"
+          "sha256": "1d6226fc05fe03410c87ea8a216ad800b4b41d0dce1439f50be1e741007d71d8"
         },
         {
           "frame": 9,
@@ -1720,203 +1720,573 @@
           "clipFrame": 9,
           "sourceRect": [
             0,
-            627,
-            314,
-            941
+            624,
+            315,
+            935
           ],
-          "sourceBootY": 294,
+          "sourceBootY": 248,
           "offset": [
-            36,
-            63
+            -32,
+            48
           ],
           "bounds": [
-            53,
-            83,
-            313,
+            33,
+            143,
+            285,
+            354
+          ],
+          "sha256": "991576ea17002c636ed1b37ccdca7a780d22db01598c92543ada5ac2847ebcf8"
+        },
+        {
+          "frame": 10,
+          "clip": "phase-engulf",
+          "clipFrame": 10,
+          "sourceRect": [
+            315,
+            624,
+            631,
+            935
+          ],
+          "sourceBootY": 249,
+          "offset": [
+            -16,
+            47
+          ],
+          "bounds": [
+            33,
+            141,
+            291,
+            354
+          ],
+          "sha256": "11e7e11733e439656626e22ee597f5de44a9d03dc5249bc995510ee7426aacc0"
+        },
+        {
+          "frame": 11,
+          "clip": "phase-engulf",
+          "clipFrame": 11,
+          "sourceRect": [
+            631,
+            624,
+            946,
+            935
+          ],
+          "sourceBootY": 249,
+          "offset": [
+            2,
+            47
+          ],
+          "bounds": [
+            38,
+            139,
+            285,
+            352
+          ],
+          "sha256": "198cc253bda948bd7f57911e8dd5bc0f069e5d685a59b59f4a8ae29871f0f3a6"
+        },
+        {
+          "frame": 12,
+          "clip": "phase-engulf",
+          "clipFrame": 12,
+          "sourceRect": [
+            946,
+            624,
+            1261,
+            935
+          ],
+          "sourceBootY": 247,
+          "offset": [
+            11,
+            49
+          ],
+          "bounds": [
+            29,
+            135,
+            286,
+            354
+          ],
+          "sha256": "681733ecf6ceecb9b1adca68083f6822fc0e75b04704bb1ff48e29b9bf97c2b7"
+        },
+        {
+          "frame": 13,
+          "clip": "phase-engulf",
+          "clipFrame": 13,
+          "sourceRect": [
+            0,
+            935,
+            315,
+            1247
+          ],
+          "sourceBootY": 231,
+          "offset": [
+            -41,
+            69
+          ],
+          "bounds": [
+            33,
+            123,
+            281,
             350
           ],
-          "sha256": "f1e8cfad3c845adeacb79e16718f4d8a39e8968543abec01f73f9f7241f1eebc"
+          "sha256": "4a90f8a67d42e10032a97f6534918e55ad556c7ee18f7022ab8458eb0183978d"
+        },
+        {
+          "frame": 14,
+          "clip": "phase-engulf",
+          "clipFrame": 14,
+          "sourceRect": [
+            315,
+            935,
+            631,
+            1247
+          ],
+          "sourceBootY": 229,
+          "offset": [
+            -17,
+            71
+          ],
+          "bounds": [
+            51,
+            119,
+            286,
+            351
+          ],
+          "sha256": "c667e7835177cf65c396ff07148ec4358d58568b6e86c0bd2be1e400d1094a8b"
+        },
+        {
+          "frame": 15,
+          "clip": "phase-engulf",
+          "clipFrame": 15,
+          "sourceRect": [
+            631,
+            935,
+            946,
+            1247
+          ],
+          "sourceBootY": 229,
+          "offset": [
+            3,
+            71
+          ],
+          "bounds": [
+            49,
+            115,
+            285,
+            350
+          ],
+          "sha256": "e69474554bb404266049084eff7d97d12b8536275ff6ae42ccb7fd4cf1501fbf"
+        },
+        {
+          "frame": 16,
+          "clip": "phase-engulf",
+          "clipFrame": 16,
+          "sourceRect": [
+            946,
+            935,
+            1261,
+            1247
+          ],
+          "sourceBootY": 228,
+          "offset": [
+            14,
+            72
+          ],
+          "bounds": [
+            56,
+            119,
+            290,
+            352
+          ],
+          "sha256": "15fdd4698daf0332700109f7ac7c1d6e449a026bab11c2ab1716b9c82ac9db0b"
+        }
+      ]
+    },
+    "phase-rise": {
+      "fps": null,
+      "loop": false,
+      "scale": 1.0874524714828897,
+      "sourceRootX": 201,
+      "recovery": null,
+      "frames": [
+        {
+          "frame": 1,
+          "clip": "phase-rise",
+          "clipFrame": 1,
+          "sourceRect": [
+            0,
+            0,
+            315,
+            312
+          ],
+          "sourceBootY": 277,
+          "offset": [
+            3,
+            45
+          ],
+          "bounds": [
+            59,
+            128,
+            289,
+            350
+          ],
+          "sha256": "98ad13787c3fc2375939acda313378f34454546e87ddf226ab02e315daf0a0db"
+        },
+        {
+          "frame": 2,
+          "clip": "phase-rise",
+          "clipFrame": 2,
+          "sourceRect": [
+            315,
+            0,
+            631,
+            312
+          ],
+          "sourceBootY": 277,
+          "offset": [
+            2,
+            45
+          ],
+          "bounds": [
+            59,
+            128,
+            290,
+            350
+          ],
+          "sha256": "b095de20e1e62d55809f6ab6d1ce1071c566edcbd74eb3307f9ea459fc44815a"
+        },
+        {
+          "frame": 3,
+          "clip": "phase-rise",
+          "clipFrame": 3,
+          "sourceRect": [
+            631,
+            0,
+            946,
+            312
+          ],
+          "sourceBootY": 277,
+          "offset": [
+            4,
+            45
+          ],
+          "bounds": [
+            60,
+            126,
+            287,
+            350
+          ],
+          "sha256": "37d0bdd31ed2e2ef1d28a4d94bd47044c65dea176b574082bba370017a00d465"
+        },
+        {
+          "frame": 4,
+          "clip": "phase-rise",
+          "clipFrame": 4,
+          "sourceRect": [
+            946,
+            0,
+            1261,
+            312
+          ],
+          "sourceBootY": 277,
+          "offset": [
+            3,
+            45
+          ],
+          "bounds": [
+            48,
+            125,
+            293,
+            350
+          ],
+          "sha256": "71bf7238b02acf4d928e8c1576a34dae3aea0543fb83fd9187cc56cbc7eb46b7"
+        },
+        {
+          "frame": 5,
+          "clip": "phase-rise",
+          "clipFrame": 5,
+          "sourceRect": [
+            0,
+            312,
+            315,
+            624
+          ],
+          "sourceBootY": 272,
+          "offset": [
+            4,
+            50
+          ],
+          "bounds": [
+            64,
+            120,
+            294,
+            348
+          ],
+          "sha256": "86b3021047cfee066e277eb41baa6b82d85bac084de7400e5244e2e0e8a4a528"
+        },
+        {
+          "frame": 6,
+          "clip": "phase-rise",
+          "clipFrame": 6,
+          "sourceRect": [
+            315,
+            312,
+            631,
+            624
+          ],
+          "sourceBootY": 272,
+          "offset": [
+            4,
+            50
+          ],
+          "bounds": [
+            55,
+            116,
+            287,
+            349
+          ],
+          "sha256": "2c5b1004b407303372f1ff3cb497a8e8780ad13f86033243bd3dee57af62770b"
+        },
+        {
+          "frame": 7,
+          "clip": "phase-rise",
+          "clipFrame": 7,
+          "sourceRect": [
+            631,
+            312,
+            946,
+            624
+          ],
+          "sourceBootY": 271,
+          "offset": [
+            3,
+            51
+          ],
+          "bounds": [
+            57,
+            117,
+            289,
+            349
+          ],
+          "sha256": "60cb0ea50928403659330c92605c2ec245e9fc36d6b6b6be4be302111523f10f"
+        },
+        {
+          "frame": 8,
+          "clip": "phase-rise",
+          "clipFrame": 8,
+          "sourceRect": [
+            946,
+            312,
+            1261,
+            624
+          ],
+          "sourceBootY": 272,
+          "offset": [
+            7,
+            50
+          ],
+          "bounds": [
+            55,
+            118,
+            293,
+            348
+          ],
+          "sha256": "3452c7c37875b3ef04bc2155954bde8be794b839f6ae9e770fc33fa6ca634f78"
+        },
+        {
+          "frame": 9,
+          "clip": "phase-rise",
+          "clipFrame": 9,
+          "sourceRect": [
+            0,
+            624,
+            315,
+            935
+          ],
+          "sourceBootY": 262,
+          "offset": [
+            2,
+            61
+          ],
+          "bounds": [
+            47,
+            134,
+            293,
+            351
+          ],
+          "sha256": "0389d26ddc14612bc056c334cc742238c4d27795a004d0fb77fab85bb2b6f3f6"
         },
         {
           "frame": 10,
           "clip": "phase-rise",
-          "clipFrame": 1,
+          "clipFrame": 10,
           "sourceRect": [
-            314,
-            627,
-            627,
-            941
+            315,
+            624,
+            631,
+            935
           ],
-          "sourceBootY": 296,
+          "sourceBootY": 264,
           "offset": [
-            37,
-            61
+            4,
+            59
           ],
           "bounds": [
             55,
-            73,
-            320,
+            131,
+            292,
             349
           ],
-          "sha256": "f67e2c7a71ab81556c3495630deca93c7ce2ccd0cdb5a44e990eb2bf16e0ceff"
+          "sha256": "020f54eaac9071bf2d88a9ad8caa6bacc4bfd025b9e6a30aa1c19444e6db3497"
         },
         {
           "frame": 11,
           "clip": "phase-rise",
-          "clipFrame": 2,
+          "clipFrame": 11,
           "sourceRect": [
-            627,
-            627,
-            941,
-            941
+            631,
+            624,
+            946,
+            935
           ],
-          "sourceBootY": 294,
+          "sourceBootY": 262,
           "offset": [
-            36,
-            63
+            6,
+            61
           ],
           "bounds": [
-            56,
-            109,
-            312,
-            352
+            52,
+            122,
+            291,
+            351
           ],
-          "sha256": "e33444e34394ff2e5d8eaa6c21cf6a12abd7f743c960af6d65f0617723a31266"
+          "sha256": "44e0febe4bf51e0c45dcb61fa4ae2d2461fba7c7e41cb2f225109e9a8fd83423"
         },
         {
           "frame": 12,
           "clip": "phase-rise",
-          "clipFrame": 3,
+          "clipFrame": 12,
           "sourceRect": [
-            941,
-            627,
-            1254,
-            941
+            946,
+            624,
+            1261,
+            935
           ],
-          "sourceBootY": 295,
+          "sourceBootY": 262,
           "offset": [
-            37,
-            62
+            16,
+            61
           ],
           "bounds": [
-            63,
-            126,
-            300,
-            349
+            64,
+            111,
+            295,
+            351
           ],
-          "sha256": "ee3a028831a37fc916ff2e664841dbcbb1e4958a5de04a9700fd55a36da14db4"
+          "sha256": "5c483f10a5712695504dd155188d306aa2421850d609c4007ebf7ff1490275e4"
         },
         {
           "frame": 13,
           "clip": "phase-rise",
-          "clipFrame": 4,
+          "clipFrame": 13,
           "sourceRect": [
             0,
-            941,
-            314,
-            1254
+            935,
+            315,
+            1247
           ],
-          "sourceBootY": 294,
+          "sourceBootY": 277,
           "offset": [
-            36,
-            63
+            23,
+            45
           ],
           "bounds": [
-            74,
-            125,
-            289,
+            72,
+            95,
+            296,
             349
           ],
-          "sha256": "c08a593642a5a1876cfbabd9ca0a80d1f5cd576a7920acc1dd6a7b6090c5c306"
+          "sha256": "0ef28983771da3e0bb34b1e68617313ecaec8624a31599470bcff44b937db1ab"
         },
         {
           "frame": 14,
           "clip": "phase-rise",
-          "clipFrame": 5,
+          "clipFrame": 14,
           "sourceRect": [
-            314,
-            941,
-            627,
-            1254
+            315,
+            935,
+            631,
+            1247
           ],
-          "sourceBootY": 295,
+          "sourceBootY": 279,
           "offset": [
-            37,
-            62
+            23,
+            43
           ],
           "bounds": [
-            81,
-            103,
-            287,
-            349
+            79,
+            83,
+            296,
+            348
           ],
-          "sha256": "a71216915f80d14edcd21b6788a5924aded73e700221d68dadfaa45b36c04e54"
+          "sha256": "ba3347a20b16da996f3160c3782c98e10c61a65a46465b27a9bb95bfd0c25e6f"
         },
         {
           "frame": 15,
           "clip": "phase-rise",
-          "clipFrame": 6,
+          "clipFrame": 15,
           "sourceRect": [
-            627,
-            941,
-            941,
-            1254
+            631,
+            935,
+            946,
+            1247
           ],
-          "sourceBootY": 297,
+          "sourceBootY": 279,
           "offset": [
-            36,
-            60
+            22,
+            43
           ],
           "bounds": [
-            77,
-            74,
-            275,
-            348
+            72,
+            73,
+            286,
+            350
           ],
-          "sha256": "fd125d2c76bead4a2305126726d2b13266aa4b7663980231cb3674948dfa988d"
+          "sha256": "4da42047bcd9b4c15c85afdcc90bb021d5fe6113a43ce163dfc2e40be5894dcb"
         },
         {
           "frame": 16,
           "clip": "phase-rise",
-          "clipFrame": 7,
+          "clipFrame": 16,
           "sourceRect": [
-            941,
-            941,
-            1254,
-            1254
+            946,
+            935,
+            1261,
+            1247
           ],
-          "sourceBootY": 298,
+          "sourceBootY": 278,
           "offset": [
-            37,
-            59
+            10,
+            44
           ],
           "bounds": [
-            65,
-            62,
-            264,
-            348
+            59,
+            61,
+            281,
+            351
           ],
-          "sha256": "45c7044cc8a7c1fbad1c059f462da36041127c0acaea842a779d1ceb6ed5e03d"
-        }
-      ],
-      "segments": [
-        {
-          "action": "phase-engulf",
-          "sourceFrames": [
-            1,
-            9
-          ],
-          "count": 9
-        },
-        {
-          "action": "phase-rise",
-          "sourceFrames": [
-            10,
-            16
-          ],
-          "count": 7
+          "sha256": "05ac1b9c1ba2cc54d5fe047820818a17fcaea0948e5d8314de39ab813d93b20a"
         }
       ]
     }
+  },
+  "transition": {
+    "sequence": [
+      "phase-engulf",
+      "phase-rise"
+    ],
+    "counts": [
+      16,
+      16
+    ],
+    "total": 32
   }
 }
