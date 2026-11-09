@@ -8,7 +8,7 @@ namespace LingyueEchoes
     {
         const string WrathRoam="WRATH_ROUTE",WrathDialogue="WRATH_DIALOGUE",WrathArrive="WRATH_ARRIVE",WrathTransfer="WRATH_TRANSFER",WrathEnter="WRATH_ENTER";
         const float WrathDoorOpenEnd=.85f,WrathWalkStart=.65f,WrathWalkEnd=1.85f,WrathFadeStart=1.7f,WrathInsideTime=2.15f,WrathFadeEnd=2.85f,WrathEnterDuration=3f;
-        const float WrathInsideX=3500,WrathOutsideCameraX=3250,WrathOutsideZoom=1.5f;
+        const float WrathInsideX=3500,WrathOutsideCameraX=2950,WrathOutsideZoom=1.5f;
         const string ShrineEntrance="月门 · 前往焚心之城",ShrineReturn="返回残月神社";
         WrathChapter wrath;
         PrologueContent wrathText;
@@ -28,7 +28,12 @@ namespace LingyueEchoes
         bool WrathCompleted=>ChapterCompleted(SaveSlot);
         static int SavedTailCount(int slot)=>Math.Max(ChapterCompleted(slot)?2:StorySeen(slot)?1:0,SaveValue(PrologueLayout.TailCountKey,slot));
         string EncounterName=>wrath&&wrathActive>=0?WrathRoute.Fights[wrathActive].Name:"守门人 · 残月的守灯者";
-        float ChapterCameraX()=>wrath&&!wrath.IsInside?WrathOutsideCameraX:Mathf.Clamp((float)sim.player.x+118,(float)WrathRoute.BoundsMin+520,(float)WrathRoute.BoundsMax-470);
+        float ExteriorCameraEndX(float zoom)
+        {
+            if(!wrath||!view||wrath.exteriorPillars==null||wrath.exteriorPillars.Length<2||!wrath.exteriorPillars[1])return WrathOutsideCameraX;
+            return (wrath.exteriorPillars[1].bounds.max.x-3.6f/zoom*view.aspect)*100;
+        }
+        float ChapterCameraX()=>wrath&&!wrath.IsInside?ExteriorCameraEndX(WrathOutsideZoom):Mathf.Clamp((float)sim.player.x+118,(float)WrathRoute.BoundsMin+520,(float)WrathRoute.BoundsMax-470);
         void PlaceShrineEntrance()
         {
             shrineGate=PixelWorld.PlacePrologueGate(world.Find("Props"));
@@ -130,10 +135,10 @@ namespace LingyueEchoes
         {
             float travel=Ease(Ramp(stageTime,.25f,WrathInsideTime));
             float settle=Ease(Ramp(stageTime,WrathInsideTime,WrathEnterDuration));
-            float thresholdCamera=(float)WrathRoute.DoorX-75;
-            cameraX=stageTime<WrathInsideTime?Mathf.Lerp(wrathEnterCameraX,thresholdCamera,travel):Mathf.Lerp(thresholdCamera,ChapterCameraX(),settle);
             zoom=stageTime<WrathInsideTime?Mathf.Lerp(WrathOutsideZoom,1.62f,travel):Mathf.Lerp(1.62f,1,settle);
-            focusY=18*travel*(1-settle);
+            float thresholdCamera=ExteriorCameraEndX(1.62f);
+            cameraX=stageTime<WrathInsideTime?ExteriorCameraEndX(zoom):Mathf.Lerp(thresholdCamera,ChapterCameraX(),settle);
+            focusY=Mathf.Lerp(65,0,settle);
         }
         void PrepareWrath(bool onEntry)
         {

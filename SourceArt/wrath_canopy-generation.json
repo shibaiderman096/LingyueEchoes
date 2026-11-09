@@ -1,0 +1,48 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "estimateUsd": null,
+  "asset": "Assets/Art/Wrath/GateCanopy.png",
+  "source": "exec-abac12e8-89f4-49be-8d85-98e474acb47a.png",
+  "prompt": "Use case: stylized-concept. Asset type: one isolated crossbeam-and-eaves sprite to sit on top of two existing red palace columns in a side scrolling Chinese dark fantasy pixel art game. Input image is MATERIAL AND PIXEL ART STYLE reference only. Draw ONLY a single narrow traditional Chinese gate canopy: a thick straight vermilion timber lintel with restrained antique gold carved trim, compact dark dougong brackets, topped by a shallow swept dark purple tile roof and muted gold circular tile ends. No pillars, no walls, no doors, no floor, no scenery, no text, no signage, no characters, no extra props. The roof and horizontal beam form one coherent standalone structure. Crisp controlled pixel clusters, hard edges and restrained warm highlights matching the reference column, not painterly blur. IMPORTANT projection: this beam connects two pillars of a gate crossing the road obliquely: LEFT support is FARTHER and HIGHER; RIGHT support is NEARER and LOWER. The underside support line should slope gently DOWN AND RIGHT, not upwards. Viewed from the left-front, show top tiled surface and a little right end thickness. It is one span, not a wide building facade. Shape overall wide about 3:1, roof tips sweep upward only slightly, entire asset comfortably within canvas with transparent margins. Lower bearing points approximately at 23% canvas width,70% height on LEFT and at77% width,85% height on RIGHT, with 15% vertical height difference, so they can sit on the two pillar capitals. Clean actual RGBA transparency outside the object, no cast ground shadow, no white matte, no black background, no halo, no annotations.",
+  "finish": "Native alpha threshold 128, transparent RGB zero, alpha-bbox crop plus 8px gutters; no resampling.",
+  "canvas": [
+    1896,
+    525
+  ],
+  "bearingPixels": [
+    [
+      281,
+      360
+    ],
+    [
+      1536,
+      515
+    ]
+  ],
+  "bearingWorld": [
+    [
+      33.28,
+      2.0102832131822868
+    ],
+    [
+      34.900000000000006,
+      1.605283213182287
+    ]
+  ],
+  "worldPosition": [
+    34.14098804780877,
+    2.265041277698416
+  ],
+  "worldSize": [
+    2.447426294820717,
+    1.3717741935483871
+  ],
+  "occlusion": "Canopy hangs in front of both pillar shafts; far capital hidden behind the canopy; near pillar extends to the top of the viewport above the eaves.",
+  "sortOrder": 15,
+  "displayScale": 1.35,
+  "scaleAnchorWorld": [
+    34.9,
+    1.605283213182286
+  ]
+}

@@ -47,6 +47,7 @@ namespace LingyueEchoes
         public SpriteRenderer[] bridgeStones;
         public SpriteRenderer[] scenery;
         public SpriteRenderer exteriorScenery;
+        public SpriteRenderer exteriorCanopy;
         public SpriteRenderer[] exteriorPillars;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
         public Sprite[] entranceDoorFrames;
@@ -61,6 +62,7 @@ namespace LingyueEchoes
         public void SetInside(bool inside){
             IsInside=inside;
             if(exteriorScenery)exteriorScenery.enabled=!inside;
+            if(exteriorCanopy)exteriorCanopy.enabled=!inside;
             if(exteriorPillars!=null)foreach(var pillar in exteriorPillars)if(pillar)pillar.enabled=!inside;
             if(scenery!=null)foreach(var plate in scenery)if(plate)plate.enabled=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;

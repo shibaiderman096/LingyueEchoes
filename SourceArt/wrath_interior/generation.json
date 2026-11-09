@@ -29,9 +29,8 @@
     "entrance": 33.4,
     "entrance_walk_max": 34.2,
     "door_center": 34.31,
-    "door_render_size": 2.2,
     "exterior_artifact": "../../Assets/Art/Wrath/Exterior.png",
-    "exterior_camera_center": 32.5,
+    "exterior_camera_center": "derived from near pillar right edge and current zoom/aspect",
     "exterior_camera_zoom": 1.5,
     "boss": 38.3,
     "combat_bounds": [
@@ -47,6 +46,24 @@
       [
         34.9,
         -0.95
+      ]
+    ],
+    "door_render_size_xy": [
+      2.48,
+      4
+    ],
+    "door_center_y": 0.9875,
+    "exterior_canopy_artifact": "../../Assets/Art/Wrath/GateCanopy.png",
+    "exterior_camera_focus_y": 0.65,
+    "exterior_camera_right_limit": "near pillar bounds.max.x minus view half width",
+    "exterior_pillar_sizes": [
+      [
+        0.445,
+        3
+      ],
+      [
+        0.445,
+        4.03
       ]
     ]
   },

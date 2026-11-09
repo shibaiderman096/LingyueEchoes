@@ -11,10 +11,10 @@ public static class WrathSceneSetup
     const string PalettePath="Assets/Scenes/WrathPlaceholderSprites.asset";
     const string ArtPath="Assets/Art/Wrath/";
     const float ExteriorWidth=14.4f,ExteriorCenterX=31.08f,ExteriorFloorFromTop=.68f;
-    // Reuse the same pillar sprite on the far and near edges of the road.
-    const float ExteriorPillarHeight=3f;
+    // Road-end posts support the separate lintel and eaves; keep the near capital visible.
+    const float ExteriorPillarHeight=3f,ExteriorNearPillarHeight=4.03f,ExteriorPillarWidth=.445f;
     const float InteriorWidth=20f,InteriorCenterX=37.1f,FloorY=-.95f;
-    const float EntranceDoorX=34.31f,EntranceDoorY=.25f,EntranceDoorSize=2.20f;
+    const float EntranceDoorX=34.31f,EntranceDoorY=.9875f,EntranceDoorWidth=2.48f,EntranceDoorHeight=4f;
     static Color C(int r,int g,int b,int a=255)=>new Color32((byte)r,(byte)g,(byte)b,(byte)a);
     [MenuItem("Lingyue/Create Wrath scene (if missing)")]
     public static void EnsureScene(){
@@ -42,13 +42,14 @@ public static class WrathSceneSetup
         var interior=LoadArt("Interior");
         var exterior=LoadArt("Exterior");
         var pillar=LoadArt("Pillar");
+        var canopy=LoadArt("GateCanopy");
         var doors=Enumerable.Range(1,16).Select(i=>LoadArt("DoorOpening/door-"+i.ToString("00"))).ToArray();
         var shapes=AssetDatabase.LoadAllAssetsAtPath(PalettePath).OfType<Sprite>().ToDictionary(x=>x.name);
         var block=shapes["Block"];var flame=shapes["Flame"];
         var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
         var camera=new GameObject("Main Camera");camera.tag="MainCamera";
         var cam=camera.AddComponent<Camera>();cam.orthographic=true;cam.orthographicSize=3.6f/1.5f;
-        cam.transform.position=new Vector3(32.5f,0,-10);cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=C(25,19,28);
+        cam.transform.position=new Vector3(29.5f,.65f,-10);cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=C(25,19,28);
         camera.AddComponent<AudioListener>();
         var root=new GameObject("LingyueEchoes");root.AddComponent<LingyueGame>();
         var chapter=root.AddComponent<WrathChapter>();
@@ -59,16 +60,16 @@ public static class WrathSceneSetup
         chapter.scenery=new[]{Piece(room,"General hall interior",interior,InteriorCenterX,FloorY+.18f*height,InteriorWidth,height,-20,Color.white)};
         float exteriorHeight=ExteriorWidth*exterior.rect.height/exterior.rect.width;
         chapter.exteriorScenery=Piece(room,"General hall exterior",exterior,ExteriorCenterX,FloorY+(ExteriorFloorFromTop-.5f)*exteriorHeight,ExteriorWidth,exteriorHeight,-20,Color.white);
-        float pillarWidth=ExteriorPillarHeight*pillar.rect.width/pillar.rect.height;
         float pillarBottomGutter=8f*ExteriorPillarHeight/pillar.rect.height;
         chapter.exteriorPillars=new[]{
-            Piece(room,"General hall exterior far pillar",pillar,33.7f,-.65f+ExteriorPillarHeight*.5f-pillarBottomGutter,pillarWidth,ExteriorPillarHeight,-15,Color.white),
-            Piece(room,"General hall exterior near pillar",pillar,34.9f,FloorY+ExteriorPillarHeight*.5f-pillarBottomGutter,pillarWidth,ExteriorPillarHeight,14,Color.white)
+            Piece(room,"General hall exterior far pillar",pillar,33.7f,-.65f+ExteriorPillarHeight*.5f-pillarBottomGutter,ExteriorPillarWidth,ExteriorPillarHeight,7,Color.white),
+            Piece(room,"General hall exterior near pillar",pillar,34.9f,FloorY+ExteriorNearPillarHeight*(.5f-8f/pillar.rect.height),ExteriorPillarWidth,ExteriorNearPillarHeight,14,Color.white)
         };
+        chapter.exteriorCanopy=Piece(room,"General hall exterior crossbeam and eaves",canopy,34.1409880f,2.2650413f,2.4474263f,1.3717742f,15,Color.white);
         chapter.bridgeStones=Array.Empty<SpriteRenderer>();
         var props=Group(world,"Props");
         chapter.entranceDoorFrames=doors;
-        chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],EntranceDoorX,EntranceDoorY,EntranceDoorSize,EntranceDoorSize,6,Color.white);
+        chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],EntranceDoorX,EntranceDoorY,EntranceDoorWidth,EntranceDoorHeight,6,Color.white);
         chapter.entranceDoor.flipX=true;
         chapter.embers=Group(world,"Interior · drifting cinders");
         for(int i=0;i<18;i++)Piece(chapter.embers,"Cinder "+i,block,32.3f+i*.6f,0,.018f,.018f,18,C(253,130,60,70));

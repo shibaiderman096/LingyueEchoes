@@ -34,12 +34,15 @@ public static class WrathChapterChecks
                 chapter.exteriorPillars.All(r=>r&&r.sprite)&&chapter.exteriorPillars[0].sprite==chapter.exteriorPillars[1].sprite,
                 "the entrance has two pillars sharing one sprite");
             var farPillar=chapter.exteriorPillars[0];var nearPillar=chapter.exteriorPillars[1];
+            Need(chapter.exteriorCanopy&&chapter.exteriorCanopy.sprite,"the entrance canopy has its authored sprite");
             var hero=chapter.world.Find("Hero").GetComponent<SpriteRenderer>();
             Need(chapter.exteriorScenery.sortingOrder<farPillar.sortingOrder&&farPillar.sortingOrder<hero.sortingOrder&&
                 nearPillar.sortingOrder>hero.sortingOrder,"far and near pillars straddle the hero sorting layer");
             chapter.SetInside(false);
+            Need(chapter.exteriorCanopy.enabled,"outside enables the entrance canopy");
             Need(chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>r.enabled)&&chapter.scenery.All(r=>!r.enabled)&&chapter.entranceDoor.enabled,"outside enables the exterior, pillars and door");
             chapter.SetInside(true);
+            Need(!chapter.exteriorCanopy.enabled,"inside hides the entrance canopy");
             Need(!chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>!r.enabled)&&chapter.scenery.All(r=>r.enabled)&&!chapter.entranceDoor.enabled,"inside enables only the interior");
             Need(WrathRoute.Entrance<chapter.entranceDoor.transform.position.x*100,"arrival begins outside before the physical door threshold");
             Need(WrathRoute.Bridge().Length==0&&!chapter.Terrain().Any(),"the deleted approach has no remaining bridge terrain");
