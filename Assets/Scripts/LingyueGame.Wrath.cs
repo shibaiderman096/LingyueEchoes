@@ -26,7 +26,7 @@ namespace LingyueEchoes
             float remaining=dt;
             while(remaining>0){
                 float slice=Mathf.Min(remaining,1f/60);remaining-=slice;
-                clock.Advance(slice*(WrathPhaseTransition ? .8f : 1f),()=>{
+                clock.Advance(slice*(WrathPhaseTransition ? .5f : 1f),()=>{
                     if(!wrathPhaseWipe.Observe(sim,stage=="GUARDIAN_FIGHT"&&ChapterBoss))return false;
                     ClearInput();return true;
                 });

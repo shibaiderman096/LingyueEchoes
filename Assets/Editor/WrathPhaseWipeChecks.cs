@@ -128,10 +128,10 @@ public static class WrathPhaseWipeChecks
                 int riseTicks=0;while(c.boss.state=="phase"&&riseTicks++<300)Tick(game,1f/60);
                 Need(Camera.main.orthographicSize>3.59f,"camera returns to normal arena size");
                 c.ResetBoss(3830,870,WrathRoute.General);Tick(game,0);Need(!game.PhaseWipe.Consumed,"real retry resets");
-                // Ordinary simulation remains sixty ticks per second; phase alone runs at eighty percent.
+                // Ordinary simulation remains sixty ticks per second; phase alone runs at half speed.
                 c=Prepare(game,duration);c.boss.hp=c.boss.maxHp;for(int i=0;i<20;i++)Tick(game,1f/60);Need(c.frame==20,"ordinary clock unchanged");
                 c.boss.hp=400;Tick(game,1f/60);Need(c.boss.state=="phase","enter phase");int phaseStart=c.frame;
-                for(int i=0;i<20;i++)Tick(game,1f/60);Need(c.frame-phaseStart==16,"phase runs at 0.8 rate");
+                for(int i=0;i<20;i++)Tick(game,1f/60);Need(c.frame-phaseStart==10,"phase runs at 0.5 rate");
                 game.clock.speed=.25;Tick(game,1f/60);Need(game.clock.speed==.25,"user slow setting preserved");
             }
             Prepare(game,90);while(!game.PhaseWipe.Active)Tick(game,.25f);game.clock.paused=true;game.enabled=true;ActivateGameView();captureStarted=EditorApplication.timeSinceStartup;captureAt=Time.frameCount+3;
