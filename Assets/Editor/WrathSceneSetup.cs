@@ -54,11 +54,80 @@ public static class WrathSceneSetup
         }
         var far=chapter.exteriorPillars[0];
         Undo.RecordObject(far,"Place far pillar behind the door");
-        far.sortingOrder=chapter.entranceDoor.sortingOrder-1;
+        far.sortingOrder=chapter.entranceDoor.sortingOrder-(chapter.exteriorDoorDarkness?2:1);
         var hero=chapter.world.Find("Hero");
         if(hero){Undo.RecordObject(hero,"Preview exterior arrival");hero.position=chapter.exteriorArrivalAnchor.position;}
         EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
         Debug.Log("WRATH_EXTERIOR_ARRIVAL_APPLIED: current layout preserved, left arrival anchor and far pillar occlusion saved");
+    }
+    const string DoorwayMeshPath=ArtPath+"ExteriorDoorwayDarkness.asset";
+    const string DoorwayMaterialPath=ArtPath+"ExteriorDoorwayBlack.mat";
+    [MenuItem("Lingyue/Apply exterior doorway and checkpoint")]
+    public static void ApplyExteriorDoorwayAndCheckpoint(){
+        if(EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Stop Play mode before editing the exterior.");
+        var scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if(scene.path!=ScenePath)throw new InvalidOperationException("Open Chapter01_Wrath before applying the doorway and checkpoint.");
+        var chapter=scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<WrathChapter>(true)).Single();
+        var door=chapter.entranceDoor;
+        if(!door||!door.sprite||!chapter.exteriorArrivalAnchor)throw new InvalidOperationException("The existing door and exterior arrival anchor are required.");
+        var lampSprite=Resources.Load<Sprite>("prologue_route/moon_lantern");
+        var shader=Shader.Find("Sprites/Default")??Shader.Find("Unlit/Color");
+        if(!lampSprite||!shader)throw new InvalidOperationException("Missing moon lantern sprite or unlit shader.");
+        Undo.RecordObject(chapter,"Set exterior doorway and checkpoint references");
+        var mesh=AssetDatabase.LoadAssetAtPath<Mesh>(DoorwayMeshPath);
+        if(!mesh){mesh=new Mesh{name="Exterior doorway darkness"};AssetDatabase.CreateAsset(mesh,DoorwayMeshPath);}
+        Undo.RecordObject(mesh,"Fit doorway darkness polygon");
+        var sprite=chapter.entranceDoorFrames!=null&&chapter.entranceDoorFrames.Length>0&&chapter.entranceDoorFrames[0]?chapter.entranceDoorFrames[0]:door.sprite;
+        // Source pixels are measured from top left. Two pixel overlap seals the transparent inner edge.
+        var pixels=new[]{new Vector2(78,74),new Vector2(231,86),new Vector2(231,299),new Vector2(78,311)};
+        var vertices=pixels.Select(pixel=>{
+            float x=(pixel.x/320f*sprite.rect.width-sprite.pivot.x)/sprite.pixelsPerUnit;
+            float y=((1-pixel.y/320f)*sprite.rect.height-sprite.pivot.y)/sprite.pixelsPerUnit;
+            return new Vector3(door.flipX?-x:x,door.flipY?-y:y,0);
+        }).ToArray();
+        mesh.Clear();mesh.vertices=vertices;
+        mesh.triangles=new[]{0,1,2,0,2,3,0,2,1,0,3,2};
+        mesh.RecalculateNormals();mesh.RecalculateBounds();EditorUtility.SetDirty(mesh);
+        var material=AssetDatabase.LoadAssetAtPath<Material>(DoorwayMaterialPath);
+        if(!material){material=new Material(shader){name="Exterior doorway black"};AssetDatabase.CreateAsset(material,DoorwayMaterialPath);}
+        Undo.RecordObject(material,"Set doorway black material");material.shader=shader;material.color=Color.black;material.renderQueue=3000;EditorUtility.SetDirty(material);
+        var darkness=chapter.exteriorDoorDarkness;
+        if(!darkness){
+            var existing=door.transform.Find("General hall doorway darkness");
+            var obj=existing?existing.gameObject:new GameObject("General hall doorway darkness");
+            if(!existing)Undo.RegisterCreatedObjectUndo(obj,"Create doorway darkness");
+            darkness=obj.GetComponent<MeshRenderer>();if(!darkness)darkness=Undo.AddComponent<MeshRenderer>(obj);
+            chapter.exteriorDoorDarkness=darkness;
+        }
+        Undo.RecordObject(darkness.transform,"Fit doorway darkness transform");
+        Undo.SetTransformParent(darkness.transform,door.transform,"Parent doorway darkness");
+        darkness.transform.localPosition=Vector3.zero;darkness.transform.localRotation=Quaternion.identity;darkness.transform.localScale=Vector3.one;
+        var filter=darkness.GetComponent<MeshFilter>();if(!filter)filter=Undo.AddComponent<MeshFilter>(darkness.gameObject);
+        Undo.RecordObject(filter,"Set doorway mesh");filter.sharedMesh=mesh;
+        Undo.RecordObject(darkness,"Set doorway renderer");darkness.sharedMaterial=material;
+        darkness.sortingLayerID=door.sortingLayerID;darkness.sortingOrder=door.sortingOrder-1;
+        darkness.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;darkness.receiveShadows=false;darkness.enabled=door.enabled;
+        if(chapter.exteriorPillars!=null&&chapter.exteriorPillars.Length>0&&chapter.exteriorPillars[0]){
+            var far=chapter.exteriorPillars[0];Undo.RecordObject(far,"Set far pillar occlusion");far.sortingLayerID=door.sortingLayerID;far.sortingOrder=door.sortingOrder-2;
+        }
+        var lamp=chapter.exteriorCheckpointLamp;
+        if(!lamp){
+            var existing=chapter.world.Find("Exterior moon lantern checkpoint");
+            var obj=existing?existing.gameObject:new GameObject("Exterior moon lantern checkpoint");
+            if(!existing)Undo.RegisterCreatedObjectUndo(obj,"Create exterior checkpoint lamp");
+            lamp=obj.GetComponent<SpriteRenderer>();if(!lamp)lamp=Undo.AddComponent<SpriteRenderer>(obj);
+            chapter.exteriorCheckpointLamp=lamp;
+        }
+        Undo.RecordObject(lamp,"Set exterior checkpoint lamp");Undo.RecordObject(lamp.transform,"Place exterior checkpoint lamp");
+        Undo.SetTransformParent(lamp.transform,chapter.world,"Parent checkpoint lamp");
+        lamp.sprite=lampSprite;lamp.color=Color.white;lamp.sortingLayerID=door.sortingLayerID;lamp.sortingOrder=12;
+        lamp.transform.rotation=Quaternion.identity;
+        lamp.transform.localScale=new Vector3(.55f/lampSprite.bounds.size.x,1.1f/lampSprite.bounds.size.y,1);
+        lamp.transform.position=chapter.exteriorArrivalAnchor.position+new Vector3(.32f,.55f,0);
+        lamp.enabled=door.enabled;
+        EditorUtility.SetDirty(chapter);AssetDatabase.SaveAssets();
+        EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
+        Debug.Log("WRATH_EXTERIOR_DOORWAY_CHECKPOINT_APPLIED: existing layout preserved; "+DoorwayMeshPath+"; "+DoorwayMaterialPath);
     }
     [MenuItem("Lingyue/Rebuild indoor general arena")]
     public static void RebuildIndoor(){
@@ -103,7 +172,7 @@ public static class WrathSceneSetup
         Actor(world,"Hero","pixel8/frames/idle/idle-01",(float)WrathRoute.Entrance/100,1.5f,12);
         Actor(world,"Guardian","guardian8/frames/idle/idle-01",38.3f,1.22f,10);
         chapter.SetInside(false);
-        EditorSceneManager.SaveScene(scene,ScenePath);ApplyExteriorArrival();AssetDatabase.SaveAssets();EnsureScene();
+        EditorSceneManager.SaveScene(scene,ScenePath);ApplyExteriorArrival();ApplyExteriorDoorwayAndCheckpoint();AssetDatabase.SaveAssets();EnsureScene();
         Debug.Log("WRATH_INDOOR_SCENE_CREATED: single room, entrance and sole general");
     }
     static Transform Group(Transform parent,string name)

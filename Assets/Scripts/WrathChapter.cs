@@ -61,6 +61,18 @@ namespace LingyueEchoes
         public SpriteRenderer[] exteriorPillars;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
         public Sprite[] entranceDoorFrames;
+        [Range(0,1)] public float exteriorDoorSeamNormalized=.503125f;
+        public MeshRenderer exteriorDoorDarkness;
+        public SpriteRenderer exteriorCheckpointLamp;
+        public float ExteriorDoorSeamX {
+            get {
+                if(!entranceDoor||!entranceDoor.sprite)return (float)WrathRoute.DoorX/100;
+                var sprite=entranceDoorFrames!=null&&entranceDoorFrames.Length>0&&entranceDoorFrames[0]?entranceDoorFrames[0]:entranceDoor.sprite;
+                float x=(sprite.rect.width*exteriorDoorSeamNormalized-sprite.pivot.x)/sprite.pixelsPerUnit;
+                if(entranceDoor.flipX)x=-x;
+                return entranceDoor.transform.TransformPoint(new Vector3(x,0,0)).x;
+            }
+        }
         public float DoorOpening {get;private set;}
         public void SetDoorOpening(float progress){
             DoorOpening=Mathf.Clamp01(progress);
@@ -76,6 +88,8 @@ namespace LingyueEchoes
             if(exteriorPillars!=null)foreach(var pillar in exteriorPillars)if(pillar)pillar.enabled=!inside;
             if(scenery!=null)foreach(var plate in scenery)if(plate)plate.enabled=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;
+            if(exteriorDoorDarkness)exteriorDoorDarkness.enabled=!inside;
+            if(exteriorCheckpointLamp)exteriorCheckpointLamp.enabled=!inside;
             if(!inside)SetDoorOpening(0);
             SetAmbientParticles(SceneParticleSettings.Enabled);
         }

@@ -27,7 +27,7 @@
     "simulation_floor": 0,
     "render_floor": -0.95,
     "entrance": 24.684113,
-    "entrance_walk_max": 34.82843306666666,
+    "entrance_walk_max": 33.8404,
     "door_center": 33.852,
     "exterior_artifact": "../../Assets/Art/Wrath/Exterior.png",
     "exterior_camera_center": 29.58,
@@ -40,7 +40,7 @@
     "exterior_pillar_artifact": "../../Assets/Art/Wrath/Pillar.png",
     "exterior_pillar_foot_positions": [
       [
-        33.025,
+        32.87,
         -0.6249
       ],
       [
@@ -67,18 +67,21 @@
       ]
     ],
     "arrival_anchor": "World/Exterior arrival anchor",
-    "exterior_movement_bounds": "entire authored exterior camera viewport; capped at near pillar",
+    "exterior_movement_bounds": "authored camera left edge to closed door seam; entry cinematic crosses the threshold",
     "exterior_canopy_in_scene": false,
     "exterior_camera_orthographic_size": 2.9522436,
     "exterior_camera_z": -9.67,
     "exterior_walk_bounds_at_16_9": [
       24.33156693333333,
-      34.82843306666666
+      33.8404
     ],
     "exterior_pillar_sort_orders": [
-      5,
+      4,
       14
-    ]
+    ],
+    "door_seam_normalized": 0.503125,
+    "doorway_backing": "opaque black polygon behind the animated door",
+    "exterior_checkpoint": "existing moon lantern beside arrival anchor; entering radius 0.65 saves using existing checkpoint keys"
   },
   "native_scene": "../../Assets/Scenes/Chapter01_Wrath.unity"
 }

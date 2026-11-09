@@ -15,7 +15,8 @@ namespace LingyueEchoes
         SpriteRenderer WrathExteriorNearPillar=>wrath&&wrath.exteriorPillars!=null&&wrath.exteriorPillars.Length>1?wrath.exteriorPillars[1]:null;
         float WrathExteriorBoundsMin=>ExteriorCameraEndX(WrathOutsideZoom)-3.6f/WrathOutsideZoom*view.aspect*100;
         float WrathExteriorBoundsMax=>Mathf.Min(ExteriorCameraEndX(WrathOutsideZoom)+3.6f/WrathOutsideZoom*view.aspect*100,
-            WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity);
+            Mathf.Min(WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity,
+                wrath?wrath.ExteriorDoorSeamX*100:float.PositiveInfinity));
         void UpdateWrathExteriorBounds(){
             sim.boundsMin=WrathExteriorBoundsMin;sim.boundsMax=WrathExteriorBoundsMax;
         }
@@ -25,7 +26,7 @@ namespace LingyueEchoes
         SpriteRenderer shrineGate;
         int wrathCheckpoint,wrathNext,wrathActive=-1,wrathArea;
         float wrathAreaTime,wrathHintTime,wrathWeaponAsh;
-        bool wrathShowOpening,wrathEntered;
+        bool wrathShowOpening,wrathEntered,wrathWithinLamp;
         float wrathEnterX,wrathEnterCameraX,wrathNextStep;
         string transferScene;
         bool ChapterDialogue=>stage==WrathDialogue;
@@ -171,6 +172,7 @@ namespace LingyueEchoes
             wrath.ResetLook();
             wrathShowOpening=onEntry&&wrathCheckpoint==0;
             SaveWrathLamp(2);
+            wrathWithinLamp=true;
             SetStage(WrathArrive);SetMusic("pilgrim_stage_2");
         }
         void UpdateWrathArrival()
@@ -179,13 +181,13 @@ namespace LingyueEchoes
             if(wrathShowOpening){SetStage(WrathDialogue);ChapterSay("wrathEnter");}
             else SetStage(WrathRoam);
         }
-        void SaveWrathLamp(int lamp)
+        void SaveWrathLamp(int lamp,bool force=false)
         {
-            if(lamp<=wrathCheckpoint)return;
-            wrathCheckpoint=lamp;
+            if(lamp<=wrathCheckpoint&&!force)return;
+            wrathCheckpoint=Math.Max(wrathCheckpoint,Math.Max(lamp,SaveValue(WrathRoute.Checkpoint,SaveSlot)));
             sim.player.hp=sim.player.maxHp;sim.player.stamina=sim.PlayerMaxStamina;
             checkpointToast=2.5f;
-            WriteSave(WrathRoute.Checkpoint,lamp);
+            WriteSave(WrathRoute.Checkpoint,wrathCheckpoint);
             WriteSave(WrathRoute.Current,1);
             PlayerPrefs.Save();
             UiSound("ui_confirm");
@@ -193,7 +195,12 @@ namespace LingyueEchoes
         void UpdateWrathRoute(float dt)
         {
             // Keep the walkable exterior in sync with viewport changes.
-            if(!wrath.IsInside)UpdateWrathExteriorBounds();
+            if(!wrath.IsInside){
+                UpdateWrathExteriorBounds();
+                bool within=Math.Abs(sim.player.x-WrathExteriorSpawnX)<=65;
+                if(within&&!wrathWithinLamp)SaveWrathLamp(2,true);
+                wrathWithinLamp=within;
+            }else wrathWithinLamp=false;
             wrathAreaTime=Mathf.Max(0,wrathAreaTime-dt);
         }
         void StartWrathEncounter(int index)
@@ -247,6 +254,7 @@ namespace LingyueEchoes
             wrath.SetInside(false);wrath.SetDoorOpening(0);wrathEntered=false;wrathNextStep=WrathWalkStart;
             UpdateWrathExteriorBounds();
             sim.player.x=WrathExteriorSpawnX;sim.player.y=sim.player.vy=0;
+            wrathWithinLamp=true;
             sim.player.state="idle";sim.player.move=null;sim.player.age=0;sim.player.face=1;
             sim.enemyActive=sim.ai=false;
             cameraX=ChapterCameraX();
@@ -304,7 +312,7 @@ namespace LingyueEchoes
             if(wrathAreaTime>0)
                 Text(new Rect(450,102,380,34),WrathRoute.Areas[wrathArea],21,WithAlpha(MoonGold,Mathf.Min(1,wrathAreaTime*2)),TextAnchor.MiddleCenter);
             if(checkpointToast>0)
-                Text(new Rect(460,140,360,34),"门前进度 · 已记录",19,MoonGold,TextAnchor.MiddleCenter);
+                Text(new Rect(460,140,360,34),"月灯存档点 · 已记录",19,MoonGold,TextAnchor.MiddleCenter);
             if(wrathActive>=0&&wrathHintTime>0){
                 RoundedFill(new Rect(394,198,492,39),Ink,7);
                 Text(new Rect(404,198,472,39),WrathRoute.Fights[wrathActive].Hint,17,Ivory,TextAnchor.MiddleCenter);

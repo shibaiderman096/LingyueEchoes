@@ -38,10 +38,24 @@ public static class WrathChapterChecks
             var hero=chapter.world.Find("Hero").GetComponent<SpriteRenderer>();
             Need(chapter.exteriorScenery.sortingOrder<farPillar.sortingOrder&&farPillar.sortingOrder<hero.sortingOrder&&
                 nearPillar.sortingOrder>hero.sortingOrder,"far and near pillars straddle the hero sorting layer");
+            Need(chapter.exteriorDoorDarkness&&chapter.exteriorDoorDarkness.GetComponent<MeshFilter>()&&
+                chapter.exteriorDoorDarkness.GetComponent<MeshFilter>().sharedMesh&&chapter.exteriorDoorDarkness.sharedMaterial&&
+                chapter.exteriorDoorDarkness.sharedMaterial.color==Color.black,
+                "the doorway has an opaque pure black mesh backing");
+            Need(chapter.exteriorDoorDarkness.sortingLayerID==chapter.entranceDoor.sortingLayerID&&
+                chapter.exteriorDoorDarkness.sortingOrder<chapter.entranceDoor.sortingOrder,
+                "the black backing sorts behind the physical door");
+            Need(chapter.exteriorCheckpointLamp&&chapter.exteriorCheckpointLamp.sprite&&
+                Math.Abs(chapter.exteriorCheckpointLamp.transform.position.x-chapter.exteriorArrivalAnchor.position.x)<=.65f,
+                "the visible checkpoint lamp stands near the authored arrival anchor");
+            Need(chapter.ExteriorDoorSeamX>chapter.exteriorArrivalAnchor.position.x,
+                "the authored door seam lies beyond the exterior arrival point");
             chapter.SetInside(false);
+            Need(chapter.exteriorCheckpointLamp.enabled&&chapter.exteriorDoorDarkness.enabled,"outside enables the lamp and black doorway backing");
             Need(!chapter.exteriorCanopy||chapter.exteriorCanopy.enabled,"outside enables an optional entrance canopy");
             Need(chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>r.enabled)&&chapter.scenery.All(r=>!r.enabled)&&chapter.entranceDoor.enabled,"outside enables the exterior, pillars and door");
             chapter.SetInside(true);
+            Need(!chapter.exteriorCheckpointLamp.enabled&&!chapter.exteriorDoorDarkness.enabled,"inside hides the lamp and black doorway backing");
             Need(!chapter.exteriorCanopy||!chapter.exteriorCanopy.enabled,"inside hides an optional entrance canopy");
             Need(!chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>!r.enabled)&&chapter.scenery.All(r=>r.enabled)&&!chapter.entranceDoor.enabled,"inside enables only the interior");
             var camera=scene.GetRootGameObjects().SelectMany(go=>go.GetComponentsInChildren<Camera>(true)).Single(c=>c.CompareTag("MainCamera"));
