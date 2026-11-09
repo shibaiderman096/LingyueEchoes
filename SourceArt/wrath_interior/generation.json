@@ -26,12 +26,12 @@
     ],
     "simulation_floor": 0,
     "render_floor": -0.95,
-    "entrance": 33.4,
-    "entrance_walk_max": 34.2,
-    "door_center": 34.31,
+    "entrance": 24.684113,
+    "entrance_walk_max": 34.82843306666666,
+    "door_center": 33.852,
     "exterior_artifact": "../../Assets/Art/Wrath/Exterior.png",
-    "exterior_camera_center": "derived from near pillar right edge and current zoom/aspect",
-    "exterior_camera_zoom": 1.5,
+    "exterior_camera_center": 29.58,
+    "exterior_camera_zoom": 1.2194115688827305,
     "boss": 38.3,
     "combat_bounds": [
       32.1,
@@ -40,31 +40,44 @@
     "exterior_pillar_artifact": "../../Assets/Art/Wrath/Pillar.png",
     "exterior_pillar_foot_positions": [
       [
-        33.7,
-        -0.65
+        33.025,
+        -0.6249
       ],
       [
-        34.9,
-        -0.95
+        34.8,
+        -0.9123
       ]
     ],
     "door_render_size_xy": [
-      2.48,
-      4
+      3.712,
+      5.568
     ],
-    "door_center_y": 0.9875,
+    "door_center_y": 1.815,
     "exterior_canopy_artifact": "../../Assets/Art/Wrath/GateCanopy.png",
-    "exterior_camera_focus_y": 0.65,
+    "exterior_camera_focus_y": 0.39,
     "exterior_camera_right_limit": "near pillar bounds.max.x minus view half width",
     "exterior_pillar_sizes": [
       [
-        0.445,
-        3
+        0.6624,
+        4.4666
       ],
       [
-        0.445,
-        4.03
+        0.6624,
+        4.0782
       ]
+    ],
+    "arrival_anchor": "World/Exterior arrival anchor",
+    "exterior_movement_bounds": "entire authored exterior camera viewport; capped at near pillar",
+    "exterior_canopy_in_scene": false,
+    "exterior_camera_orthographic_size": 2.9522436,
+    "exterior_camera_z": -9.67,
+    "exterior_walk_bounds_at_16_9": [
+      24.33156693333333,
+      34.82843306666666
+    ],
+    "exterior_pillar_sort_orders": [
+      5,
+      14
     ]
   },
   "native_scene": "../../Assets/Scenes/Chapter01_Wrath.unity"

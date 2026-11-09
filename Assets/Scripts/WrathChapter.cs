@@ -46,6 +46,16 @@ namespace LingyueEchoes
         public Transform world,embers,backdrop;
         public SpriteRenderer[] bridgeStones;
         public SpriteRenderer[] scenery;
+        public Transform exteriorArrivalAnchor;
+        public Vector3 ExteriorViewCenter {get;private set;}=new Vector3(29.5f,.65f,-10);
+        public float ExteriorViewSize {get;private set;}=2.4f;
+        bool exteriorViewCaptured;
+        public void CaptureExteriorView(Camera camera){
+            if(exteriorViewCaptured||!camera)return;
+            ExteriorViewCenter=camera.transform.position;
+            ExteriorViewSize=Mathf.Max(.01f,camera.orthographicSize);
+            exteriorViewCaptured=true;
+        }
         public SpriteRenderer exteriorScenery;
         public SpriteRenderer exteriorCanopy;
         public SpriteRenderer[] exteriorPillars;

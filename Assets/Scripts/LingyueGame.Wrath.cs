@@ -8,7 +8,17 @@ namespace LingyueEchoes
     {
         const string WrathRoam="WRATH_ROUTE",WrathDialogue="WRATH_DIALOGUE",WrathArrive="WRATH_ARRIVE",WrathTransfer="WRATH_TRANSFER",WrathEnter="WRATH_ENTER";
         const float WrathDoorOpenEnd=.85f,WrathWalkStart=.65f,WrathWalkEnd=1.85f,WrathFadeStart=1.7f,WrathInsideTime=2.15f,WrathFadeEnd=2.85f,WrathEnterDuration=3f;
-        const float WrathInsideX=3500,WrathOutsideCameraX=2950,WrathOutsideZoom=1.5f;
+        const float WrathInsideX=3500;
+        float WrathOutsideZoom=>wrath?3.6f/wrath.ExteriorViewSize:1.5f;
+        float WrathExteriorSpawnX=>wrath&&wrath.exteriorArrivalAnchor?wrath.exteriorArrivalAnchor.position.x*100:(float)WrathRoute.Entrance;
+        float WrathExteriorDoorX=>wrath&&wrath.entranceDoor?wrath.entranceDoor.transform.position.x*100:(float)WrathRoute.DoorX;
+        SpriteRenderer WrathExteriorNearPillar=>wrath&&wrath.exteriorPillars!=null&&wrath.exteriorPillars.Length>1?wrath.exteriorPillars[1]:null;
+        float WrathExteriorBoundsMin=>ExteriorCameraEndX(WrathOutsideZoom)-3.6f/WrathOutsideZoom*view.aspect*100;
+        float WrathExteriorBoundsMax=>Mathf.Min(ExteriorCameraEndX(WrathOutsideZoom)+3.6f/WrathOutsideZoom*view.aspect*100,
+            WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity);
+        void UpdateWrathExteriorBounds(){
+            sim.boundsMin=WrathExteriorBoundsMin;sim.boundsMax=WrathExteriorBoundsMax;
+        }
         const string ShrineEntrance="月门 · 前往焚心之城",ShrineReturn="返回残月神社";
         WrathChapter wrath;
         PrologueContent wrathText;
@@ -30,8 +40,10 @@ namespace LingyueEchoes
         string EncounterName=>wrath&&wrathActive>=0?WrathRoute.Fights[wrathActive].Name:"守门人 · 残月的守灯者";
         float ExteriorCameraEndX(float zoom)
         {
-            if(!wrath||!view||wrath.exteriorPillars==null||wrath.exteriorPillars.Length<2||!wrath.exteriorPillars[1])return WrathOutsideCameraX;
-            return (wrath.exteriorPillars[1].bounds.max.x-3.6f/zoom*view.aspect)*100;
+            if(!wrath||!view)return 2950;
+            float size=3.6f/zoom;
+            float baseCenter=wrath.ExteriorViewCenter.x+(wrath.ExteriorViewSize-size)*view.aspect;
+            return Mathf.Min(baseCenter,WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x-size*view.aspect:float.PositiveInfinity)*100;
         }
         float ChapterCameraX()=>wrath&&!wrath.IsInside?ExteriorCameraEndX(WrathOutsideZoom):Mathf.Clamp((float)sim.player.x+118,(float)WrathRoute.BoundsMin+520,(float)WrathRoute.BoundsMax-470);
         void PlaceShrineEntrance()
@@ -86,8 +98,8 @@ namespace LingyueEchoes
             }
             if(stage!=WrathRoam)return null;
             double x=sim.player.x;
-            if(x<=WrathRoute.Portal-70)return ShrineReturn;
-            if(Math.Abs(x-WrathRoute.DoorX)<=130)
+            if(!wrath.IsInside&&x<=WrathExteriorSpawnX+45)return ShrineReturn;
+            if(Math.Abs(x-WrathExteriorDoorX)<=130)
                 return WrathCompleted?"再次挑战赤绫":"进入将军府 · 与赤绫交谈";
             return null;
         }
@@ -119,11 +131,11 @@ namespace LingyueEchoes
             wrath.SetDoorOpening(Ramp(stageTime,0,WrathDoorOpenEnd));
             if(!wrathEntered){
                 float walk=Ramp(stageTime,WrathWalkStart,WrathWalkEnd);
-                sim.player.x=Mathf.Lerp(wrathEnterX,(float)WrathRoute.DoorX+142,walk);
+                sim.player.x=Mathf.Lerp(wrathEnterX,Mathf.Min(WrathExteriorDoorX+90,WrathExteriorNearPillar?WrathExteriorNearPillar.transform.position.x*100-10:float.PositiveInfinity),walk);
                 sim.player.y=12*walk;sim.player.vy=0;
                 if(stageTime>=wrathNextStep&&stageTime<=WrathWalkEnd){UiSound("step");wrathNextStep+=.33f;}
                 if(stageTime>=WrathInsideTime){
-                    wrathEntered=true;wrath.SetInside(true);sim.boundsMax=WrathRoute.BoundsMax;
+                    wrathEntered=true;wrath.SetInside(true);sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.BoundsMax;
                     sim.player.x=WrathInsideX;sim.player.y=sim.player.vy=0;
                 }
             }
@@ -135,10 +147,11 @@ namespace LingyueEchoes
         {
             float travel=Ease(Ramp(stageTime,.25f,WrathInsideTime));
             float settle=Ease(Ramp(stageTime,WrathInsideTime,WrathEnterDuration));
-            zoom=stageTime<WrathInsideTime?Mathf.Lerp(WrathOutsideZoom,1.62f,travel):Mathf.Lerp(1.62f,1,settle);
-            float thresholdCamera=ExteriorCameraEndX(1.62f);
+            float doorwayZoom=WrathOutsideZoom*1.08f;
+            zoom=stageTime<WrathInsideTime?Mathf.Lerp(WrathOutsideZoom,doorwayZoom,travel):Mathf.Lerp(doorwayZoom,1,settle);
+            float thresholdCamera=ExteriorCameraEndX(doorwayZoom);
             cameraX=stageTime<WrathInsideTime?ExteriorCameraEndX(zoom):Mathf.Lerp(thresholdCamera,ChapterCameraX(),settle);
-            focusY=Mathf.Lerp(65,0,settle);
+            focusY=Mathf.Lerp(wrath.ExteriorViewCenter.y*100,0,settle);
         }
         void PrepareWrath(bool onEntry)
         {
@@ -149,8 +162,8 @@ namespace LingyueEchoes
             wrathActive=-1;
             PrepareCampaignCombat();
             sim.terrain.AddRange(wrath.Terrain());
-            sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.DoorX+80;
-            sim.player.x=WrathRoute.Spawn(wrathCheckpoint);
+            UpdateWrathExteriorBounds();
+            sim.player.x=WrathExteriorSpawnX;
             sim.boss.x=WrathRoute.Fights[wrathNext].EnemyX;
             wrath.SetInside(false);wrath.SetDoorOpening(0);wrathEntered=false;
             cameraX=ChapterCameraX();
@@ -179,7 +192,8 @@ namespace LingyueEchoes
         }
         void UpdateWrathRoute(float dt)
         {
-            // The entrance is the sole checkpoint; combat begins only through its interaction.
+            // Keep the walkable exterior in sync with viewport changes.
+            if(!wrath.IsInside)UpdateWrathExteriorBounds();
             wrathAreaTime=Mathf.Max(0,wrathAreaTime-dt);
         }
         void StartWrathEncounter(int index)
@@ -231,8 +245,8 @@ namespace LingyueEchoes
         {
             wrathActive=-1;wrathNext=0;
             wrath.SetInside(false);wrath.SetDoorOpening(0);wrathEntered=false;wrathNextStep=WrathWalkStart;
-            sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.DoorX+80;
-            sim.player.x=WrathRoute.Entrance;sim.player.y=sim.player.vy=0;
+            UpdateWrathExteriorBounds();
+            sim.player.x=WrathExteriorSpawnX;sim.player.y=sim.player.vy=0;
             sim.player.state="idle";sim.player.move=null;sim.player.age=0;sim.player.face=1;
             sim.enemyActive=sim.ai=false;
             cameraX=ChapterCameraX();

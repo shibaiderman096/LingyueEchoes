@@ -37,6 +37,29 @@ public static class WrathSceneSetup
         return AssetDatabase.LoadAssetAtPath<Sprite>(path)??throw new InvalidOperationException("Missing indoor art "+path);
     }
     public static void ApplyArt()=>RebuildIndoor();
+    [MenuItem("Lingyue/Apply exterior arrival anchor")]
+    public static void ApplyExteriorArrival(){
+        if(EditorApplication.isPlaying)throw new InvalidOperationException("Stop Play mode before editing the exterior.");
+        var scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if(scene.path!=ScenePath)throw new InvalidOperationException("Open Chapter01_Wrath before applying the arrival anchor.");
+        var chapter=scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<WrathChapter>(true)).Single();
+        var camera=scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<Camera>(true)).Single(c=>c.CompareTag("MainCamera"));
+        Undo.RecordObject(chapter,"Set exterior arrival anchor");
+        if(!chapter.exteriorArrivalAnchor){
+            var anchor=new GameObject("Exterior arrival anchor");
+            Undo.RegisterCreatedObjectUndo(anchor,"Create exterior arrival anchor");
+            anchor.transform.SetParent(chapter.world,false);
+            anchor.transform.position=new Vector3(camera.transform.position.x-camera.orthographicSize*camera.aspect+.35f,FloorY,0);
+            chapter.exteriorArrivalAnchor=anchor.transform;
+        }
+        var far=chapter.exteriorPillars[0];
+        Undo.RecordObject(far,"Place far pillar behind the door");
+        far.sortingOrder=chapter.entranceDoor.sortingOrder-1;
+        var hero=chapter.world.Find("Hero");
+        if(hero){Undo.RecordObject(hero,"Preview exterior arrival");hero.position=chapter.exteriorArrivalAnchor.position;}
+        EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
+        Debug.Log("WRATH_EXTERIOR_ARRIVAL_APPLIED: current layout preserved, left arrival anchor and far pillar occlusion saved");
+    }
     [MenuItem("Lingyue/Rebuild indoor general arena")]
     public static void RebuildIndoor(){
         var interior=LoadArt("Interior");
@@ -80,7 +103,7 @@ public static class WrathSceneSetup
         Actor(world,"Hero","pixel8/frames/idle/idle-01",(float)WrathRoute.Entrance/100,1.5f,12);
         Actor(world,"Guardian","guardian8/frames/idle/idle-01",38.3f,1.22f,10);
         chapter.SetInside(false);
-        EditorSceneManager.SaveScene(scene,ScenePath);AssetDatabase.SaveAssets();EnsureScene();
+        EditorSceneManager.SaveScene(scene,ScenePath);ApplyExteriorArrival();AssetDatabase.SaveAssets();EnsureScene();
         Debug.Log("WRATH_INDOOR_SCENE_CREATED: single room, entrance and sole general");
     }
     static Transform Group(Transform parent,string name)

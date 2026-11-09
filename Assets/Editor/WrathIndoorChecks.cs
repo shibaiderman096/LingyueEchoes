@@ -58,8 +58,9 @@ public static class WrathIndoorChecks
         try{
             var chapter=UnityEngine.Object.FindAnyObjectByType<WrathChapter>();var game=chapter.GetComponent<LingyueGame>();
             Need(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name==WrathRoute.Scene&&game.SaveSlot==1,"moon gate transfers the same save slot to chapter one");
-            Need(game.sim.player.x==WrathRoute.Entrance&&!game.sim.enemyActive&&!chapter.IsInside&&chapter.entranceDoor.enabled,"moon gate lands directly at the closed boss entrance");
+            Need(Math.Abs(game.sim.player.x-chapter.exteriorArrivalAnchor.position.x*100)<.01&&!game.sim.enemyActive&&!chapter.IsInside&&chapter.entranceDoor.enabled,"moon gate lands at the authored exterior arrival anchor");
             CheckScenery(chapter);Need(game.sim.player.x<chapter.entranceDoor.transform.position.x*100,"moon gate arrival stands outside the physical door");
+            Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter);
             Need(game.sim.TailUpgrades==1,"chapter transfer preserves tail progression");
             Debug.Log("WRATH_MOON_GATE_PLAY_PASSED: actual prologue gate interaction and scene transfer, same save and tail, direct boss entrance, no approach or automatic combat");FinishMoon(0);
         }catch(Exception error){Debug.LogException(error);FinishMoon(1);}
@@ -82,7 +83,7 @@ public static class WrathIndoorChecks
     }
     static void CheckScenery(WrathChapter chapter){
         Need(chapter.exteriorScenery&&chapter.exteriorScenery.sprite&&chapter.exteriorScenery.enabled==!chapter.IsInside,"authored exterior visibility follows the entrance state");
-        Need(chapter.exteriorCanopy&&chapter.exteriorCanopy.sprite&&chapter.exteriorCanopy.enabled==!chapter.IsInside,"authored canopy visibility follows the entrance state");
+        Need(!chapter.exteriorCanopy||(chapter.exteriorCanopy.sprite&&chapter.exteriorCanopy.enabled==!chapter.IsInside),"optional authored canopy visibility follows the entrance state");
         Need(chapter.exteriorPillars!=null&&chapter.exteriorPillars.Length==2&&
             chapter.exteriorPillars.All(r=>r&&r.sprite&&r.enabled==!chapter.IsInside)&&
             chapter.exteriorPillars[0].sprite==chapter.exteriorPillars[1].sprite,
@@ -90,13 +91,38 @@ public static class WrathIndoorChecks
         Need(chapter.scenery.All(r=>r&&r.enabled==chapter.IsInside),"interior visibility follows the room state");
         Need(chapter.entranceDoor.flipX,"door faces the arriving hero");
     }
-    static void CheckExteriorCamera(WrathChapter chapter,bool atEnd=false){
+    static void CheckExteriorCamera(WrathChapter chapter,bool checkRoadBounds=true){
         if(chapter.IsInside)return;
         var camera=Camera.main;
-        Need(camera.transform.position.x+camera.orthographicSize*camera.aspect<=chapter.exteriorPillars[1].bounds.max.x+.001f,
+        float halfWidth=camera.orthographicSize*camera.aspect;
+        Need(camera.transform.position.x+halfWidth<=chapter.exteriorPillars[1].bounds.max.x+.001f,
             "the exterior viewport ends at or before the second pillar");
-        if(atEnd)Need(Math.Abs(camera.transform.position.x+camera.orthographicSize*camera.aspect-chapter.exteriorPillars[1].bounds.max.x)<.001f,
-            "the exterior viewport keeps the second pillar at its right edge");
+        if(!checkRoadBounds)return;
+        float expectedCenter=Mathf.Min(chapter.ExteriorViewCenter.x,chapter.exteriorPillars[1].bounds.max.x-halfWidth);
+        Need(Math.Abs(camera.orthographicSize-chapter.ExteriorViewSize)<.001f&&
+            Math.Abs(camera.transform.position.x-expectedCenter)<.001f,
+            "exterior preserves the authored camera size and center within the second pillar limit");
+        Need(Math.Abs(chapter.GetComponent<LingyueGame>().sim.boundsMin-(camera.transform.position.x-halfWidth)*100)<.1&&
+            Math.Abs(chapter.GetComponent<LingyueGame>().sim.boundsMax-(camera.transform.position.x+halfWidth)*100)<.1,
+            "movement bounds cover both edges of the visible exterior road");
+    }
+    static void WalkExterior(LingyueGame game,WrathChapter chapter){
+        Call(game,"SetStage","WRATH_ROUTE");Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter);
+        double left=game.sim.boundsMin+30,middle=(game.sim.boundsMin+game.sim.boundsMax)*.5,
+            nearDoor=chapter.entranceDoor.transform.position.x*100-60;
+        foreach(double target in new[]{left,middle,nearDoor}){
+            int steps=0;
+            while(Math.Abs(game.sim.player.x-target)>5&&steps++<1000){
+                game.sim.axis=Math.Sign(target-game.sim.player.x);game.sim.Step();
+            }
+            game.sim.axis=0;
+            Need(Math.Abs(game.sim.player.x-target)<=5,"the hero actually walks across left, middle and door-side exterior road");
+            Need(!chapter.IsInside&&!game.sim.enemyActive,"walking the exterior does not start combat or enter the room");
+        }
+    }
+    static void ApproachDoor(LingyueGame game,WrathChapter chapter){
+        game.sim.player.x=chapter.entranceDoor.transform.position.x*100-60;
+        Call(game,"SetStage","WRATH_ROUTE");game.Interact();
     }
     static void EnterDoor(LingyueGame game,WrathChapter chapter,bool review){
         Need(game.stage=="WRATH_ENTER"&&!chapter.IsInside&&chapter.entranceDoor.enabled,"interact starts the entrance cinematic with the door visible");
@@ -108,7 +134,7 @@ public static class WrathIndoorChecks
         Sprite walking=null;
         foreach(float time in new[]{.10f,.42f,.80f,1.20f,1.65f,2.14f,2.16f,2.60f,3.01f}){
             TimeAt(game,time);Call(game,"UpdateWrathEntrance");Call(game,"DrawWorld",0f);
-            CheckExteriorCamera(chapter);
+            CheckExteriorCamera(chapter,false);
             Need(game.sim.frame==frame&&!game.sim.ai&&!game.sim.enemyActive,"combat stays frozen throughout entry");
             Need(game.sim.player.x>=lastX,"entry advances continuously across the threshold");lastX=game.sim.player.x;
             Need(chapter.IsInside==(time>=2.15f),"room changes only under the fade to black");
@@ -131,30 +157,33 @@ public static class WrathIndoorChecks
             foreach(int checkpoint in new[]{0,1,2}){
                 PlayerPrefs.SetInt(PrologueLayout.SaveKey(WrathRoute.Checkpoint,1),checkpoint);
                 Call(game,"PrepareWrath",false);
-                Need(game.sim.player.x==WrathRoute.Entrance&&!game.sim.enemyActive&&!chapter.IsInside&&chapter.entranceDoor.enabled,"legacy save and retry arrive before the closed door: "+checkpoint);
+                Need(Math.Abs(game.sim.player.x-chapter.exteriorArrivalAnchor.position.x*100)<.01&&!game.sim.enemyActive&&!chapter.IsInside&&chapter.entranceDoor.enabled,"legacy save and retry arrive before the closed door: "+checkpoint);
                 CheckScenery(chapter);Need(game.sim.player.x<chapter.entranceDoor.transform.position.x*100,"arrival stands before the physical door threshold");
-                Need(game.sim.boundsMax==WrathRoute.DoorX+80&&game.sim.terrain.Count==0,"entrance bounds block walking around the door");
+                Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter);
+                Need(game.sim.terrain.Count==0,"the exterior road has no deleted approach terrain");
             }
             PlayerPrefs.SetInt(PrologueLayout.SaveKey(WrathRoute.Completed,1),0);
             Call(game,"SetStage","WRATH_ROUTE");Call(game,"DrawWorld",0f);Capture(Camera.main,"entrance");
-            CheckExteriorCamera(chapter,true);
-            game.Interact();EnterDoor(game,chapter,true);
+            CheckExteriorCamera(chapter);
+            WalkExterior(game,chapter);ApproachDoor(game,chapter);EnterDoor(game,chapter,true);
             Call(game,"HandleChapterSpeech","wrathBossPre");Need(game.stage=="GUARDIAN_INTRO"&&!game.sim.enemyActive,"boss intro follows dialogue without premature combat");
             Need(game.sim.player.x==3500,"boss intro preserves the position reached by walking inside");
             TimeAt(game,2.2f);Call(game,"Update");
             Need(game.stage=="GUARDIAN_FIGHT"&&game.sim.enemyActive&&game.sim.ai&&game.sim.boss.maxHp==870,"intro enables the sole general fight");
             Call(game,"DrawWorld",0f);Capture(Camera.main,"battle");
             game.sim.player.hp=0;Call(game,"SetStage","DEATH");TimeAt(game,2f);game.Retry();
-            Need(game.stage=="WRATH_ARRIVE"&&game.sim.player.hp==game.sim.player.maxHp&&game.sim.player.x==WrathRoute.Entrance&&!chapter.IsInside&&!game.sim.enemyActive,"death retry restores health at entrance without replaying approach");
-            Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter,true);
-            Need(Math.Abs(Camera.main.orthographicSize-2.4f)<.001,"retry resets the exterior camera zoom immediately");
-            Call(game,"CompleteWrath");Need(game.stage=="WRATH_ROUTE"&&!chapter.IsInside&&game.sim.player.x==WrathRoute.Entrance&&game.sim.boundsMax==WrathRoute.DoorX+80,"victory returns to entrance");
+            Need(game.stage=="WRATH_ARRIVE"&&game.sim.player.hp==game.sim.player.maxHp&&Math.Abs(game.sim.player.x-chapter.exteriorArrivalAnchor.position.x*100)<.01&&!chapter.IsInside&&!game.sim.enemyActive,"death retry restores health at entrance without replaying approach");
+            Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter);
+            Need(Math.Abs(Camera.main.orthographicSize-chapter.ExteriorViewSize)<.001,"retry resets the exterior camera zoom immediately");
+            Call(game,"CompleteWrath");Need(game.stage=="WRATH_ROUTE"&&!chapter.IsInside&&Math.Abs(game.sim.player.x-chapter.exteriorArrivalAnchor.position.x*100)<.01,"victory returns to entrance");
             Need(PlayerPrefs.GetInt(PrologueLayout.SaveKey(WrathRoute.Completed,1))==1,"victory progress persists");
             Need(chapter.DoorOpening==0&&chapter.entranceDoor.sprite==chapter.entranceDoorFrames[0],"returning to the entrance resets the closed door");
-            game.Interact();EnterDoor(game,chapter,false);
-            game.sim.player.x=WrathRoute.Portal-80;Call(game,"SetStage","WRATH_ROUTE");
+            Call(game,"DrawWorld",0f);CheckExteriorCamera(chapter);
+            ApproachDoor(game,chapter);EnterDoor(game,chapter,false);
+            Call(game,"CompleteWrath");
+            game.sim.player.x=chapter.exteriorArrivalAnchor.position.x*100-30;Call(game,"SetStage","WRATH_ROUTE");
             Need((string)Call(game,"ChapterInteraction")=="返回残月神社","return portal remains accessible");
-            Debug.Log("WRATH_INDOOR_PLAY_PASSED: legacy saves, entrance blockade, door dialogue, boss intro, 870 HP combat, retry, victory persistence, rematch and return portal");code=0;
+            Debug.Log("WRATH_INDOOR_PLAY_PASSED: legacy saves, full-width exterior walking, door dialogue, boss intro, 870 HP combat, retry, victory persistence, rematch and return portal");code=0;
         }catch(Exception error){Debug.LogException(error);}
         finally{
             foreach(string key in WrathRoute.SaveKeys.Concat(new[]{PrologueLayout.TailCountKey})){

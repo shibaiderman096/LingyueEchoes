@@ -18,7 +18,7 @@ public static class WrathChapterChecks
             var chapter=root.GetComponent<WrathChapter>();
             Need(root.GetComponent<LingyueGame>()&&chapter.world&&chapter.world.Find("Hero")&&chapter.world.Find("Guardian")&&
                 chapter.embers&&
-                chapter.entranceDoor&&chapter.exteriorScenery&&chapter.fireMark,"chapter has native scene references");
+                chapter.entranceDoor&&chapter.exteriorScenery&&chapter.exteriorArrivalAnchor&&chapter.fireMark,"chapter has native scene references");
             Need(!chapter.world.Find("Props/Entrance checkpoint")&&!chapter.world.Find("Props/Arena seal left")&&
                 !chapter.world.Find("Props/Arena seal right")&&!chapter.world.Find("Props/Shrine return"),
                 "removed checkpoint and arena steles are absent");
@@ -34,17 +34,24 @@ public static class WrathChapterChecks
                 chapter.exteriorPillars.All(r=>r&&r.sprite)&&chapter.exteriorPillars[0].sprite==chapter.exteriorPillars[1].sprite,
                 "the entrance has two pillars sharing one sprite");
             var farPillar=chapter.exteriorPillars[0];var nearPillar=chapter.exteriorPillars[1];
-            Need(chapter.exteriorCanopy&&chapter.exteriorCanopy.sprite,"the entrance canopy has its authored sprite");
+            Need(!chapter.exteriorCanopy||chapter.exteriorCanopy.sprite,"an optional entrance canopy has its authored sprite");
             var hero=chapter.world.Find("Hero").GetComponent<SpriteRenderer>();
             Need(chapter.exteriorScenery.sortingOrder<farPillar.sortingOrder&&farPillar.sortingOrder<hero.sortingOrder&&
                 nearPillar.sortingOrder>hero.sortingOrder,"far and near pillars straddle the hero sorting layer");
             chapter.SetInside(false);
-            Need(chapter.exteriorCanopy.enabled,"outside enables the entrance canopy");
+            Need(!chapter.exteriorCanopy||chapter.exteriorCanopy.enabled,"outside enables an optional entrance canopy");
             Need(chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>r.enabled)&&chapter.scenery.All(r=>!r.enabled)&&chapter.entranceDoor.enabled,"outside enables the exterior, pillars and door");
             chapter.SetInside(true);
-            Need(!chapter.exteriorCanopy.enabled,"inside hides the entrance canopy");
+            Need(!chapter.exteriorCanopy||!chapter.exteriorCanopy.enabled,"inside hides an optional entrance canopy");
             Need(!chapter.exteriorScenery.enabled&&chapter.exteriorPillars.All(r=>!r.enabled)&&chapter.scenery.All(r=>r.enabled)&&!chapter.entranceDoor.enabled,"inside enables only the interior");
-            Need(WrathRoute.Entrance<chapter.entranceDoor.transform.position.x*100,"arrival begins outside before the physical door threshold");
+            var camera=scene.GetRootGameObjects().SelectMany(go=>go.GetComponentsInChildren<Camera>(true)).Single(c=>c.CompareTag("MainCamera"));
+            // Gameplay letterboxes to 16:9 before calculating the exterior bounds.
+            float viewLeft=camera.transform.position.x-camera.orthographicSize*(16f/9);
+            Need(chapter.exteriorArrivalAnchor.position.x>viewLeft&&chapter.exteriorArrivalAnchor.position.x<camera.transform.position.x,
+                "the authored arrival anchor stands in the visible left half of the exterior road");
+            Need(chapter.exteriorArrivalAnchor.position.x<chapter.entranceDoor.transform.position.x,
+                "arrival begins outside before the physical door threshold");
+            Need(farPillar.sortingOrder<chapter.entranceDoor.sortingOrder,"the far pillar base is partially covered by the door");
             Need(WrathRoute.Bridge().Length==0&&!chapter.Terrain().Any(),"the deleted approach has no remaining bridge terrain");
             Need(chapter.UseActorArt(false,0)==null&&chapter.UseActorArt(false,4)==null,"no approach enemy art is available");
             Need(chapter.world.GetComponentsInChildren<SpriteRenderer>(true).All(r=>r.sprite),"all chapter sprites resolve");

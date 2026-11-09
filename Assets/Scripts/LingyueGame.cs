@@ -95,10 +95,12 @@ namespace LingyueEchoes
         internal bool BrokenStepsCleared=>tutorial.StepsCleared;
         void Awake(){Application.targetFrameRate=60;QualitySettings.vSyncCount=0;Input.simulateMouseWithTouches=true;
             content=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/prologue-content").text);PixelWorld.Load();
-            view=Camera.main;if(!view){var camera=new GameObject("Main Camera");camera.tag="MainCamera";view=camera.AddComponent<Camera>();}
-            view.orthographic=true;view.orthographicSize=3.6f;view.transform.position=new Vector3(0,0,-10);view.clearFlags=CameraClearFlags.SolidColor;view.backgroundColor=new Color(.043f,.075f,.106f);
-            if(!FindAnyObjectByType<AudioListener>())view.gameObject.AddComponent<AudioListener>();
             wrath=GetComponent<WrathChapter>();
+            view=Camera.main;if(!view){var camera=new GameObject("Main Camera");camera.tag="MainCamera";view=camera.AddComponent<Camera>();}
+            wrath?.CaptureExteriorView(view);
+            view.orthographic=true;view.orthographicSize=3.6f;view.transform.position=new Vector3(0,0,-10);view.clearFlags=CameraClearFlags.SolidColor;view.backgroundColor=new Color(.043f,.075f,.106f);
+            UpdateViewport();
+            if(!FindAnyObjectByType<AudioListener>())view.gameObject.AddComponent<AudioListener>();
             wrathText=JsonUtility.FromJson<PrologueContent>(Resources.Load<TextAsset>("Data/wrath-content").text);
             world=wrath?wrath.world:transform.Find("World");if(!world)world=PixelWorld.Create(transform);
             if(!wrath){
@@ -331,10 +333,10 @@ namespace LingyueEchoes
                 else if(stage=="TAIL_DIALOGUE"){float focus=(float)((p.x+b.x)/2);cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-4*dt));zoom=1.14f;focusY=16;}
                 else if(wrath){float focus=wrathActive>=0&&stage=="GUARDIAN_FIGHT"
                         ?(float)((WrathRoute.Fights[wrathActive].Min+WrathRoute.Fights[wrathActive].Max)*.5):ChapterCameraX();
-                    cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));zoom=wrath.IsInside?1:WrathOutsideZoom;focusY=wrath.IsInside?0:65;}
+                    cameraX=wrath.IsInside?Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt)):focus;zoom=wrath.IsInside?1:WrathOutsideZoom;focusY=wrath.IsInside?0:wrath.ExteriorViewCenter.y*100;}
                 else{float focus=stage=="TUTORIAL"||stage=="GATE_READY"||stage=="GATE_DIALOGUE"||stage=="WAKE_UP"||stage=="TAIL_EPILOGUE"||ChapterDialogue||stage==WrathTransfer?RouteCameraX():(float)PrologueLayout.ArenaCenter;cameraX=Mathf.Lerp(cameraX,focus,1-Mathf.Exp(-8*dt));}
                 if(!wrath)FramePrologue(ref zoom,ref focusY);
-                view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,-10);}
+                view.orthographicSize=3.6f/zoom;view.transform.position=new Vector3(cameraX/100,focusY/100,wrath&&!wrath.IsInside?wrath.ExteriorViewCenter.z:-10);}
             if(!wrath){
                 var cameraPosition=view.transform.position;
                 cameraPosition.x=PrologueLayout.ClampViewX(cameraPosition.x*100,view.orthographicSize*view.aspect*100)/100;
