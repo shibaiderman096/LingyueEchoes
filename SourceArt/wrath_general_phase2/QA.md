@@ -2,14 +2,15 @@
 
 ## 内容
 
-- `phase.webp`：站立失力 → 单膝跪地 → 地面怒火吞噬全身 → 掉落武器灰化消失 → 黑化形态起身，16 帧。
+- 转阶段拆成两段：`phase-engulf.webp` 为原第1–9帧，站立失力 → 单膝跪地 → 地面怒火吞噬全身、武器灰化；`phase-rise.webp` 为原第10–16帧，黑化形态显现 → 起身。对应运行资源分别在 `phase-engulf/`（9帧）和 `phase-rise/`（7帧），每段从01编号。
+- `phase.webp` 保留为两段连续播放预览。游戏仍在原转阶段总时长中按序播放全部16帧，两段之间不重复、不跳帧；90/120 tick下逐tick检查顺序与覆盖。显式 pose 名称 `phase-engulf`、`phase-rise` 可独立预览，各自使用 `PhaseTransitionFrames` 时长。
 - `idle.webp`、`walk.webp`、`hurt.webp`：二阶段空手待机、移动、受击，各 16 帧。
 - `stun.webp`：16 帧跪下动作，预览包含末帧停留和倒放起身。游戏按实际眩晕时长分配进入、保持和恢复。
 - 游戏帧位于 `Assets/Resources/WrathGeneral/phase2/frames`，384×384，PPU 180，统一 pivot (230/384, 37/384)。
 
 ## 来源与处理
 
-主智能体使用内置 image_gen 绘制；子智能体只参与代码接入和检查。当前无可用视频生成通道，未使用视频生成。`reference.png` 为用户参考，`master.png` 为二阶段身份参考。生成费用由工具管理，未提供金额。
+原图由主智能体使用内置 image_gen 绘制；本次拆段沿用现有图像，未重新生成或增加姿势。子智能体只参与代码接入和检查。当前无可用视频生成通道，未使用视频生成。`reference.png` 为用户参考，`master.png` 为二阶段身份参考。生成费用由工具管理，未提供金额。
 
 `prompts.json`、`generation.json` 保留初始及修正提示。最终转阶段使用 `phase-kneeling-prompt.json`，取代 generation.json 中的站立变身提示；最终行走使用 `walk-stride-prompt.json`。后续一次换腿定向修正仍未解决问题，未替换当前素材。
 

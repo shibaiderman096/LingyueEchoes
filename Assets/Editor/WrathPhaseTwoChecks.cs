@@ -12,13 +12,27 @@ public static class WrathPhaseTwoChecks
     static int started;
     static WrathPhaseTwoChecks(){EditorApplication.playModeStateChanged+=OnPlay;}
     static void Need(bool ok,string message){if(!ok)throw new Exception("Wrath phase two: "+message);}
-    static Sprite Frame(string action,int index)=>AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/"+WrathGeneralArt.Phase2ResourceRoot+action+"/"+action+"-"+index.ToString("00")+".png");
+    static string FramePath(string action,int index){
+        if(action=="phase"){
+            if(index<=WrathGeneralArt.PhaseEngulfFrameCount)action="phase-engulf";
+            else{action="phase-rise";index-=WrathGeneralArt.PhaseEngulfFrameCount;}
+        }
+        return "Assets/Resources/"+WrathGeneralArt.Phase2ResourceRoot+action+"/"+action+"-"+index.ToString("00")+".png";
+    }
+    static Sprite Frame(string action,int index)=>AssetDatabase.LoadAssetAtPath<Sprite>(FramePath(action,index));
+    static void CheckSequence(Sprite sprite,ref int previous,bool[] seen){
+        int current=-1;
+        for(int i=0;i<seen.Length;i++)if(sprite==Frame("phase",i+1)){current=i;break;}
+        Need(current>=0,"transition uses authored frame");
+        Need(current==previous||current==previous+1,"continuous transition order including engulf 09 to rise 01");
+        seen[current]=true;previous=current;
+    }
     public static void Run(){
         var art=new WrathGeneralArt{CurrentPhase=2};var fighter=new Fighter(2,3830,870);
         foreach(string action in new[]{"idle","walk","hurt","stun","phase"}){
             fighter.state=action=="walk"?"run":action=="stun"?"broken":action;
             for(int i=0;i<16;i++){
-                string path="Assets/Resources/"+WrathGeneralArt.Phase2ResourceRoot+action+"/"+action+"-"+(i+1).ToString("00")+".png";
+                string path=FramePath(action,i+1);
                 var sprite=Frame(action,i+1);var importer=AssetImporter.GetAtPath(path) as TextureImporter;
                 Need(sprite&&importer,"80 unique sprite paths: "+path);
                 var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);
@@ -33,6 +47,15 @@ public static class WrathPhaseTwoChecks
             art.PhaseTransitionFrames=duration;fighter.state="phase";
             Need(art.Pose(fighter,null,7,0)==Frame("phase",1),"transition first frame");
             Need(art.Pose(fighter,null,7,(duration-2)/60d)==Frame("phase",16),"configured transition last visible frame");
+            int previous=-1;var seen=new bool[WrathGeneralArt.FrameCount];
+            for(int tick=0;tick<=duration-2;tick++)CheckSequence(art.Pose(fighter,null,7,tick/60d),ref previous,seen);
+            Need(Array.TrueForAll(seen,value=>value),"every split transition frame appears at configured tick duration");
+            foreach(string clip in new[]{"phase-engulf","phase-rise"}){
+                int count=clip=="phase-engulf"?WrathGeneralArt.PhaseEngulfFrameCount:WrathGeneralArt.PhaseRiseFrameCount;
+                Need(art.Pose(fighter,clip,0,0)==Frame(clip,1),"explicit clip first frame: "+clip);
+                Need(art.Pose(fighter,clip,7,(duration-2)/60d)==Frame(clip,count),"explicit clip last frame: "+clip);
+                Need(art.Pose(fighter,clip,0,null)==Frame(clip,1)&&art.Pose(fighter,clip,7,null)==Frame(clip,count),"explicit clip cell endpoints: "+clip);
+            }
         }
         fighter.state="broken";
         double end=(art.BossStaggerFrames-2)/60d,motion=Math.Min(15d/24,end/3),rise=end-motion;
@@ -59,8 +82,9 @@ public static class WrathPhaseTwoChecks
                 combat.Step();Need(combat.phase==2&&combat.boss.state=="phase","real half HP enters transition");
                 chapter.PrepareActorArt(combat,false);Need(art.PhaseTransitionFrames==duration,"active definition timing sync");
                 actor.Draw(combat.boss,combat.frame);Need(renderer.sprite==Frame("phase",1),"real transition starts frame one");
-                int guard=0;Sprite last=null;
-                while(combat.boss.state=="phase"&&guard++<duration+2){actor.Draw(combat.boss,combat.frame);last=renderer.sprite;combat.Step();}
+                int guard=0,previous=-1;Sprite last=null;var seen=new bool[WrathGeneralArt.FrameCount];
+                while(combat.boss.state=="phase"&&guard++<duration+2){actor.Draw(combat.boss,combat.frame);last=renderer.sprite;CheckSequence(last,ref previous,seen);combat.Step();}
+                Need(Array.TrueForAll(seen,value=>value),"real combat visits both clips completely in order");
                 Need(guard<duration+2&&last==Frame("phase",16)&&combat.boss.state=="idle","real transition reaches frame sixteen then idle");
                 chapter.PrepareActorArt(combat,false);actor.Draw(combat.boss,combat.frame);Need(renderer.sprite==Frame("idle",1),"real combat idle switches to phase two");
                 combat.ResetBoss(3830,870,WrathRoute.General);chapter.PrepareActorArt(combat,false);Need(art.CurrentPhase==1,"retry resets phase");

@@ -9,20 +9,21 @@ namespace LingyueEchoes
         public const string ResourceRoot="WrathGeneral/frames/";
         public const string Phase2ResourceRoot="WrathGeneral/phase2/frames/";
         public const int FrameCount=16;
+        public const int PhaseEngulfFrameCount=9,PhaseRiseFrameCount=7;
         public const int StunLoopStart=15,StunEntryFps=24,StunHoldFps=8;
         // Shared import calibration, measured from the bottom-left of each square canvas.
         public const int CanvasPixels=384;
         public const float RootX=230f/384,FootY=37f/384,PixelsPerUnit=180f;
         readonly Sprite[] idle=Load("idle"),walk=Load("walk"),stun=Load("stun"),hurt=Load("hurt");
-        Sprite[] phase2Idle,phase2Walk,phase2Stun,phase2Hurt,phaseTransition;
+        Sprite[] phase2Idle,phase2Walk,phase2Stun,phase2Hurt,phaseEngulf,phaseRise;
         public int CurrentPhase {get;set;}=1;
         public int PhaseTransitionFrames {get;set;}=BossBehaviorCatalog.WrathGeneral.phases[1].transitionFrames;
         // The owning combat view supplies its active definition; standalone previews use the catalog.
         public int BossStaggerFrames {get;set;}=BossBehaviorCatalog.WrathGeneral.staggerFrames;
         public bool CanRecoverFromBreak {get;set;}=true;
 
-        static Sprite[] Load(string action,string root=ResourceRoot){
-            var frames=new Sprite[FrameCount];
+        static Sprite[] Load(string action,string root=ResourceRoot,int count=FrameCount){
+            var frames=new Sprite[count];
             for(int i=0;i<frames.Length;i++){
                 string path=root+action+"/"+action+"-"+(i+1).ToString("00");
                 frames[i]=Resources.Load<Sprite>(path);
@@ -34,9 +35,19 @@ namespace LingyueEchoes
         public Sprite Pose(Fighter fighter,string scripted,int cell,double? seconds){
             double elapsed=Math.Max(0,seconds??Math.Max(0,fighter.age-1)/60d);
             string state=scripted??fighter.state;
-            if(state=="phase"){
-                if(phaseTransition==null)phaseTransition=Load("phase",Phase2ResourceRoot);
-                return phaseTransition[ReactionFrame(elapsed,PhaseTransitionFrames)];
+            if(state=="phase"||state=="phase-engulf"||state=="phase-rise"){
+                if(phaseEngulf==null)phaseEngulf=Load("phase-engulf",Phase2ResourceRoot,PhaseEngulfFrameCount);
+                if(phaseRise==null)phaseRise=Load("phase-rise",Phase2ResourceRoot,PhaseRiseFrameCount);
+                // Combat keeps its original sixteen-frame clock across the two clips.
+                if(state=="phase"){
+                    int globalFrame=ReactionFrame(elapsed,PhaseTransitionFrames);
+                    return globalFrame<PhaseEngulfFrameCount?phaseEngulf[globalFrame]:phaseRise[globalFrame-PhaseEngulfFrameCount];
+                }
+                var clip=state=="phase-engulf"?phaseEngulf:phaseRise;
+                // An explicit clip preview uses the configured transition duration for that clip.
+                int clipFrame=scripted!=null&&!seconds.HasValue?Mathf.Clamp(cell*(clip.Length-1)/7,0,clip.Length-1):
+                    ReactionFrame(elapsed,PhaseTransitionFrames,clip.Length);
+                return clip[clipFrame];
             }
             Sprite[] idle=this.idle,walk=this.walk,stun=this.stun,hurt=this.hurt;
             if(CurrentPhase>=2){
@@ -67,10 +78,10 @@ namespace LingyueEchoes
             return frames[index%FrameCount];
         }
 
-        public static int ReactionFrame(double seconds,int durationFrames){
+        public static int ReactionFrame(double seconds,int durationFrames,int count=FrameCount){
             // age reaches duration before the next render, so age=duration-1 is the last visible tick.
             double lastTick=Math.Max(1,durationFrames-2);
-            return Math.Min(FrameCount-1,(int)Math.Floor(Math.Max(0,seconds)*60*(FrameCount-1)/lastTick+1e-7));
+            return Math.Min(count-1,(int)Math.Floor(Math.Max(0,seconds)*60*(count-1)/lastTick+1e-7));
         }
 
         public static int BreakFrame(double seconds,int durationFrames,bool recover){

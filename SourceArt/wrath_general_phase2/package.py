@@ -78,11 +78,13 @@ def export():
             bbox = output.getbbox()
             if min(bbox[0], bbox[1], CANVAS-bbox[2], CANVAS-bbox[3]) < 8:
                 raise ValueError(f'{action}-{index+1}: insufficient export gutter {bbox}')
-            target = DEST / action / f'{action}-{index+1:02}.png'
+            clip = 'phase-engulf' if action == 'phase' and index < 9 else 'phase-rise' if action == 'phase' else action
+            clip_index = index + 1 if clip != 'phase-rise' else index - 8
+            target = DEST / clip / f'{clip}-{clip_index:02}.png'
             target.parent.mkdir(parents=True, exist_ok=True)
             output.save(target, optimize=True)
             frames.append(output)
-            records.append({'frame': index+1, 'sourceRect': box, 'sourceBootY': foot,
+            records.append({'frame': index+1, 'clip': clip, 'clipFrame': clip_index, 'sourceRect': box, 'sourceBootY': foot,
                             'offset': offset, 'bounds': bbox,
                             'sha256': hashlib.sha256(output.tobytes()).hexdigest()})
         if len({record['sha256'] for record in records}) != 16:
@@ -96,10 +98,18 @@ def export():
         if action == 'stun':
             duration += [42]*15
         preview_frames[0].save(HERE / f'{action}.webp', save_all=True, append_images=preview_frames[1:], duration=duration, loop=0, lossless=True, method=6)
+        if action == 'phase':
+            for name, start, stop in [('phase-engulf', 0, 9), ('phase-rise', 9, 16)]:
+                segment = frames[start:stop]
+                segment[0].save(HERE / f'{name}.webp', save_all=True, append_images=segment[1:], duration=duration[start:stop], loop=0, lossless=True, method=6)
         report['clips'][action] = {'fps': fps, 'loop': action in ('idle', 'walk'),
                                   'scale': scale, 'sourceRootX': source_x,
                                   'recovery': 'reverse entry, stable frame16 hold' if action == 'stun' else 'included' if action == 'hurt' else None,
                                   'frames': records}
+        if action == 'phase':
+            report['clips'][action]['segments'] = [
+                {'action': 'phase-engulf', 'sourceFrames': [1, 9], 'count': 9},
+                {'action': 'phase-rise', 'sourceFrames': [10, 16], 'count': 7}]
     (HERE / 'manifest.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps({'frames': 80, 'canvas': CANVAS, 'alpha': [0, 255],
                       'actionScales': {a: r['scale'] for a, r in report['clips'].items()}}))

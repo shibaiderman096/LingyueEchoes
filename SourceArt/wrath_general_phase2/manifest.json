@@ -24,6 +24,8 @@
       "frames": [
         {
           "frame": 1,
+          "clip": "idle",
+          "clipFrame": 1,
           "sourceRect": [
             0,
             0,
@@ -45,6 +47,8 @@
         },
         {
           "frame": 2,
+          "clip": "idle",
+          "clipFrame": 2,
           "sourceRect": [
             314,
             0,
@@ -66,6 +70,8 @@
         },
         {
           "frame": 3,
+          "clip": "idle",
+          "clipFrame": 3,
           "sourceRect": [
             627,
             0,
@@ -87,6 +93,8 @@
         },
         {
           "frame": 4,
+          "clip": "idle",
+          "clipFrame": 4,
           "sourceRect": [
             941,
             0,
@@ -108,6 +116,8 @@
         },
         {
           "frame": 5,
+          "clip": "idle",
+          "clipFrame": 5,
           "sourceRect": [
             0,
             314,
@@ -129,6 +139,8 @@
         },
         {
           "frame": 6,
+          "clip": "idle",
+          "clipFrame": 6,
           "sourceRect": [
             314,
             314,
@@ -150,6 +162,8 @@
         },
         {
           "frame": 7,
+          "clip": "idle",
+          "clipFrame": 7,
           "sourceRect": [
             627,
             314,
@@ -171,6 +185,8 @@
         },
         {
           "frame": 8,
+          "clip": "idle",
+          "clipFrame": 8,
           "sourceRect": [
             941,
             314,
@@ -192,6 +208,8 @@
         },
         {
           "frame": 9,
+          "clip": "idle",
+          "clipFrame": 9,
           "sourceRect": [
             0,
             627,
@@ -213,6 +231,8 @@
         },
         {
           "frame": 10,
+          "clip": "idle",
+          "clipFrame": 10,
           "sourceRect": [
             314,
             627,
@@ -234,6 +254,8 @@
         },
         {
           "frame": 11,
+          "clip": "idle",
+          "clipFrame": 11,
           "sourceRect": [
             627,
             627,
@@ -255,6 +277,8 @@
         },
         {
           "frame": 12,
+          "clip": "idle",
+          "clipFrame": 12,
           "sourceRect": [
             941,
             627,
@@ -276,6 +300,8 @@
         },
         {
           "frame": 13,
+          "clip": "idle",
+          "clipFrame": 13,
           "sourceRect": [
             0,
             941,
@@ -297,6 +323,8 @@
         },
         {
           "frame": 14,
+          "clip": "idle",
+          "clipFrame": 14,
           "sourceRect": [
             314,
             941,
@@ -318,6 +346,8 @@
         },
         {
           "frame": 15,
+          "clip": "idle",
+          "clipFrame": 15,
           "sourceRect": [
             627,
             941,
@@ -339,6 +369,8 @@
         },
         {
           "frame": 16,
+          "clip": "idle",
+          "clipFrame": 16,
           "sourceRect": [
             941,
             941,
@@ -369,6 +401,8 @@
       "frames": [
         {
           "frame": 1,
+          "clip": "walk",
+          "clipFrame": 1,
           "sourceRect": [
             0,
             0,
@@ -390,6 +424,8 @@
         },
         {
           "frame": 2,
+          "clip": "walk",
+          "clipFrame": 2,
           "sourceRect": [
             314,
             0,
@@ -411,6 +447,8 @@
         },
         {
           "frame": 3,
+          "clip": "walk",
+          "clipFrame": 3,
           "sourceRect": [
             627,
             0,
@@ -432,6 +470,8 @@
         },
         {
           "frame": 4,
+          "clip": "walk",
+          "clipFrame": 4,
           "sourceRect": [
             941,
             0,
@@ -453,6 +493,8 @@
         },
         {
           "frame": 5,
+          "clip": "walk",
+          "clipFrame": 5,
           "sourceRect": [
             0,
             314,
@@ -474,6 +516,8 @@
         },
         {
           "frame": 6,
+          "clip": "walk",
+          "clipFrame": 6,
           "sourceRect": [
             314,
             314,
@@ -495,6 +539,8 @@
         },
         {
           "frame": 7,
+          "clip": "walk",
+          "clipFrame": 7,
           "sourceRect": [
             627,
             314,
@@ -516,6 +562,8 @@
         },
         {
           "frame": 8,
+          "clip": "walk",
+          "clipFrame": 8,
           "sourceRect": [
             941,
             314,
@@ -537,6 +585,8 @@
         },
         {
           "frame": 9,
+          "clip": "walk",
+          "clipFrame": 9,
           "sourceRect": [
             0,
             627,
@@ -558,6 +608,8 @@
         },
         {
           "frame": 10,
+          "clip": "walk",
+          "clipFrame": 10,
           "sourceRect": [
             314,
             627,
@@ -579,6 +631,8 @@
         },
         {
           "frame": 11,
+          "clip": "walk",
+          "clipFrame": 11,
           "sourceRect": [
             627,
             627,
@@ -600,6 +654,8 @@
         },
         {
           "frame": 12,
+          "clip": "walk",
+          "clipFrame": 12,
           "sourceRect": [
             941,
             627,
@@ -621,6 +677,8 @@
         },
         {
           "frame": 13,
+          "clip": "walk",
+          "clipFrame": 13,
           "sourceRect": [
             0,
             941,
@@ -642,6 +700,8 @@
         },
         {
           "frame": 14,
+          "clip": "walk",
+          "clipFrame": 14,
           "sourceRect": [
             314,
             941,
@@ -663,6 +723,8 @@
         },
         {
           "frame": 15,
+          "clip": "walk",
+          "clipFrame": 15,
           "sourceRect": [
             627,
             941,
@@ -684,6 +746,8 @@
         },
         {
           "frame": 16,
+          "clip": "walk",
+          "clipFrame": 16,
           "sourceRect": [
             941,
             941,
@@ -714,6 +778,8 @@
       "frames": [
         {
           "frame": 1,
+          "clip": "hurt",
+          "clipFrame": 1,
           "sourceRect": [
             0,
             0,
@@ -735,6 +801,8 @@
         },
         {
           "frame": 2,
+          "clip": "hurt",
+          "clipFrame": 2,
           "sourceRect": [
             314,
             0,
@@ -756,6 +824,8 @@
         },
         {
           "frame": 3,
+          "clip": "hurt",
+          "clipFrame": 3,
           "sourceRect": [
             627,
             0,
@@ -777,6 +847,8 @@
         },
         {
           "frame": 4,
+          "clip": "hurt",
+          "clipFrame": 4,
           "sourceRect": [
             941,
             0,
@@ -798,6 +870,8 @@
         },
         {
           "frame": 5,
+          "clip": "hurt",
+          "clipFrame": 5,
           "sourceRect": [
             0,
             314,
@@ -819,6 +893,8 @@
         },
         {
           "frame": 6,
+          "clip": "hurt",
+          "clipFrame": 6,
           "sourceRect": [
             314,
             314,
@@ -840,6 +916,8 @@
         },
         {
           "frame": 7,
+          "clip": "hurt",
+          "clipFrame": 7,
           "sourceRect": [
             627,
             314,
@@ -861,6 +939,8 @@
         },
         {
           "frame": 8,
+          "clip": "hurt",
+          "clipFrame": 8,
           "sourceRect": [
             941,
             314,
@@ -882,6 +962,8 @@
         },
         {
           "frame": 9,
+          "clip": "hurt",
+          "clipFrame": 9,
           "sourceRect": [
             0,
             627,
@@ -903,6 +985,8 @@
         },
         {
           "frame": 10,
+          "clip": "hurt",
+          "clipFrame": 10,
           "sourceRect": [
             314,
             627,
@@ -924,6 +1008,8 @@
         },
         {
           "frame": 11,
+          "clip": "hurt",
+          "clipFrame": 11,
           "sourceRect": [
             627,
             627,
@@ -945,6 +1031,8 @@
         },
         {
           "frame": 12,
+          "clip": "hurt",
+          "clipFrame": 12,
           "sourceRect": [
             941,
             627,
@@ -966,6 +1054,8 @@
         },
         {
           "frame": 13,
+          "clip": "hurt",
+          "clipFrame": 13,
           "sourceRect": [
             0,
             941,
@@ -987,6 +1077,8 @@
         },
         {
           "frame": 14,
+          "clip": "hurt",
+          "clipFrame": 14,
           "sourceRect": [
             314,
             941,
@@ -1008,6 +1100,8 @@
         },
         {
           "frame": 15,
+          "clip": "hurt",
+          "clipFrame": 15,
           "sourceRect": [
             627,
             941,
@@ -1029,6 +1123,8 @@
         },
         {
           "frame": 16,
+          "clip": "hurt",
+          "clipFrame": 16,
           "sourceRect": [
             941,
             941,
@@ -1059,6 +1155,8 @@
       "frames": [
         {
           "frame": 1,
+          "clip": "stun",
+          "clipFrame": 1,
           "sourceRect": [
             0,
             0,
@@ -1080,6 +1178,8 @@
         },
         {
           "frame": 2,
+          "clip": "stun",
+          "clipFrame": 2,
           "sourceRect": [
             314,
             0,
@@ -1101,6 +1201,8 @@
         },
         {
           "frame": 3,
+          "clip": "stun",
+          "clipFrame": 3,
           "sourceRect": [
             627,
             0,
@@ -1122,6 +1224,8 @@
         },
         {
           "frame": 4,
+          "clip": "stun",
+          "clipFrame": 4,
           "sourceRect": [
             941,
             0,
@@ -1143,6 +1247,8 @@
         },
         {
           "frame": 5,
+          "clip": "stun",
+          "clipFrame": 5,
           "sourceRect": [
             0,
             314,
@@ -1164,6 +1270,8 @@
         },
         {
           "frame": 6,
+          "clip": "stun",
+          "clipFrame": 6,
           "sourceRect": [
             314,
             314,
@@ -1185,6 +1293,8 @@
         },
         {
           "frame": 7,
+          "clip": "stun",
+          "clipFrame": 7,
           "sourceRect": [
             627,
             314,
@@ -1206,6 +1316,8 @@
         },
         {
           "frame": 8,
+          "clip": "stun",
+          "clipFrame": 8,
           "sourceRect": [
             941,
             314,
@@ -1227,6 +1339,8 @@
         },
         {
           "frame": 9,
+          "clip": "stun",
+          "clipFrame": 9,
           "sourceRect": [
             0,
             627,
@@ -1248,6 +1362,8 @@
         },
         {
           "frame": 10,
+          "clip": "stun",
+          "clipFrame": 10,
           "sourceRect": [
             314,
             627,
@@ -1269,6 +1385,8 @@
         },
         {
           "frame": 11,
+          "clip": "stun",
+          "clipFrame": 11,
           "sourceRect": [
             627,
             627,
@@ -1290,6 +1408,8 @@
         },
         {
           "frame": 12,
+          "clip": "stun",
+          "clipFrame": 12,
           "sourceRect": [
             941,
             627,
@@ -1311,6 +1431,8 @@
         },
         {
           "frame": 13,
+          "clip": "stun",
+          "clipFrame": 13,
           "sourceRect": [
             0,
             941,
@@ -1332,6 +1454,8 @@
         },
         {
           "frame": 14,
+          "clip": "stun",
+          "clipFrame": 14,
           "sourceRect": [
             314,
             941,
@@ -1353,6 +1477,8 @@
         },
         {
           "frame": 15,
+          "clip": "stun",
+          "clipFrame": 15,
           "sourceRect": [
             627,
             941,
@@ -1374,6 +1500,8 @@
         },
         {
           "frame": 16,
+          "clip": "stun",
+          "clipFrame": 16,
           "sourceRect": [
             941,
             941,
@@ -1404,6 +1532,8 @@
       "frames": [
         {
           "frame": 1,
+          "clip": "phase-engulf",
+          "clipFrame": 1,
           "sourceRect": [
             0,
             0,
@@ -1425,6 +1555,8 @@
         },
         {
           "frame": 2,
+          "clip": "phase-engulf",
+          "clipFrame": 2,
           "sourceRect": [
             314,
             0,
@@ -1446,6 +1578,8 @@
         },
         {
           "frame": 3,
+          "clip": "phase-engulf",
+          "clipFrame": 3,
           "sourceRect": [
             627,
             0,
@@ -1467,6 +1601,8 @@
         },
         {
           "frame": 4,
+          "clip": "phase-engulf",
+          "clipFrame": 4,
           "sourceRect": [
             941,
             0,
@@ -1488,6 +1624,8 @@
         },
         {
           "frame": 5,
+          "clip": "phase-engulf",
+          "clipFrame": 5,
           "sourceRect": [
             0,
             314,
@@ -1509,6 +1647,8 @@
         },
         {
           "frame": 6,
+          "clip": "phase-engulf",
+          "clipFrame": 6,
           "sourceRect": [
             314,
             314,
@@ -1530,6 +1670,8 @@
         },
         {
           "frame": 7,
+          "clip": "phase-engulf",
+          "clipFrame": 7,
           "sourceRect": [
             627,
             314,
@@ -1551,6 +1693,8 @@
         },
         {
           "frame": 8,
+          "clip": "phase-engulf",
+          "clipFrame": 8,
           "sourceRect": [
             941,
             314,
@@ -1572,6 +1716,8 @@
         },
         {
           "frame": 9,
+          "clip": "phase-engulf",
+          "clipFrame": 9,
           "sourceRect": [
             0,
             627,
@@ -1593,6 +1739,8 @@
         },
         {
           "frame": 10,
+          "clip": "phase-rise",
+          "clipFrame": 1,
           "sourceRect": [
             314,
             627,
@@ -1614,6 +1762,8 @@
         },
         {
           "frame": 11,
+          "clip": "phase-rise",
+          "clipFrame": 2,
           "sourceRect": [
             627,
             627,
@@ -1635,6 +1785,8 @@
         },
         {
           "frame": 12,
+          "clip": "phase-rise",
+          "clipFrame": 3,
           "sourceRect": [
             941,
             627,
@@ -1656,6 +1808,8 @@
         },
         {
           "frame": 13,
+          "clip": "phase-rise",
+          "clipFrame": 4,
           "sourceRect": [
             0,
             941,
@@ -1677,6 +1831,8 @@
         },
         {
           "frame": 14,
+          "clip": "phase-rise",
+          "clipFrame": 5,
           "sourceRect": [
             314,
             941,
@@ -1698,6 +1854,8 @@
         },
         {
           "frame": 15,
+          "clip": "phase-rise",
+          "clipFrame": 6,
           "sourceRect": [
             627,
             941,
@@ -1719,6 +1877,8 @@
         },
         {
           "frame": 16,
+          "clip": "phase-rise",
+          "clipFrame": 7,
           "sourceRect": [
             941,
             941,
@@ -1737,6 +1897,24 @@
             348
           ],
           "sha256": "45c7044cc8a7c1fbad1c059f462da36041127c0acaea842a779d1ceb6ed5e03d"
+        }
+      ],
+      "segments": [
+        {
+          "action": "phase-engulf",
+          "sourceFrames": [
+            1,
+            9
+          ],
+          "count": 9
+        },
+        {
+          "action": "phase-rise",
+          "sourceFrames": [
+            10,
+            16
+          ],
+          "count": 7
         }
       ]
     }
