@@ -26,6 +26,10 @@ namespace LingyueEchoes
         float backpackTime;
         float healGuideTime,healFeedbackTime;string healFeedback;
         bool debug,boxes,focused=true,motion,muted,hadTouch,showKeyHints,gameSettings;
+        bool applicationSuspended;
+        readonly WrathPhaseWipe wrathPhaseWipe=new WrathPhaseWipe();
+        Texture2D[] wrathWipeTextures;
+        public WrathPhaseWipe PhaseWipe=>wrathPhaseWipe;
         int settingsChoice,settingsDirection;
         static readonly Rect SettingsButton=new Rect(1125,35,120,52);
         const float RightHintKeyEdge=1180,HintRightMargin=18,HintKeyGap=10;
@@ -209,6 +213,7 @@ namespace LingyueEchoes
         }
         public void Home(){ClearInput();speech.Reset();effects?.Clear();modal="";deleteSaveSlot=0;gameSettings=backpackOpen=false;menuChoice=menuDirection=0;menuPointer=Input.mousePosition;SetStage("MENU");world.gameObject.SetActive(false);SetMusic("menu_stage_select");}
         void SetStage(string value){
+            if(value!="GUARDIAN_FIGHT")wrathPhaseWipe.Reset();
             if(stage=="FIRST_TAIL"&&value!="FIRST_TAIL"){
                 music.volume=MusicVolume;
                 if(value!="TAIL_EPILOGUE")tailAudio.Stop();
@@ -281,7 +286,15 @@ namespace LingyueEchoes
             deathZoomTime=Math.Min(DeathZoomDuration,deathZoomTime+dt);
             if(deathZoomTime>=DeathZoomDuration&&(sim.frame-deathFrame)/60f>=deathAnimationDuration&&sim.player.vy==0)SetStage("DEATH");
         }
-        void Update(){float dt=Math.Min(Time.unscaledDeltaTime,.25f);UpdateViewport();if(!focused&&!Application.isBatchMode)return;ReadInput();
+        void Update(){UpdateFrame(Time.unscaledDeltaTime);}
+        void UpdateFrame(float unscaledDelta){float dt=Math.Min(unscaledDelta,.25f);UpdateViewport();
+            bool wipeEligible=stage=="GUARDIAN_FIGHT"&&ChapterBoss;
+            if(wrathPhaseWipe.Observe(sim,wipeEligible)){ClearInput();clock.ClearAccumulation();}
+            if(applicationSuspended||!focused&&(!Application.isBatchMode||wrathPhaseWipe.Active))return;ReadInput();
+            if(wrathPhaseWipe.Active){
+                wrathPhaseWipe.Advance(unscaledDelta,clock.paused||gameSettings||backpackOpen);
+                clock.ClearAccumulation();DrawActors(null);return;
+            }
             if(music)music.mute=muted;
             if(tailAudio)tailAudio.mute=muted;
             if(backpackOpen){backpackTime+=dt;DrawActors(dt);return;}
@@ -307,7 +320,7 @@ namespace LingyueEchoes
                 case "GUARDIAN_DEFEAT":UpdateGuardianDefeat(dt);break;
                 case "DYING":case "DEATH":UpdateDeath(dt);break;
                 default:
-                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();clock.Advance(dt);SyncSounds();
+                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();clock.Advance(dt,()=>{if(!wrathPhaseWipe.Observe(sim,stage=="GUARDIAN_FIGHT"&&ChapterBoss))return false;ClearInput();return true;});SyncSounds();
                         if(sim.player.hp<=0&&sim.player.state=="dead"){EnterDeath();}
                         else if(stage=="TUTORIAL"){var id=tutorial.Speech(sim,!speech.Active);if(id!=null)Say(id);
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
@@ -381,6 +394,7 @@ namespace LingyueEchoes
             }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
             else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
+            else if(wrathPhaseWipe.Active)guardian.Draw(b,sim.frame,pose:"phase-engulf",poseCell:7);
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&!ChapterGeneralVisible?0:1,idleDelta:idleDelta);
             float glintAge=stageTime-TrialSlashTime;
             bool bladeFlash=!wrath&&stage=="GUARDIAN_INTRO"&&glintAge>=0&&glintAge<.18f;
@@ -455,7 +469,7 @@ namespace LingyueEchoes
                 if(device=="pad"&&!Input.GetJoystickNames().Any(n=>!string.IsNullOrWhiteSpace(n)))inputDevice.Select(Application.isMobilePlatform||previewTouchControls?"touch":"keyboard");}
             lastInputDevice=device;
         }
-        void ReadInput(){DetectInputDevice();bool padA=Input.GetKeyDown(PadConfirm),padB=Input.GetKeyDown(PadBack);bool confirm=Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.Space)||padA;
+        void ReadInput(){if(wrathPhaseWipe.Active){if(Input.GetKeyDown(KeyCode.Escape))Act("pause");return;}DetectInputDevice();bool padA=Input.GetKeyDown(PadConfirm),padB=Input.GetKeyDown(PadBack);bool confirm=Input.GetKeyDown(KeyCode.Return)||Input.GetKeyDown(KeyCode.Space)||padA;
             Vector2 pointer=Input.mousePosition;
             Vector2? hover=pointer!=menuPointer&&!TouchControlsVisible?UiPoint(pointer):null;
             menuPointer=pointer;
@@ -624,7 +638,7 @@ namespace LingyueEchoes
         }
         void MobileAction(string action){if(action==null||clock.paused&&action!="pause")return;if(action=="interact")Interact();else if(action=="heal")RequestHeal();else Act(action);}
         void RequestHeal(){
-            if(!HealAvailable||clock.paused||sim.player.hp<=0||sim.player.state=="heal")return;
+            if(wrathPhaseWipe.Active||!HealAvailable||clock.paused||sim.player.hp<=0||sim.player.state=="heal")return;
             var p=sim.player;
             healFeedback=p.hp>=p.maxHp?"生命已满":p.energy<Rules.healCost?"回响不足":null;
             healFeedbackTime=healFeedback==null?0:1.4f;
@@ -632,13 +646,13 @@ namespace LingyueEchoes
         }
         double ReadAxis(){if(scriptedAxis.HasValue)return scriptedAxis.Value;float pad=Input.GetAxisRaw("PadX"),dpad=Input.GetAxisRaw("PadDpad");if(Math.Abs(pad)>.2f)return pad;if(Math.Abs(dpad)>.2f)return dpad;
             bool left=Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow),right=Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow);int keys=(right?1:0)-(left?1:0);return keys!=0?keys:mobileControls.Axis;}
-        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen)return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun")sim.BreakBossPosture();else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
+        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen||wrathPhaseWipe.Active&&action!="pause")return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun")sim.BreakBossPosture();else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
-        void OnApplicationPause(bool pause){if(pause)ClearInput();}
+        void OnApplicationPause(bool pause){applicationSuspended=pause;if(pause){ClearInput();clock?.ClearAccumulation();}}
         void OnDestroy(){StopSounds();if(font)Destroy(font);if(hudPortrait)Destroy(hudPortrait);if(hudRing)Destroy(hudRing);if(tailGlow)Destroy(tailGlow);if(tailVignette)Destroy(tailVignette);}
 
-        void OnGUI(){if(!font)return;var oldMatrix=GUI.matrix;float scale=Math.Min(Screen.width/1280f,Screen.height/720f);GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*scale)/2,(Screen.height-720*scale)/2,0),Quaternion.identity,Vector3.one*scale);
+        void OnGUI(){if(wrathPhaseWipe.Active){DrawWrathPhaseWipe();return;}if(!font)return;var oldMatrix=GUI.matrix;float scale=Math.Min(Screen.width/1280f,Screen.height/720f);GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*scale)/2,(Screen.height-720*scale)/2,0),Quaternion.identity,Vector3.one*scale);
             if(textStyle==null){textStyle=new GUIStyle(GUI.skin.label){font=font,wordWrap=true};buttonStyle=new GUIStyle(GUI.skin.button){font=font,fontSize=21,alignment=TextAnchor.MiddleCenter,wordWrap=true};}
             if(stage=="MENU")MenuGUI();
             else{

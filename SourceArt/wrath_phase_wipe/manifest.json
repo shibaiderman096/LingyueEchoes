@@ -1,0 +1,195 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "sourceSize": [
+    1672,
+    941
+  ],
+  "canvas": [
+    512,
+    288
+  ],
+  "count": 16,
+  "durationSeconds": 1.6,
+  "alpha": "binary; transparent RGB zero",
+  "fullBleed": true,
+  "peakComposite": "runtime opaque charcoal underlay fills tiny alpha holes in frames9-11",
+  "frames": [
+    {
+      "frame": 1,
+      "sourceRect": [
+        2,
+        2,
+        416,
+        233
+      ],
+      "opaqueCoverage": 0.012864854600694444,
+      "sha256": "ec08faf4eccbfddfb2791ab067d3f5aa4f1243027f4740712246ca0241d784e5"
+    },
+    {
+      "frame": 2,
+      "sourceRect": [
+        420,
+        2,
+        834,
+        233
+      ],
+      "opaqueCoverage": 0.03350830078125,
+      "sha256": "04c9ac48bb48f1c5977a188b356a3bcacc58d4dde8fed9a6f174bd1aee88da7e"
+    },
+    {
+      "frame": 3,
+      "sourceRect": [
+        838,
+        2,
+        1252,
+        233
+      ],
+      "opaqueCoverage": 0.0765652126736111,
+      "sha256": "65ac70db152a30b5f8cbc374e221ca39470827c225f10e7b2dc9b580320bead0"
+    },
+    {
+      "frame": 4,
+      "sourceRect": [
+        1256,
+        2,
+        1670,
+        233
+      ],
+      "opaqueCoverage": 0.13761393229166666,
+      "sha256": "0dd96adb0c3f0c9c98e9e049804e13809740d5ed6b531e91b4126ac4e6f0af89"
+    },
+    {
+      "frame": 5,
+      "sourceRect": [
+        2,
+        237,
+        416,
+        469
+      ],
+      "opaqueCoverage": 0.3176608615451389,
+      "sha256": "37bb1220b8e1ede865a77500e3aad1e8f7242cd07848c728b3587d00d0718026"
+    },
+    {
+      "frame": 6,
+      "sourceRect": [
+        420,
+        237,
+        834,
+        469
+      ],
+      "opaqueCoverage": 0.5378757052951388,
+      "sha256": "9b989b4f455038943095174b5b1c9785c9e9d8e79fd11b2a2dbf7a887febec2d"
+    },
+    {
+      "frame": 7,
+      "sourceRect": [
+        838,
+        237,
+        1252,
+        469
+      ],
+      "opaqueCoverage": 0.7436455620659722,
+      "sha256": "0373d49ef6f19b797211e512e4381806095d42bfeb04515ac06524769bfc12cf"
+    },
+    {
+      "frame": 8,
+      "sourceRect": [
+        1256,
+        237,
+        1670,
+        469
+      ],
+      "opaqueCoverage": 0.9613172743055556,
+      "sha256": "ac6f570da99fc40ba129a9ab93a76341a003da4e6b8f2c3d27e5dcc8a4a3d658"
+    },
+    {
+      "frame": 9,
+      "sourceRect": [
+        2,
+        473,
+        416,
+        704
+      ],
+      "opaqueCoverage": 0.9787801106770834,
+      "sha256": "024d29f64e2e224afde7765206624e5176cf327e0adacf507dd44855ae8f95e5"
+    },
+    {
+      "frame": 10,
+      "sourceRect": [
+        420,
+        473,
+        834,
+        704
+      ],
+      "opaqueCoverage": 0.9787529839409722,
+      "sha256": "19085b7ee1d3e0401f6d7c1203bfe23760fb5929ea27545f4ba7947abb5d3bf2"
+    },
+    {
+      "frame": 11,
+      "sourceRect": [
+        838,
+        473,
+        1252,
+        704
+      ],
+      "opaqueCoverage": 0.9795871310763888,
+      "sha256": "f785c7ea5470de863b7f80c8012b5ae9205257dc6f5061d08d6cb82b2b40b227"
+    },
+    {
+      "frame": 12,
+      "sourceRect": [
+        1256,
+        473,
+        1670,
+        704
+      ],
+      "opaqueCoverage": 0.87274169921875,
+      "sha256": "d7e5bb625353f6f323515ef35553ddf40183055220ac80e4d7c5189803b6e307"
+    },
+    {
+      "frame": 13,
+      "sourceRect": [
+        2,
+        708,
+        416,
+        939
+      ],
+      "opaqueCoverage": 0.6489664713541666,
+      "sha256": "937c9eaad8e318857784b96359127ba747693928e01c122f6c35bc68ef2b4ce6"
+    },
+    {
+      "frame": 14,
+      "sourceRect": [
+        420,
+        708,
+        834,
+        939
+      ],
+      "opaqueCoverage": 0.2673678927951389,
+      "sha256": "941c606b22e16700d0a7e6fcbe55a1b995e6c00a63d1e2c3869d2858a6be3f61"
+    },
+    {
+      "frame": 15,
+      "sourceRect": [
+        838,
+        708,
+        1252,
+        939
+      ],
+      "opaqueCoverage": 0.09301079644097222,
+      "sha256": "83495134755d917e70ceda115b300a26af85be6bb69f853a9dcd016602e38bdc"
+    },
+    {
+      "frame": 16,
+      "sourceRect": [
+        1256,
+        708,
+        1670,
+        939
+      ],
+      "opaqueCoverage": 0.005167643229166667,
+      "sha256": "c9a77dc41ba5c28e1074cbe94733faad9fc516465443851d44c3debada82ca5a"
+    }
+  ]
+}

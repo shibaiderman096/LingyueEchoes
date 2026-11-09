@@ -329,7 +329,16 @@ namespace LingyueEchoes
         public double Rate=>speed*(cinematicTicks>0?.25:1);
         public void ClearAccumulation(){accumulator=0;fraction=0;}
         void ObserveTempo(){if(tempoSeen!=combat.tempoSerial){tempoSeen=combat.tempoSerial;cinematicTicks=24;fraction=0;}}
-        public void Advance(double dt){if(paused)return;accumulator+=Math.Min(Math.Max(dt,0),.25);while(accumulator+1e-9>=1d/60){accumulator-=1d/60;ObserveTempo();if(combat.hitstop>0){combat.Step();continue;}double rate=Rate;if(cinematicTicks>0)cinematicTicks--;fraction+=rate;while(fraction+1e-9>=1){fraction--;combat.Step();ObserveTempo();}}}
+        public void Advance(double dt,Func<bool> stopAfterTick=null){
+            if(paused)return;
+            accumulator+=Math.Min(Math.Max(dt,0),.25);
+            while(accumulator+1e-9>=1d/60){
+                accumulator-=1d/60;ObserveTempo();
+                if(combat.hitstop>0){combat.Step();if(stopAfterTick?.Invoke()==true){ClearAccumulation();return;}continue;}
+                double rate=Rate;if(cinematicTicks>0)cinematicTicks--;fraction+=rate;
+                while(fraction+1e-9>=1){fraction--;combat.Step();ObserveTempo();if(stopAfterTick?.Invoke()==true){ClearAccumulation();return;}}
+            }
+        }
         public void Single(){combat.Step();ObserveTempo();}
     }
 }

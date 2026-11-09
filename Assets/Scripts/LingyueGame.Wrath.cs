@@ -17,6 +17,18 @@ namespace LingyueEchoes
         float WrathExteriorBoundsMax=>Mathf.Min(ExteriorCameraEndX(WrathOutsideZoom)+3.6f/WrathOutsideZoom*view.aspect*100,
             Mathf.Min(WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity,
                 wrath?wrath.ExteriorDoorSeamX*100:float.PositiveInfinity));
+        void DrawWrathPhaseWipe(){
+            if(wrathWipeTextures==null){wrathWipeTextures=new Texture2D[WrathPhaseWipe.FrameCount];for(int i=0;i<wrathWipeTextures.Length;i++)wrathWipeTextures[i]=Resources.Load<Texture2D>(WrathPhaseWipe.ResourceRoot+(i+1).ToString("00"));}
+            var matrix=GUI.matrix;var color=GUI.color;bool enabled=GUI.enabled;int depth=GUI.depth;
+            try{GUI.matrix=Matrix4x4.identity;GUI.color=Color.white;GUI.enabled=false;GUI.depth=-10000;
+                var screen=new Rect(0,0,Screen.width,Screen.height);
+                // The charred screen seals tiny transparent holes in the flame peak, including letterboxing.
+                float blacken=Mathf.Min(Mathf.Clamp01((wrathPhaseWipe.Elapsed-.5f)/.3f),Mathf.Clamp01((1.3f-wrathPhaseWipe.Elapsed)/.2f));
+                GUI.color=new Color(.06f,.005f,.005f,blacken);GUI.DrawTexture(screen,Texture2D.whiteTexture);GUI.color=Color.white;
+                var texture=wrathWipeTextures[wrathPhaseWipe.FrameIndex];if(texture)GUI.DrawTexture(screen,texture,ScaleMode.StretchToFill,true);
+            }finally{GUI.matrix=matrix;GUI.color=color;GUI.enabled=enabled;GUI.depth=depth;}
+        }
+
         void UpdateWrathExteriorBounds(){
             sim.boundsMin=WrathExteriorBoundsMin;sim.boundsMax=WrathExteriorBoundsMax;
         }
