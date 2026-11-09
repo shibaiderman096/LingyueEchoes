@@ -115,7 +115,7 @@ namespace LingyueEchoes
             if(!wrathEntered){
                 float walk=Ramp(stageTime,WrathWalkStart,WrathWalkEnd);
                 sim.player.x=Mathf.Lerp(wrathEnterX,(float)WrathRoute.DoorX+142,walk);
-                sim.player.y=30*walk;sim.player.vy=0;
+                sim.player.y=12*walk;sim.player.vy=0;
                 if(stageTime>=wrathNextStep&&stageTime<=WrathWalkEnd){UiSound("step");wrathNextStep+=.33f;}
                 if(stageTime>=WrathInsideTime){
                     wrathEntered=true;wrath.SetInside(true);sim.boundsMax=WrathRoute.BoundsMax;

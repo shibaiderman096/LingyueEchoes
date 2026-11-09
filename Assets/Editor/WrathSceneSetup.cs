@@ -11,8 +11,10 @@ public static class WrathSceneSetup
     const string PalettePath="Assets/Scenes/WrathPlaceholderSprites.asset";
     const string ArtPath="Assets/Art/Wrath/";
     const float ExteriorWidth=14.4f,ExteriorCenterX=31.08f,ExteriorFloorFromTop=.68f;
+    // Independent house plate: adjust its placement without rescaling the road backdrop.
+    const float ExteriorHouseX=35.60f,ExteriorHouseY=.66f,ExteriorHouseWidth=6f,ExteriorHouseHeight=4f;
     const float InteriorWidth=20f,InteriorCenterX=37.1f,FloorY=-.95f;
-    const float EntranceDoorX=34.36f,EntranceDoorY=1.22f,EntranceDoorSize=3.90f;
+    const float EntranceDoorX=34.31f,EntranceDoorY=.25f,EntranceDoorSize=2.20f;
     static Color C(int r,int g,int b,int a=255)=>new Color32((byte)r,(byte)g,(byte)b,(byte)a);
     [MenuItem("Lingyue/Create Wrath scene (if missing)")]
     public static void EnsureScene(){
@@ -39,6 +41,7 @@ public static class WrathSceneSetup
     public static void RebuildIndoor(){
         var interior=LoadArt("Interior");
         var exterior=LoadArt("Exterior");
+        var house=LoadArt("House");
         var doors=Enumerable.Range(1,16).Select(i=>LoadArt("DoorOpening/door-"+i.ToString("00"))).ToArray();
         var shapes=AssetDatabase.LoadAllAssetsAtPath(PalettePath).OfType<Sprite>().ToDictionary(x=>x.name);
         var block=shapes["Block"];var flame=shapes["Flame"];
@@ -56,6 +59,7 @@ public static class WrathSceneSetup
         chapter.scenery=new[]{Piece(room,"General hall interior",interior,InteriorCenterX,FloorY+.18f*height,InteriorWidth,height,-20,Color.white)};
         float exteriorHeight=ExteriorWidth*exterior.rect.height/exterior.rect.width;
         chapter.exteriorScenery=Piece(room,"General hall exterior",exterior,ExteriorCenterX,FloorY+(ExteriorFloorFromTop-.5f)*exteriorHeight,ExteriorWidth,exteriorHeight,-20,Color.white);
+        chapter.exteriorHouse=Piece(room,"General hall exterior house",house,ExteriorHouseX,ExteriorHouseY,ExteriorHouseWidth,ExteriorHouseHeight,-15,Color.white);
         chapter.bridgeStones=Array.Empty<SpriteRenderer>();
         var props=Group(world,"Props");
         chapter.entranceDoorFrames=doors;

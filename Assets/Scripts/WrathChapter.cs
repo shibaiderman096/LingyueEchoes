@@ -46,7 +46,7 @@ namespace LingyueEchoes
         public Transform world,embers,backdrop;
         public SpriteRenderer[] bridgeStones;
         public SpriteRenderer[] scenery;
-        public SpriteRenderer exteriorScenery;
+        public SpriteRenderer exteriorScenery,exteriorHouse;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
         public Sprite[] entranceDoorFrames;
         public float DoorOpening {get;private set;}
@@ -60,6 +60,7 @@ namespace LingyueEchoes
         public void SetInside(bool inside){
             IsInside=inside;
             if(exteriorScenery)exteriorScenery.enabled=!inside;
+            if(exteriorHouse)exteriorHouse.enabled=!inside;
             if(scenery!=null)foreach(var plate in scenery)if(plate)plate.enabled=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;
             if(!inside)SetDoorOpening(0);

@@ -1,0 +1,37 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "estimateUsd": null,
+  "asset": "Assets/Art/Wrath/House.png",
+  "source": "exec-76a97bd4-3a28-4d45-a5a2-59db049bb4df.png",
+  "masterPrompt": "Draw ONE independent game-ready PALACE HOUSE FACADE TEXTURE as a clean cutout on TRUE RGBA TRANSPARENT background. Use the supplied colored palace scene ONLY as the exact style/material identity reference, and the user's black-line sketch as the placement/projection reference. Do NOT generate another complete landscape. The deliverable is just one whole building/facade prop, which we will place over a separate road/background in Unity.\nMatch the existing dark Chinese fantasy pixel art: aged vermilion red wood, dark carved stone plinth, restrained antique-gold floral medallions, tall red columns, coherent ornate dougong brackets, curved dark tile roof with gold tile ends, two muted warm lanterns. Same elegant imposing first-chapter boss palace, no new theme.\nCRITICAL GEOMETRY from sketch: show the entrance facade as a THREE-QUARTER PLANE facing to the LEFT, standing diagonally across the end of a side-scrolling road. The LEFT/FAR entrance post meets the BACK edge of the road; the RIGHT/NEAR heavy corner post meets the FRONT edge of the road. Both posts perfectly vertical. The base/threshold between them slopes clearly DOWN AND RIGHT, the near-right post is visibly in front and slightly larger. This is real oblique construction, not rotating a flat sprite. Draw a narrow solid right-return wall continuing behind the near post to the right; the main doorway is on the angled LEFT-facing facade, exactly like the brown door marked between black posts in the user's sketch. No rear corridor and no porch walkway. Roof/eaves, header, carved plinth and beams all obey this ONE coherent projection, meeting at a believable corner.\nProvide a LARGE DARK EMPTY DOOR APERTURE with no actual door leaves: our separate animated double-door sprite must fit here. Its upright jambs and slightly diagonal threshold use the same oblique projection; leave the inside painted dark shadow, NOT transparent, so no outdoor sky shows inside. Make the aperture clear and plain enough to overlay door leaves. Do not create a second entrance.\nCOMPOSITION for placement: one square canvas, entire building inside with 4% transparent margins; far-left ground contact around (23% canvas width,84% canvas height), near-right heavy corner ground contact around (66%,93%). Door aperture between roughly31% and59% canvas width, from46% to90% canvas height. Roof fills upper region but remains fully inside. A small solid wall return extends to95% canvas width. All painted stone belongs to the building's own plinth; no terrain platform, no ground slab, no stairs, no railings, no foundation cliff, sky, trees, skyline or floor plane. No detached shadow, white matte, glow, checkerboard, letters, labels, lines, UI, annotations or characters. Crisp detailed pixel clusters matching the source, no smoothing. Transparent outside, opaque building interior. 1536x1536 or largest square possible.",
+  "horizontalWallPrompt": "编辑这张透明背景的独立房屋贴图，按用户红线修改右侧墙。保留门口斜向正立面和原有朱红暗金像素美术，重点是把粗转角柱右边的墙，横着向右铺开。\n右侧墙脚从粗柱柱脚的最低落地点开始，沿同一条完全水平的地面线一直向右延伸。右侧所有墙基底边、柱脚底边都与粗柱最底边齐平，不能像现在一样越往右越向上退、形成一条斜墙脚。右侧是一整段横向平铺的长墙，面板、团花、竖柱、石墙裙尺寸一致，横梁和墙裙线水平连续。墙体必须填满用户红线圈出的底部三角空缺，长到画面右端；不要画走廊、不要留地面空带。按同一结构重接右侧屋檐和横梁，不能出现断开拼接。\n为了能直接放到横版游戏尽头，请改用宽的透明画布，约1536x1024横向3:2。原有门口及左侧建筑放在画布左边约三分之二，保持原来的真实斜向透视：左后柱脚较高、右前粗柱脚较低，中间门槛斜向右下。只在粗柱右边延伸新增横向长墙，不要把门口这一面也拉正，不要整体镜像。原有深色门洞保持为空暗，不画门扇，我们要叠加独立门动画。\n只输出一个完整的房屋/门楼建筑精灵，整座屋顶和左右边界都在画布内并有少量透明边距。透明背景，无天空、地面、栏杆、地台悬崖、人物、额外道具、文字或网格。完全清除红色标注。保留原图精细的像素簇与克制光照，干净RGBA，无白边或白膜。",
+  "finish": "native alpha threshold 128, detached components smaller than 12px removed, transparent RGB zero; no resampling",
+  "groundAsset": "Assets/Art/Wrath/Exterior.png",
+  "groundPrompt": "Edit the supplied full pixel-art exterior into a clean ENVIRONMENT BACKGROUND PLATE WITHOUT ANY FOREGROUND PALACE BUILDING. Remove the entire large red palace, its roof, doorway, columns, red walls, carved plinth and its lanterns from the right half. Fill where it stood with coherent continuation of the same purple night sky, distant subdued roof silhouettes and the stone terrace railing along the back, so a separately generated transparent building prop can be placed on top in Unity. Retain the same left bare tree, purple clouds, distant city, palette and lighting.\nMake a clean continuous horizontal stone-slab road across the whole image width. The FRONT platform lip / pavement-to-vertical-foundation edge stays perfectly HORIZONTAL around y=643 (68.3% image height). The BACK edge of the road / base of the railing should sit around y=565 (60% image height), giving the path a clear 78-pixel depth band to receive an angled building footprint. Continue this road and rail to both image edges with correct slab perspective. Below y=645 keep the same dark vertical stone foundation with its repeating small carved gold-red medallions. Do not add obstacles or stairs.\nNo foreground house/building, doorway, pillars, lantern pedestals, steles, characters, UI, text or annotations. This is ONLY the sky, remote city, railing, wide flat terrace floor and foundation; no bright empty blank area where the building was. Same pixel style/detail, camera and landscape dimensions1672x941. Opaque background.",
+  "canvas": [
+    1536,
+    1024
+  ],
+  "houseWorldSize": [
+    6,
+    4
+  ],
+  "houseWorldPosition": [
+    35.6,
+    0.66
+  ],
+  "nearFootPixels": [
+    690,
+    925
+  ],
+  "nearFootWorldY": -0.953125,
+  "doorWorldPosition": [
+    34.31,
+    0.25
+  ],
+  "doorWorldSize": [
+    2.2,
+    2.2
+  ]
+}
