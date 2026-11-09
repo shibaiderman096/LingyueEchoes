@@ -23,7 +23,7 @@ public static class WrathIndoorChecks
     static void TimeAt(LingyueGame game,float seconds)=>typeof(LingyueGame)
         .GetField("stageTime",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(game,seconds);
     public static void PlayBatch(){
-        WrathSceneSetup.RebuildIndoor();WrathChapterChecks.Run();BossBehaviorChecks.Run();WrathGeneralArtChecks.Run();
+        WrathChapterChecks.Run();BossBehaviorChecks.Run();WrathGeneralArtChecks.Run();
         foreach(string key in WrathRoute.SaveKeys.Concat(new[]{PrologueLayout.TailCountKey})){
             string save=PrologueLayout.SaveKey(key,1);
             SessionState.SetString(Key+save,PlayerPrefs.HasKey(save)?PlayerPrefs.GetInt(save).ToString():"missing");

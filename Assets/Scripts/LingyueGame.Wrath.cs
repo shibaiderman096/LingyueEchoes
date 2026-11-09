@@ -150,7 +150,7 @@ namespace LingyueEchoes
             wrath.SetInside(false);wrath.SetDoorOpening(0);wrathEntered=false;
             cameraX=ChapterCameraX();
             wrathArea=WrathRoute.Area(sim.player.x);wrathAreaTime=0;wrathHintTime=0;wrathWeaponAsh=0;checkpointToast=0;
-            wrath.ResetLook(wrathCheckpoint,WrathCompleted);
+            wrath.ResetLook();
             wrathShowOpening=onEntry&&wrathCheckpoint==0;
             SaveWrathLamp(2);
             SetStage(WrathArrive);SetMusic("pilgrim_stage_2");
@@ -165,7 +165,6 @@ namespace LingyueEchoes
         {
             if(lamp<=wrathCheckpoint)return;
             wrathCheckpoint=lamp;
-            wrath.LightLamp(lamp,true);
             sim.player.hp=sim.player.maxHp;sim.player.stamina=sim.PlayerMaxStamina;
             checkpointToast=2.5f;
             WriteSave(WrathRoute.Checkpoint,lamp);
@@ -190,7 +189,7 @@ namespace LingyueEchoes
             sim.player.y=sim.player.vy=0;sim.player.face=1;sim.player.move=null;
             sim.player.state="idle";sim.player.age=sim.player.combo=sim.player.invuln=0;
             bossHealthTrail.Reset(1);postureTrail.Reset(0);phase2Spoken=false;wrathWeaponAsh=0;
-            wrath.Seal(true,e.Min,e.Max);effects.Clear();
+            effects.Clear();
             clock=new FixedClock(sim);
             sim.enemyActive=sim.ai=false;
             wrathHintTime=0;
@@ -198,7 +197,7 @@ namespace LingyueEchoes
         }
         void FinishWrathEncounter()
         {
-            StopSounds();wrath.Seal(false);
+            StopSounds();
             sim.boundsMin=WrathRoute.BoundsMin;sim.boundsMax=WrathRoute.BoundsMax;
             sim.visuals.Clear();effects.Clear();
             wrathNext=wrathActive+1;
@@ -220,7 +219,6 @@ namespace LingyueEchoes
             PlayerPrefs.Save();
             wrathCheckpoint=2;
             ReturnToWrathEntrance();
-            wrath.returnSeal.enabled=true;
             wrathAreaTime=0;
             SetStage(WrathRoam);
         }
@@ -287,7 +285,7 @@ namespace LingyueEchoes
             if(wrathAreaTime>0)
                 Text(new Rect(450,102,380,34),WrathRoute.Areas[wrathArea],21,WithAlpha(MoonGold,Mathf.Min(1,wrathAreaTime*2)),TextAnchor.MiddleCenter);
             if(checkpointToast>0)
-                Text(new Rect(460,140,360,34),"存档灯 · 已记录",19,MoonGold,TextAnchor.MiddleCenter);
+                Text(new Rect(460,140,360,34),"门前进度 · 已记录",19,MoonGold,TextAnchor.MiddleCenter);
             if(wrathActive>=0&&wrathHintTime>0){
                 RoundedFill(new Rect(394,198,492,39),Ink,7);
                 Text(new Rect(404,198,472,39),WrathRoute.Fights[wrathActive].Hint,17,Ivory,TextAnchor.MiddleCenter);

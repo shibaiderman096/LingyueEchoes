@@ -47,7 +47,6 @@ namespace LingyueEchoes
         public SpriteRenderer[] bridgeStones;
         public SpriteRenderer[] scenery;
         public SpriteRenderer exteriorScenery;
-        public SpriteRenderer firstLamp,secondLamp,leftSeal,rightSeal,returnSeal;
         public SpriteRenderer fireMark,fireShadow,fireWarning,entranceDoor;
         public Sprite[] entranceDoorFrames;
         public float DoorOpening {get;private set;}
@@ -63,8 +62,6 @@ namespace LingyueEchoes
             if(exteriorScenery)exteriorScenery.enabled=!inside;
             if(scenery!=null)foreach(var plate in scenery)if(plate)plate.enabled=inside;
             if(entranceDoor)entranceDoor.enabled=!inside;
-            if(firstLamp)firstLamp.gameObject.SetActive(!inside);
-            if(returnSeal)returnSeal.enabled=!inside;
             if(!inside)SetDoorOpening(0);
             SetAmbientParticles(SceneParticleSettings.Enabled);
         }
@@ -86,21 +83,9 @@ namespace LingyueEchoes
                 yield return new Box(bounds.min.x*100,Math.Max(0,bounds.min.y*100+95),bounds.size.x*100,bounds.size.y*100);
             }
         }
-        public void ResetLook(int checkpoint,bool completed)
+        public void ResetLook()
         {
-            LightLamp(1,checkpoint>=1);LightLamp(2,checkpoint>=2);
-            Seal(false);returnSeal.enabled=true;ClearFireMark();
-        }
-        public void LightLamp(int number,bool lit)
-        {
-            (number==1?firstLamp:secondLamp).color=lit?new Color(1,.87f,.64f):new Color(.65f,.57f,.61f);
-        }
-        public void Seal(bool active,double left=0,double right=0)
-        {
-            leftSeal.enabled=rightSeal.enabled=active;
-            if(!active)return;
-            leftSeal.transform.localPosition=new Vector3((float)(left-40)/100,-.22f,0);
-            rightSeal.transform.localPosition=new Vector3((float)(right+40)/100,-.22f,0);
+            ClearFireMark();
         }
         public void Animate(Combat sim,Camera camera,bool general,float heat,float weaponAsh)
         {

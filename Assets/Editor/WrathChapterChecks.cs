@@ -17,9 +17,11 @@ public static class WrathChapterChecks
             var root=scene.GetRootGameObjects().Single(go=>go.GetComponent<WrathChapter>());
             var chapter=root.GetComponent<WrathChapter>();
             Need(root.GetComponent<LingyueGame>()&&chapter.world&&chapter.world.Find("Hero")&&chapter.world.Find("Guardian")&&
-                chapter.firstLamp&&chapter.secondLamp&&chapter.leftSeal&&chapter.rightSeal&&chapter.returnSeal&&chapter.embers&&
+                chapter.embers&&
                 chapter.entranceDoor&&chapter.exteriorScenery&&chapter.fireMark,"chapter has native scene references");
-            Need(chapter.firstLamp==chapter.secondLamp,"legacy lamp references share the sole entrance checkpoint");
+            Need(!chapter.world.Find("Props/Entrance checkpoint")&&!chapter.world.Find("Props/Arena seal left")&&
+                !chapter.world.Find("Props/Arena seal right")&&!chapter.world.Find("Props/Shrine return"),
+                "removed checkpoint and arena steles are absent");
             Need(chapter.entranceDoorFrames!=null&&chapter.entranceDoorFrames.Length==16&&
                 chapter.entranceDoorFrames.All(sprite=>sprite&&sprite.rect.width==320&&sprite.rect.height==320),
                 "the oblique doorway has sixteen registered opening frames");

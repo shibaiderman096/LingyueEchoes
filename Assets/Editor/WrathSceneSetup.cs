@@ -61,12 +61,6 @@ public static class WrathSceneSetup
         chapter.entranceDoorFrames=doors;
         chapter.entranceDoor=Piece(props,"General hall · oblique entrance",doors[0],EntranceDoorX,EntranceDoorY,EntranceDoorSize,EntranceDoorSize,6,Color.white);
         chapter.entranceDoor.flipX=true;
-        chapter.firstLamp=chapter.secondLamp=Lantern(props,"Entrance checkpoint",WrathRoute.Entrance-68);
-        chapter.leftSeal=PixelWorld.Sprite(props,"Arena seal left","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));
-        chapter.rightSeal=PixelWorld.Sprite(props,"Arena seal right","prologue_route/moon-boundary",0,-95,55,160,7,new Vector2(.5f,0));
-        chapter.leftSeal.color=chapter.rightSeal.color=C(253,119,76);chapter.leftSeal.enabled=chapter.rightSeal.enabled=false;
-        chapter.returnSeal=PixelWorld.Sprite(props,"Shrine return","prologue_route/moon-boundary",(float)WrathRoute.Portal-105,-95,64,155,7,new Vector2(.5f,0));
-        chapter.returnSeal.color=C(237,197,141);
         chapter.embers=Group(world,"Interior · drifting cinders");
         for(int i=0;i<18;i++)Piece(chapter.embers,"Cinder "+i,block,32.3f+i*.6f,0,.018f,.018f,18,C(253,130,60,70));
         chapter.fireMark=Piece(world,"Delayed fire burst",flame,0,-.91f,1.36f,.10f,17,C(255,81,34));
@@ -77,7 +71,7 @@ public static class WrathSceneSetup
         Actor(world,"Guardian","guardian8/frames/idle/idle-01",38.3f,1.22f,10);
         chapter.SetInside(false);
         EditorSceneManager.SaveScene(scene,ScenePath);AssetDatabase.SaveAssets();EnsureScene();
-        Debug.Log("WRATH_INDOOR_SCENE_CREATED: single room, entrance checkpoint and sole general");
+        Debug.Log("WRATH_INDOOR_SCENE_CREATED: single room, entrance and sole general");
     }
     static Transform Group(Transform parent,string name)
     {
@@ -91,8 +85,6 @@ public static class WrathSceneSetup
         actor.localPosition=new Vector3(x,-.95f,0);actor.localScale=new Vector3(size,size,1);
         return actor;
     }
-    static SpriteRenderer Lantern(Transform parent,string name,double x)
-        =>PixelWorld.Sprite(parent,name,"prologue_route/moon_lantern",(float)x,-95,64,128,7,new Vector2(.5f,0));
     static SpriteRenderer Piece(Transform parent,string name,Sprite sprite,float x,float y,float w,float h,int order,Color color)
     {
         var t=Group(parent,name);
