@@ -290,7 +290,7 @@ namespace LingyueEchoes
         void UpdateFrame(float unscaledDelta){float dt=Math.Min(unscaledDelta,.25f);UpdateViewport();
             bool wipeEligible=stage=="GUARDIAN_FIGHT"&&ChapterBoss;
             if(wrathPhaseWipe.Observe(sim,wipeEligible)){ClearInput();clock.ClearAccumulation();}
-            if(applicationSuspended||!focused&&(!Application.isBatchMode||wrathPhaseWipe.Active))return;ReadInput();
+            if(applicationSuspended||!focused&&(!Application.isBatchMode||wrathPhaseWipe.Active||WrathPhaseDialogue))return;ReadInput();
             if(wrathPhaseWipe.Active){
                 wrathPhaseWipe.Advance(unscaledDelta,clock.paused||gameSettings||backpackOpen);
                 clock.ClearAccumulation();if(clock.paused||gameSettings||backpackOpen)DrawActors(null);else DrawWorld(0);return;
@@ -320,15 +320,15 @@ namespace LingyueEchoes
                 case "GUARDIAN_DEFEAT":UpdateGuardianDefeat(dt);break;
                 case "DYING":case "DEATH":UpdateDeath(dt);break;
                 default:
-                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();AdvanceWrathBattle(dt);SyncSounds();
+                    if(BattleOn){sim.axis=WakeDialogue||WrathPhaseDialogue?0:ReadAxis();AdvanceWrathBattle(dt);SyncSounds();
                         if(sim.player.hp<=0&&sim.player.state=="dead"){EnterDeath();}
                         else if(stage=="TUTORIAL"){var id=tutorial.Speech(sim,!speech.Active);if(id!=null)Say(id);
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
                         else if(stage=="GUARDIAN_FIGHT"&&sim.BossDefeated)BeginGuardianDefeat();
                         else if(stage==WrathRoam)UpdateWrathRoute(dt);
-                        else if(stage=="GUARDIAN_FIGHT"&&sim.phase>=2&&!phase2Spoken){phase2Spoken=true;if(wrath)ChapterSay("wrathPhase2");else Say("bossPhase2");}}
+                        else if(stage=="GUARDIAN_FIGHT"&&!wrath&&sim.phase>=2&&!phase2Spoken){phase2Spoken=true;Say("bossPhase2");}}
                     break;}
-            if(speech.Active)speech.Update(dt);
+            if(speech.Active&&!(WrathPhaseDialogue&&clock.paused))speech.Update(dt);
             if(stage!="MENU"){UpdateStatusTrails(dt);DrawWorld(dt);}
             checkpointToast=Math.Max(0,checkpointToast-dt);
             if(wrath)wrathHintTime=Mathf.Max(0,wrathHintTime-dt);
@@ -440,14 +440,14 @@ namespace LingyueEchoes
         static float Ease(float t)=>t<.5f?4*t*t*t:1-Mathf.Pow(-2*t+2,3)/2;
         void Say(string id){var script=Array.Find(content.scripts,s=>s.id==id);if(script!=null){if(stage=="TUTORIAL")tutorial.BeginDialogue(id);speech.Play(script);}}
         string Interaction(){
-            if((tutorialDialogue||stage=="GATE_DIALOGUE"||ChapterDialogue)&&speech.Active)return "继续";
+            if((tutorialDialogue||stage=="GATE_DIALOGUE"||ChapterDialogue||WrathPhaseDialogue)&&speech.Active)return "继续";
             string chapterAction=ChapterInteraction();
             if(chapterAction!=null)return chapterAction;
             if(stage=="GATE_READY"&&Math.Abs(sim.player.x-sim.boss.x)<210)return FirstVictoryStorySeen?"再次挑战":"交谈";
             return stage=="TUTORIAL"&&tutorial.CanInteract(sim)?"交谈":null;
         }
         public void Interact(){
-            if(clock==null||clock.paused||backpackOpen)return;
+            if(clock==null||clock.paused||backpackOpen||gameSettings)return;
             string interaction=Interaction();
             if(interaction==null)return;
             if(interaction=="继续"){speech.Confirm();return;}
@@ -501,6 +501,11 @@ namespace LingyueEchoes
             if(stage=="MENU"){ReadMenuInput(confirm,padB||escape,hover);return;}
             if(escape){Home();return;}
             if(stage=="STORY"){if(padB){Home();return;}if(confirm)AdvanceStory();return;}
+            if(WrathPhaseDialogue){
+                if(Input.GetKeyDown(KeyCode.P))Act("pause");
+                if(!clock.paused&&(confirm||Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.JoystickButton5)))Interact();
+                ReadTouchInput();return;
+            }
             if(!BattleOn&&stage!="GATE_DIALOGUE")return;
             bool ePressed=Input.GetKeyDown(KeyCode.E);
             if(Input.GetKeyDown(KeyCode.JoystickButton5)||ePressed&&Interaction()!=null)Interact();
@@ -656,7 +661,7 @@ namespace LingyueEchoes
         }
         double ReadAxis(){if(scriptedAxis.HasValue)return scriptedAxis.Value;float pad=Input.GetAxisRaw("PadX"),dpad=Input.GetAxisRaw("PadDpad");if(Math.Abs(pad)>.2f)return pad;if(Math.Abs(dpad)>.2f)return dpad;
             bool left=Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow),right=Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow);int keys=(right?1:0)-(left?1:0);return keys!=0?keys:mobileControls.Axis;}
-        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen||wrathPhaseWipe.Active&&action!="pause")return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun")sim.BreakBossPosture();else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
+        public void Act(string action){if(!BattleOn||WakeDialogue||backpackOpen||(wrathPhaseWipe.Active||WrathPhaseDialogue)&&action!="pause")return;if(action=="pause"){clock.paused=!clock.paused;ClearInput();}else if(action=="step"){clock.paused=true;clock.Single();}else if(action=="slow")clock.speed=clock.speed==1?.25:1;else if(action=="charge"){sim.player.energy=3;sim.player.echo=0;}else if(action=="stun")sim.BreakBossPosture();else if(action=="echoWindow"){sim.player.energy=Math.Max(1,sim.player.energy);sim.executeWindow=30;}else sim.Press(action);}
         void ClearInput(){mobileControls.Reset();sim?.ClearCommands();clock?.ClearAccumulation();StopSounds();}
         void OnApplicationFocus(bool hasFocus){focused=hasFocus;ClearInput();}
         void OnApplicationPause(bool pause){applicationSuspended=pause;if(pause){ClearInput();clock?.ClearAccumulation();}}
@@ -897,7 +902,7 @@ namespace LingyueEchoes
             }
             if(BattleOn)ChapterFieldGUI();
             if((BattleOn||stage=="GATE_DIALOGUE")&&TouchControlsVisible)MobileControlsGUI();
-            if(debug&&BattleOn){Fill(new Rect(15,385,670,168),Ink);Text(new Rect(30,395,640,72),$"60 Hz  Tick {sim.tick}  Frame {sim.frame}  {clock.Rate}x\n玩家 {sim.player.state} [{sim.player.age}]  Boss {sim.boss.state} [{sim.boss.age}]\n停顿 {sim.hitstop}  慢放 {clock.cinematicTicks}  处决窗 {sim.executeWindow}",16);string[] labels={"AI","无敌","暂停","单帧","慢速","回响","崩解","小处决"};for(int i=0;i<8;i++)if(Button(new Rect(24+i*81,493,76,39),labels[i])){if(i==0)sim.ai=!sim.ai;else if(i==1)sim.god=!sim.god;else Act(new[]{"","","pause","step","slow","charge","stun","echoWindow"}[i]);}}
+            if(debug&&BattleOn&&!WrathPhaseDialogue){Fill(new Rect(15,385,670,168),Ink);Text(new Rect(30,395,640,72),$"60 Hz  Tick {sim.tick}  Frame {sim.frame}  {clock.Rate}x\n玩家 {sim.player.state} [{sim.player.age}]  Boss {sim.boss.state} [{sim.boss.age}]\n停顿 {sim.hitstop}  慢放 {clock.cinematicTicks}  处决窗 {sim.executeWindow}",16);string[] labels={"AI","无敌","暂停","单帧","慢速","回响","崩解","小处决"};for(int i=0;i<8;i++)if(Button(new Rect(24+i*81,493,76,39),labels[i])){if(i==0)sim.ai=!sim.ai;else if(i==1)sim.god=!sim.god;else Act(new[]{"","","pause","step","slow","charge","stun","echoWindow"}[i]);}}
             if(boxes&&BattleOn){DrawBox(sim.Hurtbox(sim.player),Color.green);DrawBox(sim.Hurtbox(sim.boss),Color.green);foreach(var hit in sim.hits)DrawBox(hit,new Color(1,.3f,.3f,.6f));}
         }
         float TutorialLessonGUI(){
@@ -917,7 +922,7 @@ namespace LingyueEchoes
             return y+height+8;
         }
         void DialogueBubble(float lessonBottom){
-            bool manual=tutorialDialogue||stage=="GATE_DIALOGUE";
+            bool manual=tutorialDialogue||stage=="GATE_DIALOGUE"||WrathPhaseDialogue;
             var actor=speech.Speaker=="hero"?sim.player:sim.boss;
             var point=StoryPoint(actor,(float)Combat.BodyHeight(actor)+20);
             const float width=380,pad=16,inside=width-2*pad;
@@ -946,7 +951,7 @@ namespace LingyueEchoes
             RoundedFill(new Rect(252,538,776,123),Ink,8);
             Text(new Rect(276,550,550,30),speech.Speaker=="hero"?"铃月":speech.Speaker=="narration"?"":npc,18,Gold);
             Text(new Rect(276,583,590,60),speech.VisibleText,22,Ivory);
-            if(MenuButton(new Rect(896,599,106,42),"继续",true))speech.Confirm();
+            if(MenuButton(new Rect(896,599,106,42),"继续",true,!WrathPhaseDialogue||!clock.paused))speech.Confirm();
         }
         Vector2 StoryPoint(Fighter actor,float height)=>StoryPoint(actor.x,(float)actor.y+height);
         Vector2 StoryPoint(double x,float height){

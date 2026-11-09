@@ -18,19 +18,24 @@ namespace LingyueEchoes
             Mathf.Min(WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity,
                 wrath?wrath.ExteriorDoorSeamX*100:float.PositiveInfinity));
         bool WrathPhaseTransition=>stage=="GUARDIAN_FIGHT"&&ChapterBoss&&sim.phase>=2&&sim.boss.state=="phase";
+        bool WrathPhaseDialogue=>WrathPhaseTransition&&speech.Active&&speech.Id=="wrathPhase2";
         bool wrathPhaseCamera;
         Vector3 wrathPhaseCameraStart;
         float wrathPhaseCameraSize;
         void AdvanceWrathBattle(float dt){
+            if(WrathPhaseDialogue){ClearInput();return;}
             // Split wall time into one-tick pieces: only the phase-entry tick can use the old rate.
             float remaining=dt;
             while(remaining>0){
                 float slice=Mathf.Min(remaining,1f/60);remaining-=slice;
                 clock.Advance(slice*(WrathPhaseTransition ? .5f : 1f),()=>{
+                    if(WrathPhaseTransition&&!phase2Spoken&&WrathGeneralArt.ReactionFrame(Math.Max(0,sim.boss.age-1)/60d,sim.BossTransitionFrames,32)>=7){
+                        phase2Spoken=true;ChapterSay("wrathPhase2");ClearInput();return true;
+                    }
                     if(!wrathPhaseWipe.Observe(sim,stage=="GUARDIAN_FIGHT"&&ChapterBoss))return false;
                     ClearInput();return true;
                 });
-                if(wrathPhaseWipe.Active){clock.ClearAccumulation();break;}
+                if(wrathPhaseWipe.Active||WrathPhaseDialogue){clock.ClearAccumulation();break;}
             }
         }
         void CaptureWrathPhaseCamera(){
@@ -133,6 +138,7 @@ namespace LingyueEchoes
         }
         bool HandleChapterSpeech(string id)
         {
+            if(id=="wrathPhase2"){ClearInput();return true;}
             if(stage==WrathDialogue){
                 if(id=="stele"){TransferTo(WrathRoute.Scene);return true;}
                 if(id=="wrathEnter"){SetStage(WrathRoam);return true;}
@@ -334,6 +340,7 @@ namespace LingyueEchoes
                 Fill(new Rect(0,0,1280,58),WithAlpha(Color.black,bars));
                 Fill(new Rect(0,662,1280,58),WithAlpha(Color.black,bars));return true;
             }
+            if(WrathPhaseDialogue){StoryDialogueGUI("赤绫");return true;}
             if(stage==WrathDialogue){StoryDialogueGUI(wrath?"赤绫":"守灯人");return true;}
             if(stage!=WrathArrive)return false;
             float alpha=1-Ramp(stageTime,.06f,.83f);

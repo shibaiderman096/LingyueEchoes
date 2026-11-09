@@ -24,6 +24,7 @@ public static class WrathPhaseWipeChecks
         return ((SpriteRenderer)typeof(PixelActor).GetField("renderer",Flags).GetValue(actor)).sprite.name;
     }
     static Combat Prepare(LingyueGame game,int duration){
+        ((DialogueDirector)typeof(LingyueGame).GetField("speech",Flags).GetValue(game)).Reset();
         var definition=BossBehaviorCatalog.WrathGeneral.Copy();definition.phases[1].transitionFrames=duration;
         var combat=new Combat{ai=false};combat.ResetBoss(3830,870,OpponentPattern.FromBoss(definition));combat.boss.hp=400;
         combat.boundsMin=WrathRoute.BoundsMin;combat.boundsMax=WrathRoute.BoundsMax;combat.player.x=3500;combat.player.y=0;
@@ -35,6 +36,40 @@ public static class WrathPhaseWipeChecks
         Set(game,"wrathActive",WrathRoute.Fights.Length-1);Set(game,"phase2Spoken",true);Set(game,"focused",true);
         Set(game,"backpackOpen",false);Set(game,"gameSettings",false);Set(game,"applicationSuspended",false);
         return combat;
+    }
+    static void CheckPhaseDialogue(LingyueGame game,int duration,bool automatic){
+        var c=Prepare(game,duration);Set(game,"phase2Spoken",false);
+        var speech=(DialogueDirector)typeof(LingyueGame).GetField("speech",Flags).GetValue(game);
+        int guard=0;
+        while(!speech.Active&&guard++<200){
+            int previous=WrathGeneralArt.ReactionFrame(Math.Max(0,c.boss.age-1)/60d,duration,32);
+            Tick(game,1f/60);
+            if(!speech.Active)Need(WrathGeneralArt.ReactionFrame(Math.Max(0,c.boss.age-1)/60d,duration,32)<7,"no early dialogue "+duration);
+            else Need(previous<7,"first eighth-frame crossing "+duration);
+        }
+        Need(speech.Active&&speech.Id=="wrathPhase2"&&BossSprite(game)=="phase-engulf-08","dialogue on eighth pose "+duration);
+        int age=c.boss.age,frame=c.frame;double hp=c.player.hp,bossHp=c.boss.hp;
+        var position=Camera.main.transform.position;float size=Camera.main.orthographicSize;
+        string text=speech.VisibleText;
+        game.Act("attack");game.Act("step");game.Act("stun");game.Act("charge");
+        Tick(game,.25f);
+        Need(c.frame==frame&&c.boss.age==age&&c.player.hp==hp&&c.boss.hp==bossHp,"dialogue freezes simulation");
+        Need(speech.VisibleText!=text,"dialogue typing advances");
+        Need(Camera.main.transform.position==position&&Camera.main.orthographicSize==size,"dialogue camera freezes");
+        game.Act("pause");text=speech.VisibleText;Tick(game,.25f);Need(speech.VisibleText==text,"pause freezes dialogue");game.Act("pause");
+        foreach(string field in new[]{"gameSettings","backpackOpen","applicationSuspended"}){
+            Set(game,field,true);text=speech.VisibleText;Tick(game,.25f);Need(speech.VisibleText==text,"dialogue suspension "+field);Set(game,field,false);
+        }
+        Set(game,"focused",false);text=speech.VisibleText;Tick(game,.25f);Need(speech.VisibleText==text,"dialogue focus suspension");Set(game,"focused",true);
+        guard=0;
+        while(speech.Active&&guard++<1000){if(automatic)Tick(game,.25f);else game.Interact();}
+        Need(!speech.Active&&c.frame==frame&&c.boss.age==age&&game.clock.accumulator==0,"close without catchup "+duration);
+        Tick(game,.25f);Need(c.frame>frame&&!speech.Active,"resume without repeat");
+        // A large wall-time update must stop at the same exact pose.
+        c=Prepare(game,duration);Set(game,"phase2Spoken",false);guard=0;
+        while(!speech.Active&&guard++<20)Tick(game,4);
+        Need(speech.Active&&BossSprite(game)=="phase-engulf-08"&&game.clock.accumulator==0,"large dt and retry dialogue boundary "+duration);
+        while(speech.Active)game.Interact();
     }
     public static void Run(){
         for(int i=1;i<=WrathPhaseWipe.FrameCount;i++){
@@ -79,21 +114,27 @@ public static class WrathPhaseWipeChecks
                 Need(EditorApplication.timeSinceStartup-captureStarted<15,"peak screenshot timed out after 15 seconds; actual GameView rendering is required");
                 if(Time.frameCount<captureAt)return;
                 if(screenshot==null){
-                    string name=captureStage==0?"before-hold-screen.png":captureStage==1?"peak-screen.png":captureStage==2?"after-hold-screen.png":"after-rise-screen.png";
+                    string name=captureStage==0?"before-hold-screen.png":captureStage==1?"peak-screen.png":captureStage==2?"after-hold-screen.png":captureStage==3?"after-rise-screen.png":"phase-dialogue-screen.png";
                     screenshot=Path.GetFullPath(Path.Combine(Application.dataPath,"../.utmp/wrath-phase-wipe/"+name));Directory.CreateDirectory(Path.GetDirectoryName(screenshot));
                     if(File.Exists(screenshot))File.Delete(screenshot);ScreenCapture.CaptureScreenshot(screenshot);captureAt=Time.frameCount+1;return;
                 }
                 if(!File.Exists(screenshot)||new FileInfo(screenshot).Length==0)return;
-                if(captureStage<3){
+                if(captureStage<4){
                     game.enabled=false;game.clock.paused=false;Set(game,"focused",true);
                     if(captureStage==0){Tick(game,1);Tick(game,.8f);}
                     else if(captureStage==1){Tick(game,.8f);Tick(game,.2f);}
-                    else{
+                    else if(captureStage==2){
                         int guard=0;while(game.sim.boss.state=="phase"&&guard++<400)Tick(game,1f/60);
                         Need(game.sim.boss.state!="phase","rise completes before normal arena screenshot");
                         Need(Mathf.Abs(Camera.main.orthographicSize-3.6f)<.01f,"after-rise camera normal size");
                         float center=(float)((WrathRoute.Fights[WrathRoute.Fights.Length-1].Min+WrathRoute.Fights[WrathRoute.Fights.Length-1].Max)*.5)/100;
                         Need(Mathf.Abs(Camera.main.transform.position.x-center)<.01f&&Mathf.Abs(Camera.main.transform.position.y)<.01f,"after-rise camera arena center");
+                    }else{
+                        Prepare(game,90);Set(game,"phase2Spoken",false);
+                        var speech=(DialogueDirector)typeof(LingyueGame).GetField("speech",Flags).GetValue(game);
+                        int guard=0;while(!speech.Active&&guard++<200)Tick(game,1f/60);
+                        Need(speech.Active&&BossSprite(game)=="phase-engulf-08","dialogue screenshot exact pose");
+                        speech.Confirm();
                     }
                     captureStage++;screenshot=null;game.clock.paused=true;game.enabled=true;captureStarted=EditorApplication.timeSinceStartup;captureAt=Time.frameCount+3;return;
                 }
@@ -102,6 +143,7 @@ public static class WrathPhaseWipeChecks
                 EditorApplication.Exit(0);return;
             }
             Run();WrathPhaseTwoChecks.Run();MigrationChecks.Run();
+            foreach(int duration in new[]{90,120}){CheckPhaseDialogue(game,duration,false);CheckPhaseDialogue(game,duration,true);}
             foreach(int duration in new[]{90,120}){
                 var c=Prepare(game,duration);int guard=0;
                 while(!game.PhaseWipe.Active&&guard++<200)Tick(game,1f/60);
