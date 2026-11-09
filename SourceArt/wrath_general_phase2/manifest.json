@@ -1,0 +1,1744 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "canvas": 384,
+  "pivot": [
+    0.5989583333333334,
+    0.09635416666666667
+  ],
+  "pixelsPerUnit": 180,
+  "root": [
+    230,
+    347
+  ],
+  "frameCount": 80,
+  "alpha": "binary 0/255; transparent RGB zero",
+  "registration": "fixed hip X and one scale per action; grounded boot baseline",
+  "clips": {
+    "idle": {
+      "fps": 8,
+      "loop": true,
+      "scale": 1.1349206349206349,
+      "sourceRootX": 197,
+      "recovery": null,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            6,
+            10
+          ],
+          "bounds": [
+            91,
+            61,
+            283,
+            347
+          ],
+          "sha256": "f6cf1994f413234d4aaf7094e3d3555986b266694f6abe85834b7117415ef956"
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            7,
+            10
+          ],
+          "bounds": [
+            84,
+            61,
+            283,
+            347
+          ],
+          "sha256": "3755008118c552ed2d667badc85e6df915bd71ac28c70764428b83aa54e8dead"
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            941,
+            314
+          ],
+          "sourceBootY": 295,
+          "offset": [
+            6,
+            11
+          ],
+          "bounds": [
+            79,
+            63,
+            278,
+            348
+          ],
+          "sha256": "f9243804b7eb636551289cc803ef7bd0abd28c2792c6b6f057d83886cbf849da"
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            941,
+            0,
+            1254,
+            314
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            7,
+            10
+          ],
+          "bounds": [
+            78,
+            61,
+            276,
+            347
+          ],
+          "sha256": "7062186a4b8a436243ee95d0ec6761adc3bfd663d910f65e6c64636e05a99617"
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceBootY": 285,
+          "offset": [
+            6,
+            23
+          ],
+          "bounds": [
+            85,
+            64,
+            286,
+            349
+          ],
+          "sha256": "156679ba6235b9fb5568d05feb0acbe6412ca4bb98729c417ed406584875ba31"
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceBootY": 285,
+          "offset": [
+            7,
+            23
+          ],
+          "bounds": [
+            83,
+            64,
+            284,
+            349
+          ],
+          "sha256": "c380b89ab2641b5316cdaf72e0dd81d26eb892596ce315d9ad3e93b37cd86a69"
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            941,
+            627
+          ],
+          "sourceBootY": 285,
+          "offset": [
+            6,
+            23
+          ],
+          "bounds": [
+            80,
+            64,
+            278,
+            349
+          ],
+          "sha256": "1ab412757068f5552f4fcd46e087d21e5f4998485f9745108ee1645a64b11044"
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            941,
+            314,
+            1254,
+            627
+          ],
+          "sourceBootY": 285,
+          "offset": [
+            7,
+            23
+          ],
+          "bounds": [
+            78,
+            64,
+            275,
+            349
+          ],
+          "sha256": "4e446e067fed3ab0989b97bd101b1b571d60ba68356baf57890036d755b0bd39"
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            941
+          ],
+          "sourceBootY": 279,
+          "offset": [
+            6,
+            29
+          ],
+          "bounds": [
+            85,
+            58,
+            285,
+            346
+          ],
+          "sha256": "304f024f906482da8dcc32d238593c40f37d79211372e79ec332301c22037b5d"
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            941
+          ],
+          "sourceBootY": 278,
+          "offset": [
+            7,
+            30
+          ],
+          "bounds": [
+            86,
+            61,
+            285,
+            347
+          ],
+          "sha256": "35ff8319ecb70bda80932b63591ad99d0f5e818a478cec14dbe025a51ba6a283"
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            941,
+            941
+          ],
+          "sourceBootY": 278,
+          "offset": [
+            6,
+            30
+          ],
+          "bounds": [
+            74,
+            61,
+            279,
+            347
+          ],
+          "sha256": "08a5abd20e4fb9c0aca682d1ae6af535b0aa5a4aea7b193a7793d9f01c4f44f7"
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            941,
+            627,
+            1254,
+            941
+          ],
+          "sourceBootY": 279,
+          "offset": [
+            7,
+            29
+          ],
+          "bounds": [
+            71,
+            60,
+            280,
+            346
+          ],
+          "sha256": "f05108645fb35818a197edf328fd99ee5af63ebbd4620e961e6ffb5d57806beb"
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            941,
+            314,
+            1254
+          ],
+          "sourceBootY": 271,
+          "offset": [
+            6,
+            38
+          ],
+          "bounds": [
+            82,
+            60,
+            286,
+            348
+          ],
+          "sha256": "710a369c11908b532f09adad04fc8c9a0d534c106e3da7aa55bd4c911e1bbeda"
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            941,
+            627,
+            1254
+          ],
+          "sourceBootY": 271,
+          "offset": [
+            7,
+            38
+          ],
+          "bounds": [
+            83,
+            61,
+            284,
+            348
+          ],
+          "sha256": "6060e9cc7ef6fbae99b9a39bf43cab96a233ba5a2932188b8789d9250cba292f"
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            941,
+            941,
+            1254
+          ],
+          "sourceBootY": 271,
+          "offset": [
+            6,
+            38
+          ],
+          "bounds": [
+            81,
+            60,
+            280,
+            348
+          ],
+          "sha256": "48832d77f8bf94b486d6bc4667f44bf1b203f927ee47c8c230b28a0f121a89f9"
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            941,
+            941,
+            1254,
+            1254
+          ],
+          "sourceBootY": 271,
+          "offset": [
+            7,
+            38
+          ],
+          "bounds": [
+            76,
+            61,
+            276,
+            348
+          ],
+          "sha256": "5249e2c4599d6f7b5fc5b5ee2411b8ed8286f50cfa42ed1f249809471de27982"
+        }
+      ]
+    },
+    "walk": {
+      "fps": 16,
+      "loop": true,
+      "scale": 1.1171875,
+      "sourceRootX": 195,
+      "recovery": null,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            82,
+            61,
+            280,
+            349
+          ],
+          "sha256": "ab62376aea7019937358ca9778c62da635c7cdc5d3c5deab51cc6abde31a80ee"
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            80,
+            61,
+            280,
+            349
+          ],
+          "sha256": "9263974cdb3b78ed06a62cad7ede04212babc8c20adb2c0af9cf0c6ed546c41b"
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            941,
+            314
+          ],
+          "sourceBootY": 290,
+          "offset": [
+            12,
+            22
+          ],
+          "bounds": [
+            79,
+            59,
+            281,
+            347
+          ],
+          "sha256": "19c4826b6c57149561186f3bef3785c81b501d834c1543686dc12cd7fa09341d"
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            941,
+            0,
+            1254,
+            314
+          ],
+          "sourceBootY": 286,
+          "offset": [
+            12,
+            26
+          ],
+          "bounds": [
+            76,
+            63,
+            285,
+            350
+          ],
+          "sha256": "b338611776f58b9be6c3b9179f63c57837a730453fb009d2bcb71f1d4b7d1cdb"
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            12,
+            23
+          ],
+          "bounds": [
+            77,
+            61,
+            286,
+            350
+          ],
+          "sha256": "f048e37e83ea5d0019f15904f228dc7c4e7febbd6b2632351c7a90afcc67d991"
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            76,
+            63,
+            280,
+            349
+          ],
+          "sha256": "9b8bb2e79d1013722aafab0c08976083af548630b913f571e1e349519b4a75c2"
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            941,
+            627
+          ],
+          "sourceBootY": 290,
+          "offset": [
+            12,
+            22
+          ],
+          "bounds": [
+            72,
+            60,
+            275,
+            350
+          ],
+          "sha256": "268daed85dc827d4cd1d31cbc772eea4d1eee6da03fc2b302a21e1e6356a5b65"
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            941,
+            314,
+            1254,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            74,
+            63,
+            268,
+            351
+          ],
+          "sha256": "10bbd797478743b303fea7482ae40c674aaa15e7b0a6f019225a8c445b59a49d"
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            941
+          ],
+          "sourceBootY": 290,
+          "offset": [
+            12,
+            22
+          ],
+          "bounds": [
+            73,
+            59,
+            279,
+            350
+          ],
+          "sha256": "91a04cc292a6f981f3745b83d0cfbd0aeac01865b55cdbfd00cca95b683b0bfc"
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            941
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            12,
+            23
+          ],
+          "bounds": [
+            71,
+            60,
+            265,
+            351
+          ],
+          "sha256": "04f1015fcfe84223e84d19a9f04e26e052daf2b49a353c5521a09e2b1e3b8128"
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            941,
+            941
+          ],
+          "sourceBootY": 281,
+          "offset": [
+            12,
+            32
+          ],
+          "bounds": [
+            70,
+            69,
+            283,
+            351
+          ],
+          "sha256": "d98db94d077146fbd4cb372567fa2d3cbf6b5c30719b5da312226badb708872e"
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            941,
+            627,
+            1254,
+            941
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            70,
+            61,
+            289,
+            352
+          ],
+          "sha256": "37291096b4e4a4415b0ba58dfff066703ca67ec93699dd876ba7f1ac69088ece"
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            941,
+            314,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            75,
+            61,
+            289,
+            351
+          ],
+          "sha256": "b5984a643e46dce81c8cea0891e67fffe0ef5212b9862016fd871c5da1f245e6"
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            941,
+            627,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            76,
+            63,
+            279,
+            352
+          ],
+          "sha256": "4c8d1a944436ad899ca8a1c5cbfdacc5da4579dbc0a2092ac9cc4272ba050bf9"
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            941,
+            941,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            79,
+            61,
+            277,
+            352
+          ],
+          "sha256": "c904792300bcabcbdb087d3893de52e300874659a03b3c1fef05c7596b7a4bb9"
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            941,
+            941,
+            1254,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            12,
+            24
+          ],
+          "bounds": [
+            80,
+            62,
+            275,
+            348
+          ],
+          "sha256": "f89b8882a91b4c3ba622c44fe14285ae9c76a555ea986603798ba6764e0a5de3"
+        }
+      ]
+    },
+    "hurt": {
+      "fps": 32,
+      "loop": false,
+      "scale": 1.0514705882352942,
+      "sourceRootX": 195,
+      "recovery": "included",
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            93,
+            61,
+            292,
+            348
+          ],
+          "sha256": "805e44bc02ea4144779f1a6a360ed9203ab8675de7f9a96b22c4cbf52bb230e8"
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            87,
+            64,
+            300,
+            348
+          ],
+          "sha256": "32b03e7276d8bf15cd1a075d375732d08f072dee6e4f77d2050c543ba2ce7195"
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            941,
+            314
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            76,
+            68,
+            302,
+            348
+          ],
+          "sha256": "e2b6acee0478fc4a64b536f270dd88e442cca81783c890b450836931ea5a9cd3"
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            941,
+            0,
+            1254,
+            314
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            73,
+            73,
+            297,
+            349
+          ],
+          "sha256": "0067b1724c2e30301fd75f18b3b4060517172e9cdfd44af7c0e090c27b33e625"
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            72,
+            76,
+            299,
+            349
+          ],
+          "sha256": "c25fc6156ae895f7c9d9adfa886fe9dd01a8e182c5dc0f9367fcf84edf6af936"
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            69,
+            85,
+            292,
+            349
+          ],
+          "sha256": "b0f64cdfdc3278277f589507b817d0dcad46f9d5b9dc689ed07c80ab568134c8"
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            941,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            69,
+            85,
+            291,
+            349
+          ],
+          "sha256": "eeb351e8e8df99e6208c748de7afb18965995fe495fe9caa40d490447059a54f"
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            941,
+            314,
+            1254,
+            627
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            71,
+            84,
+            290,
+            349
+          ],
+          "sha256": "013e106bc9196e1d195d318466a7f6fe1261d7cf53a57749feaffa704ca5d179"
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            941
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            73,
+            78,
+            289,
+            348
+          ],
+          "sha256": "bcc4f82f8c422f15ac72ed1d84fe35cafdaada16d6be8497db5783cf06b2cf48"
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            941
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            80,
+            70,
+            291,
+            348
+          ],
+          "sha256": "64635a69b8e63cce25c0843fd684bdbd680722462c212998d870d4977155cc6a"
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            941,
+            941
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            85,
+            67,
+            292,
+            348
+          ],
+          "sha256": "64921e205cf47974b6b8cc34b33a028e0ecc5cc5ec85265f15e092a0455922e4"
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            941,
+            627,
+            1254,
+            941
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            87,
+            64,
+            291,
+            349
+          ],
+          "sha256": "694ca9e45a8e1b3ba98421d426956392aeb0a6b833f093d8587ec3ddd0bccc01"
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            941,
+            314,
+            1254
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            89,
+            64,
+            290,
+            348
+          ],
+          "sha256": "7e74ffd9d6fea1f33eb9a9f0713c272c2f3bc2334300cb72d75d772bb85561f6"
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            941,
+            627,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            89,
+            65,
+            291,
+            349
+          ],
+          "sha256": "8e1cd63048f8051295f86aebfba5bff43b6538947f2219354f236aee313eb013"
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            941,
+            941,
+            1254
+          ],
+          "sourceBootY": 289,
+          "offset": [
+            25,
+            42
+          ],
+          "bounds": [
+            90,
+            65,
+            291,
+            348
+          ],
+          "sha256": "155cc085729d5697a4d0fcd979a7dc309329b6380d534508b04148dc737b07fe"
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            941,
+            941,
+            1254,
+            1254
+          ],
+          "sourceBootY": 288,
+          "offset": [
+            25,
+            43
+          ],
+          "bounds": [
+            90,
+            64,
+            291,
+            349
+          ],
+          "sha256": "4f7cd10020e261c10b41a19533979a590a09f3bb5bb0b9312a8ed6c13d954d0d"
+        }
+      ]
+    },
+    "stun": {
+      "fps": 24,
+      "loop": false,
+      "scale": 1.0437956204379562,
+      "sourceRootX": 195,
+      "recovery": "reverse entry, stable frame16 hold",
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceBootY": 298,
+          "offset": [
+            26,
+            35
+          ],
+          "bounds": [
+            93,
+            61,
+            284,
+            349
+          ],
+          "sha256": "0cb73d73a5a68c9fd6db3ba9d133d93637bd05d578dceb3a5e320c6982cdbd44"
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceBootY": 298,
+          "offset": [
+            27,
+            35
+          ],
+          "bounds": [
+            91,
+            64,
+            279,
+            349
+          ],
+          "sha256": "55e5915f947dc6490beec5f4e4454cff0982e6981fe6b22a4dcfddc8158373e1"
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            941,
+            314
+          ],
+          "sourceBootY": 298,
+          "offset": [
+            26,
+            35
+          ],
+          "bounds": [
+            87,
+            73,
+            273,
+            349
+          ],
+          "sha256": "f7838a629f5e6d24835f658bd0b2f31c76b9e89ecb6858440d6a32573ae02805"
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            941,
+            0,
+            1254,
+            314
+          ],
+          "sourceBootY": 298,
+          "offset": [
+            27,
+            35
+          ],
+          "bounds": [
+            84,
+            77,
+            275,
+            349
+          ],
+          "sha256": "0f91103c8edf0e626e75df259375be03201a8b50a767a2b1be2aa1d0ddfa8c9f"
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            26,
+            37
+          ],
+          "bounds": [
+            84,
+            82,
+            276,
+            349
+          ],
+          "sha256": "0693256e329227ade2bad3be7ee94085399cda4d5782128dcbeefeddb0b5e212"
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            27,
+            37
+          ],
+          "bounds": [
+            86,
+            91,
+            281,
+            349
+          ],
+          "sha256": "b4cb859c997ecb7c9c517b87574e5a6c52157457b634a314805cec1046c4a294"
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            941,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            26,
+            37
+          ],
+          "bounds": [
+            83,
+            99,
+            283,
+            349
+          ],
+          "sha256": "f7a65b0ea4a5f1bf7f3e59904eda0448cc4f0db77f4c8861e9f594d8c28093e1"
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            941,
+            314,
+            1254,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            27,
+            37
+          ],
+          "bounds": [
+            83,
+            106,
+            285,
+            349
+          ],
+          "sha256": "cd70251a8e5c0a60223790a862de77987edbbbfa921d9e9418ab14dfc21e907e"
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            941
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            26,
+            36
+          ],
+          "bounds": [
+            83,
+            109,
+            285,
+            349
+          ],
+          "sha256": "a80cd74b24cad9bbf1aee27893e762f3e705886420ebb09b6c2125e69052e7bc"
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            941
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            27,
+            36
+          ],
+          "bounds": [
+            81,
+            116,
+            289,
+            349
+          ],
+          "sha256": "76cd3fa79e80dd7ef6a2223f34838355d3515caf948549c685e7c454bcf62612"
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            941,
+            941
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            26,
+            36
+          ],
+          "bounds": [
+            79,
+            121,
+            289,
+            349
+          ],
+          "sha256": "3a3f17d57572c22fd30a254a943858a5103d39610f223bc3bc3e5162a1a58ff0"
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            941,
+            627,
+            1254,
+            941
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            27,
+            36
+          ],
+          "bounds": [
+            75,
+            125,
+            289,
+            349
+          ],
+          "sha256": "f3eab03a9bc5ebe38f40de39e0e349accee72f100517b0b51b20e6d8d1bdaf64"
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            941,
+            314,
+            1254
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            26,
+            37
+          ],
+          "bounds": [
+            74,
+            129,
+            290,
+            348
+          ],
+          "sha256": "788a839de4334ea7634b9f343f770706bfa58122e6fe53ac341db8967e7cb15e"
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            941,
+            627,
+            1254
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            27,
+            36
+          ],
+          "bounds": [
+            71,
+            133,
+            290,
+            347
+          ],
+          "sha256": "44bac3f6b69b7477e21f2b8bc5992bc6e3afb3b35441998b1485eac1e6d3c60a"
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            941,
+            941,
+            1254
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            26,
+            37
+          ],
+          "bounds": [
+            69,
+            140,
+            288,
+            348
+          ],
+          "sha256": "8ae525a749c30f133e8a78263163e5db7da1501b003003de713299edfad0c926"
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            941,
+            941,
+            1254,
+            1254
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            27,
+            37
+          ],
+          "bounds": [
+            70,
+            143,
+            288,
+            348
+          ],
+          "sha256": "981a23469102e8ece04f11a286ee7df00d603a711def4bffce1292c76337c587"
+        }
+      ]
+    },
+    "phase": {
+      "fps": null,
+      "loop": false,
+      "scale": 0.9615384615384616,
+      "sourceRootX": 201,
+      "recovery": null,
+      "frames": [
+        {
+          "frame": 1,
+          "sourceRect": [
+            0,
+            0,
+            314,
+            314
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            36,
+            60
+          ],
+          "bounds": [
+            54,
+            72,
+            309,
+            349
+          ],
+          "sha256": "17c06580c5ea0e9225336ba3457c16cc6c58d2b7d78f1d2658f67fa8ecbf6ab4"
+        },
+        {
+          "frame": 2,
+          "sourceRect": [
+            314,
+            0,
+            627,
+            314
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            37,
+            60
+          ],
+          "bounds": [
+            49,
+            84,
+            306,
+            348
+          ],
+          "sha256": "cbd09649a37af8962a23fd3f6931a663cd49ab2afc93496706e84abd41b4657e"
+        },
+        {
+          "frame": 3,
+          "sourceRect": [
+            627,
+            0,
+            941,
+            314
+          ],
+          "sourceBootY": 294,
+          "offset": [
+            36,
+            63
+          ],
+          "bounds": [
+            46,
+            111,
+            299,
+            351
+          ],
+          "sha256": "bd12122acd053e67bc39600e853c78959591f5c70ce2388387d9cd894611aced"
+        },
+        {
+          "frame": 4,
+          "sourceRect": [
+            941,
+            0,
+            1254,
+            314
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            37,
+            61
+          ],
+          "bounds": [
+            45,
+            141,
+            275,
+            350
+          ],
+          "sha256": "cc2c89178cd89358d6a7bdef32d22a154b5ab6f8223337017e553ee8b43246a9"
+        },
+        {
+          "frame": 5,
+          "sourceRect": [
+            0,
+            314,
+            314,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            36,
+            61
+          ],
+          "bounds": [
+            47,
+            143,
+            295,
+            349
+          ],
+          "sha256": "cebdce79e3a1fe88f7e457ffef37f09029fc870c40314fe26749a1843362b29e"
+        },
+        {
+          "frame": 6,
+          "sourceRect": [
+            314,
+            314,
+            627,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            37,
+            61
+          ],
+          "bounds": [
+            50,
+            145,
+            301,
+            349
+          ],
+          "sha256": "f9c32d8b1e879f193231c8d6145eb7d3a8e1bca9f17444d79938a369656911a3"
+        },
+        {
+          "frame": 7,
+          "sourceRect": [
+            627,
+            314,
+            941,
+            627
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            36,
+            61
+          ],
+          "bounds": [
+            49,
+            129,
+            310,
+            349
+          ],
+          "sha256": "06df6e91136e6ca828ff1401b2938c49cd8a56e1da58a15b1579c12d372c01dd"
+        },
+        {
+          "frame": 8,
+          "sourceRect": [
+            941,
+            314,
+            1254,
+            627
+          ],
+          "sourceBootY": 295,
+          "offset": [
+            37,
+            62
+          ],
+          "bounds": [
+            53,
+            120,
+            320,
+            350
+          ],
+          "sha256": "43f0084bde8a583ce9a2ef499eb732ab7890553edcca9db2edda2ca99fd45652"
+        },
+        {
+          "frame": 9,
+          "sourceRect": [
+            0,
+            627,
+            314,
+            941
+          ],
+          "sourceBootY": 294,
+          "offset": [
+            36,
+            63
+          ],
+          "bounds": [
+            53,
+            83,
+            313,
+            350
+          ],
+          "sha256": "f1e8cfad3c845adeacb79e16718f4d8a39e8968543abec01f73f9f7241f1eebc"
+        },
+        {
+          "frame": 10,
+          "sourceRect": [
+            314,
+            627,
+            627,
+            941
+          ],
+          "sourceBootY": 296,
+          "offset": [
+            37,
+            61
+          ],
+          "bounds": [
+            55,
+            73,
+            320,
+            349
+          ],
+          "sha256": "f67e2c7a71ab81556c3495630deca93c7ce2ccd0cdb5a44e990eb2bf16e0ceff"
+        },
+        {
+          "frame": 11,
+          "sourceRect": [
+            627,
+            627,
+            941,
+            941
+          ],
+          "sourceBootY": 294,
+          "offset": [
+            36,
+            63
+          ],
+          "bounds": [
+            56,
+            109,
+            312,
+            352
+          ],
+          "sha256": "e33444e34394ff2e5d8eaa6c21cf6a12abd7f743c960af6d65f0617723a31266"
+        },
+        {
+          "frame": 12,
+          "sourceRect": [
+            941,
+            627,
+            1254,
+            941
+          ],
+          "sourceBootY": 295,
+          "offset": [
+            37,
+            62
+          ],
+          "bounds": [
+            63,
+            126,
+            300,
+            349
+          ],
+          "sha256": "ee3a028831a37fc916ff2e664841dbcbb1e4958a5de04a9700fd55a36da14db4"
+        },
+        {
+          "frame": 13,
+          "sourceRect": [
+            0,
+            941,
+            314,
+            1254
+          ],
+          "sourceBootY": 294,
+          "offset": [
+            36,
+            63
+          ],
+          "bounds": [
+            74,
+            125,
+            289,
+            349
+          ],
+          "sha256": "c08a593642a5a1876cfbabd9ca0a80d1f5cd576a7920acc1dd6a7b6090c5c306"
+        },
+        {
+          "frame": 14,
+          "sourceRect": [
+            314,
+            941,
+            627,
+            1254
+          ],
+          "sourceBootY": 295,
+          "offset": [
+            37,
+            62
+          ],
+          "bounds": [
+            81,
+            103,
+            287,
+            349
+          ],
+          "sha256": "a71216915f80d14edcd21b6788a5924aded73e700221d68dadfaa45b36c04e54"
+        },
+        {
+          "frame": 15,
+          "sourceRect": [
+            627,
+            941,
+            941,
+            1254
+          ],
+          "sourceBootY": 297,
+          "offset": [
+            36,
+            60
+          ],
+          "bounds": [
+            77,
+            74,
+            275,
+            348
+          ],
+          "sha256": "fd125d2c76bead4a2305126726d2b13266aa4b7663980231cb3674948dfa988d"
+        },
+        {
+          "frame": 16,
+          "sourceRect": [
+            941,
+            941,
+            1254,
+            1254
+          ],
+          "sourceBootY": 298,
+          "offset": [
+            37,
+            59
+          ],
+          "bounds": [
+            65,
+            62,
+            264,
+            348
+          ],
+          "sha256": "45c7044cc8a7c1fbad1c059f462da36041127c0acaea842a779d1ceb6ed5e03d"
+        }
+      ]
+    }
+  }
+}

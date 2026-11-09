@@ -357,12 +357,9 @@ namespace LingyueEchoes
         void DrawActors(double? idleDelta){
             var p=sim.player;var b=sim.boss;
             if(wrath){
+                wrath.PrepareActorArt(sim,speech.Cue=="weaponAsh"||wrathWeaponAsh>0);
                 guardian.ChapterArt=wrath.UseActorArt(ChapterGeneralVisible,wrathActive);
-                if(guardian.ChapterArt is WrathGeneralArt generalArt){
-                    generalArt.BossStaggerFrames=sim.BossStaggerFrames;
-                    generalArt.CanRecoverFromBreak=!sim.BossDefeated;
-                }
-                guardian.Tint=guardian.ChapterArt!=null?(sim.phase>=2?new Color(1,.82f,.72f):Color.white):
+                guardian.Tint=guardian.ChapterArt!=null?Color.white:
                     wrathActive==0||wrathActive==2?new Color(.80f,.71f,.58f):
                     wrathActive==1?new Color(.84f,.52f,.35f):wrathActive==3?new Color(.65f,.52f,.61f):
                     sim.phase>=2?new Color(1,.43f,.30f):new Color(.91f,.61f,.54f);

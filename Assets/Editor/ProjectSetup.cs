@@ -16,7 +16,7 @@ public class PixelImport:AssetPostprocessor
         var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);settings.spriteMeshType=SpriteMeshType.FullRect;settings.spriteAlignment=(int)SpriteAlignment.Custom;
         bool hero=assetPath.Contains("/pixel8/frames16/")||assetPath.Contains("/pixel8/frames/")&&!new[]{"slash/","impact/","parry_success/","perfect_dodge/","heal_fx/","attack_fx/"}.Any(s=>assetPath.Contains(s));
         bool guardian=assetPath.Contains("/guardian8/frames/")||assetPath.Contains("/guardian8/frames16/");
-        bool wrathGeneral=assetPath.StartsWith("Assets/Resources/"+WrathGeneralArt.ResourceRoot,StringComparison.Ordinal);
+        bool wrathGeneral=assetPath.StartsWith("Assets/Resources/"+WrathGeneralArt.ResourceRoot,StringComparison.Ordinal)||assetPath.StartsWith("Assets/Resources/"+WrathGeneralArt.Phase2ResourceRoot,StringComparison.Ordinal);
         if(wrathGeneral)settings.spritePixelsPerUnit=WrathGeneralArt.PixelsPerUnit;
         settings.spritePivot=wrathGeneral?new Vector2(WrathGeneralArt.RootX,WrathGeneralArt.FootY):guardian?new Vector2(.5f,24f/224):hero?new Vector2(.5f,.125f):new Vector2(.5f,.5f);importer.SetTextureSettings(settings);
     }

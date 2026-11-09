@@ -104,6 +104,13 @@ namespace LingyueEchoes
             generalArt=new WrathGeneralArt();
         }
         public IWrathPoseSource UseActorArt(bool general,int encounter)=>general?generalArt:null;
+        public void PrepareActorArt(Combat sim,bool weaponAsh)
+        {
+            generalArt.CurrentPhase=sim.phase>=2||weaponAsh?2:1;
+            generalArt.PhaseTransitionFrames=sim.BossTransitionFrames;
+            generalArt.BossStaggerFrames=sim.BossStaggerFrames;
+            generalArt.CanRecoverFromBreak=!sim.BossDefeated;
+        }
         public System.Collections.Generic.IEnumerable<Box> Terrain()
         {
             foreach(var stone in bridgeStones){

@@ -7,20 +7,24 @@ namespace LingyueEchoes
     public sealed class WrathGeneralArt:IWrathPoseSource
     {
         public const string ResourceRoot="WrathGeneral/frames/";
+        public const string Phase2ResourceRoot="WrathGeneral/phase2/frames/";
         public const int FrameCount=16;
         public const int StunLoopStart=15,StunEntryFps=24,StunHoldFps=8;
         // Shared import calibration, measured from the bottom-left of each square canvas.
         public const int CanvasPixels=384;
         public const float RootX=230f/384,FootY=37f/384,PixelsPerUnit=180f;
         readonly Sprite[] idle=Load("idle"),walk=Load("walk"),stun=Load("stun"),hurt=Load("hurt");
+        Sprite[] phase2Idle,phase2Walk,phase2Stun,phase2Hurt,phaseTransition;
+        public int CurrentPhase {get;set;}=1;
+        public int PhaseTransitionFrames {get;set;}=BossBehaviorCatalog.WrathGeneral.phases[1].transitionFrames;
         // The owning combat view supplies its active definition; standalone previews use the catalog.
         public int BossStaggerFrames {get;set;}=BossBehaviorCatalog.WrathGeneral.staggerFrames;
         public bool CanRecoverFromBreak {get;set;}=true;
 
-        static Sprite[] Load(string action){
+        static Sprite[] Load(string action,string root=ResourceRoot){
             var frames=new Sprite[FrameCount];
             for(int i=0;i<frames.Length;i++){
-                string path=ResourceRoot+action+"/"+action+"-"+(i+1).ToString("00");
+                string path=root+action+"/"+action+"-"+(i+1).ToString("00");
                 frames[i]=Resources.Load<Sprite>(path);
                 if(!frames[i])throw new InvalidOperationException("Missing Wrath General animation frame: Resources/"+path+".png");
             }
@@ -30,6 +34,18 @@ namespace LingyueEchoes
         public Sprite Pose(Fighter fighter,string scripted,int cell,double? seconds){
             double elapsed=Math.Max(0,seconds??Math.Max(0,fighter.age-1)/60d);
             string state=scripted??fighter.state;
+            if(state=="phase"){
+                if(phaseTransition==null)phaseTransition=Load("phase",Phase2ResourceRoot);
+                return phaseTransition[ReactionFrame(elapsed,PhaseTransitionFrames)];
+            }
+            Sprite[] idle=this.idle,walk=this.walk,stun=this.stun,hurt=this.hurt;
+            if(CurrentPhase>=2){
+                if(phase2Idle==null)phase2Idle=Load("idle",Phase2ResourceRoot);
+                if(phase2Walk==null)phase2Walk=Load("walk",Phase2ResourceRoot);
+                if(phase2Stun==null)phase2Stun=Load("stun",Phase2ResourceRoot);
+                if(phase2Hurt==null)phase2Hurt=Load("hurt",Phase2ResourceRoot);
+                idle=phase2Idle;walk=phase2Walk;stun=phase2Stun;hurt=phase2Hurt;
+            }
             bool kneeling=state=="broken"||state=="stun"||state=="dead"||fighter.hp<=0;
             if(kneeling){
                 // Scripted defeat and death stay down. Only a timed combat break rises again.
