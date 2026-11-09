@@ -17,6 +17,44 @@ namespace LingyueEchoes
         float WrathExteriorBoundsMax=>Mathf.Min(ExteriorCameraEndX(WrathOutsideZoom)+3.6f/WrathOutsideZoom*view.aspect*100,
             Mathf.Min(WrathExteriorNearPillar?WrathExteriorNearPillar.bounds.max.x*100:float.PositiveInfinity,
                 wrath?wrath.ExteriorDoorSeamX*100:float.PositiveInfinity));
+        bool WrathPhaseTransition=>stage=="GUARDIAN_FIGHT"&&ChapterBoss&&sim.phase>=2&&sim.boss.state=="phase";
+        bool wrathPhaseCamera;
+        Vector3 wrathPhaseCameraStart;
+        float wrathPhaseCameraSize;
+        void AdvanceWrathBattle(float dt){
+            // Split wall time into one-tick pieces: only the phase-entry tick can use the old rate.
+            float remaining=dt;
+            while(remaining>0){
+                float slice=Mathf.Min(remaining,1f/60);remaining-=slice;
+                clock.Advance(slice*(WrathPhaseTransition ? .8f : 1f),()=>{
+                    if(!wrathPhaseWipe.Observe(sim,stage=="GUARDIAN_FIGHT"&&ChapterBoss))return false;
+                    ClearInput();return true;
+                });
+                if(wrathPhaseWipe.Active){clock.ClearAccumulation();break;}
+            }
+        }
+        void CaptureWrathPhaseCamera(){
+            if(!WrathPhaseTransition){wrathPhaseCamera=false;return;}
+            if(wrathPhaseCamera)return;
+            wrathPhaseCamera=true;wrathPhaseCameraStart=view.transform.position;wrathPhaseCameraSize=view.orthographicSize;
+        }
+        void ApplyWrathPhaseCamera(){
+            if(!WrathPhaseTransition||!wrathPhaseCamera)return;
+            int frame=WrathGeneralArt.ReactionFrame(Math.Max(0,sim.boss.age-1)/60d,sim.BossTransitionFrames,32);
+            var close=new Vector3((float)sim.boss.x/100,-.18f,view.transform.position.z);
+            const float closeSize=3.6f/2.5f;
+            if(wrathPhaseWipe.Active){view.transform.position=close;view.orthographicSize=closeSize;return;}
+            if(!wrathPhaseWipe.Consumed){
+                float approach=Mathf.SmoothStep(0,1,Mathf.Clamp01(frame/12f));
+                view.transform.position=Vector3.Lerp(wrathPhaseCameraStart,close,approach);
+                view.orthographicSize=Mathf.Lerp(wrathPhaseCameraSize,closeSize,approach);
+            }else{
+                float rise=Mathf.SmoothStep(0,1,Mathf.Clamp01((frame-16)/15f));
+                view.transform.position=Vector3.Lerp(close,view.transform.position,rise);
+                view.orthographicSize=Mathf.Lerp(closeSize,view.orthographicSize,rise);
+            }
+        }
+
         void DrawWrathPhaseWipe(){
             if(wrathWipeTextures==null){wrathWipeTextures=new Texture2D[WrathPhaseWipe.FrameCount];for(int i=0;i<wrathWipeTextures.Length;i++)wrathWipeTextures[i]=Resources.Load<Texture2D>(WrathPhaseWipe.ResourceRoot+(i+1).ToString("00"));}
             var matrix=GUI.matrix;var color=GUI.color;bool enabled=GUI.enabled;int depth=GUI.depth;
@@ -24,6 +62,7 @@ namespace LingyueEchoes
                 var screen=new Rect(0,0,Screen.width,Screen.height);
                 // The charred screen seals tiny transparent holes in the flame peak, including letterboxing.
                 float blacken=Mathf.Min(Mathf.Clamp01((wrathPhaseWipe.Elapsed-.5f)/.3f),Mathf.Clamp01((1.3f-wrathPhaseWipe.Elapsed)/.2f));
+                if(wrathPhaseWipe.FrameIndex>=8&&wrathPhaseWipe.FrameIndex<=10)blacken=1;
                 GUI.color=new Color(.06f,.005f,.005f,blacken);GUI.DrawTexture(screen,Texture2D.whiteTexture);GUI.color=Color.white;
                 var texture=wrathWipeTextures[wrathPhaseWipe.FrameIndex];if(texture)GUI.DrawTexture(screen,texture,ScaleMode.StretchToFill,true);
             }finally{GUI.matrix=matrix;GUI.color=color;GUI.enabled=enabled;GUI.depth=depth;}

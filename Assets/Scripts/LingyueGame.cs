@@ -293,7 +293,7 @@ namespace LingyueEchoes
             if(applicationSuspended||!focused&&(!Application.isBatchMode||wrathPhaseWipe.Active))return;ReadInput();
             if(wrathPhaseWipe.Active){
                 wrathPhaseWipe.Advance(unscaledDelta,clock.paused||gameSettings||backpackOpen);
-                clock.ClearAccumulation();DrawActors(null);return;
+                clock.ClearAccumulation();if(clock.paused||gameSettings||backpackOpen)DrawActors(null);else DrawWorld(0);return;
             }
             if(music)music.mute=muted;
             if(tailAudio)tailAudio.mute=muted;
@@ -320,7 +320,7 @@ namespace LingyueEchoes
                 case "GUARDIAN_DEFEAT":UpdateGuardianDefeat(dt);break;
                 case "DYING":case "DEATH":UpdateDeath(dt);break;
                 default:
-                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();clock.Advance(dt,()=>{if(!wrathPhaseWipe.Observe(sim,stage=="GUARDIAN_FIGHT"&&ChapterBoss))return false;ClearInput();return true;});SyncSounds();
+                    if(BattleOn){sim.axis=WakeDialogue?0:ReadAxis();AdvanceWrathBattle(dt);SyncSounds();
                         if(sim.player.hp<=0&&sim.player.state=="dead"){EnterDeath();}
                         else if(stage=="TUTORIAL"){var id=tutorial.Speech(sim,!speech.Active);if(id!=null)Say(id);
                             if(!checkpointReached&&tutorial.GateBound&&sim.player.x>=PrologueLayout.CheckpointX)SaveCheckpoint();}
@@ -336,7 +336,7 @@ namespace LingyueEchoes
         }
         void UpdateStory(float dt){if(stageTime<.4f)return;storyTime+=dt;float span=storyPhase=="hold"?(float)DialogueDirector.ReadingHold(content.story[storyIndex].Length):.4f;if(storyTime>=span){storyTime=0;if(storyPhase=="in")storyPhase="hold";else if(storyPhase=="hold")storyPhase="out";else AdvanceStory();}}
         void AdvanceStory(){if(stage!="STORY"||stageTime<.4f)return;storyIndex++;storyPhase="in";storyTime=0;if(storyIndex>=content.story.Length){SetStage("FADE_IN");SetMusic("prologue_stage_1");}}
-        void DrawWorld(float dt){var p=sim.player;var b=sim.boss;float zoom=1,focusY=0;
+        void DrawWorld(float dt){if(WrathPhaseTransition&&clock.paused){DrawActors(null);return;}CaptureWrathPhaseCamera();var p=sim.player;var b=sim.boss;float zoom=1,focusY=0;
             if(stage=="DYING"||stage=="DEATH"){float t=Ease(Mathf.Clamp01(deathZoomTime/DeathZoomDuration));
                 var target=new Vector3((float)p.x/100,((float)p.y-55)/100,-10);view.orthographicSize=Mathf.Lerp(deathCameraSize,3.6f/2.2f,t);view.transform.position=Vector3.Lerp(deathCameraPosition,target,t);}
             else{if(stage=="FADE_IN"||stage=="CAMERA_REVEAL"){float t=stage=="FADE_IN"?0:Mathf.Clamp01((stageTime-.7f)/2.8f),ease=Ease(t);zoom=Mathf.Lerp(2.2f,1,ease);cameraX=Mathf.Lerp((float)p.x,RouteCameraX(),ease);focusY=Mathf.Lerp((float)p.y+40,0,ease);}
@@ -361,6 +361,7 @@ namespace LingyueEchoes
                 view.transform.position=cameraPosition;
                 cameraX=cameraPosition.x*100;
             }
+            ApplyWrathPhaseCamera();
             // Noninteractive scenes still need idle loops, even when the battle clock is stopped.
             bool ticked=BattleOn||stage=="GUARDIAN_DEFEAT"||stage=="DYING"||stage=="DEATH";
             DrawActors(ticked?(double?)null:dt);
@@ -394,7 +395,16 @@ namespace LingyueEchoes
             }else if(stage=="GATE_DIALOGUE"&&speech.Cue=="drawBlade")guardian.Draw(b,sim.frame,pose:"slash",poseCell:Mathf.Min(3,(int)(bladeDrawTime*5)));
             else if(stage=="GUARDIAN_DEFEAT")guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:GuardianDefeatElapsed);
             else if(TailStory)guardian.Draw(b,sim.frame,pose:"broken",poseSeconds:guardianDefeatDuration);
-            else if(wrathPhaseWipe.Active)guardian.Draw(b,sim.frame,pose:"phase-engulf",poseCell:7);
+            else if(wrathPhaseWipe.Active){
+                bool rise=wrathPhaseWipe.AfterHold;
+                int cell=wrathPhaseWipe.WipeActive?15:wrathPhaseWipe.HoldSpriteIndex;
+                guardian.Draw(b,sim.frame,pose:rise?"phase-rise":"phase-engulf",poseSeconds:(cell+.001)*Math.Max(1,sim.BossTransitionFrames-2)/(15d*60));
+            }
+            else if(WrathPhaseTransition&&wrathPhaseWipe.Consumed){
+                int frame=WrathGeneralArt.ReactionFrame(Math.Max(0,b.age-1)/60d,sim.BossTransitionFrames,32);
+                int cell=Mathf.Clamp(frame-16,1,15);
+                guardian.Draw(b,sim.frame,pose:"phase-rise",poseSeconds:(cell+.001)*Math.Max(1,sim.BossTransitionFrames-2)/(15d*60));
+            }
             else guardian.Draw(b,sim.frame,alpha:wrath&&wrathActive<0&&!ChapterGeneralVisible?0:1,idleDelta:idleDelta);
             float glintAge=stageTime-TrialSlashTime;
             bool bladeFlash=!wrath&&stage=="GUARDIAN_INTRO"&&glintAge>=0&&glintAge<.18f;
@@ -652,7 +662,7 @@ namespace LingyueEchoes
         void OnApplicationPause(bool pause){applicationSuspended=pause;if(pause){ClearInput();clock?.ClearAccumulation();}}
         void OnDestroy(){StopSounds();if(font)Destroy(font);if(hudPortrait)Destroy(hudPortrait);if(hudRing)Destroy(hudRing);if(tailGlow)Destroy(tailGlow);if(tailVignette)Destroy(tailVignette);}
 
-        void OnGUI(){if(wrathPhaseWipe.Active){DrawWrathPhaseWipe();return;}if(!font)return;var oldMatrix=GUI.matrix;float scale=Math.Min(Screen.width/1280f,Screen.height/720f);GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*scale)/2,(Screen.height-720*scale)/2,0),Quaternion.identity,Vector3.one*scale);
+        void OnGUI(){if(wrathPhaseWipe.WipeActive){DrawWrathPhaseWipe();return;}if(wrathPhaseWipe.Active)return;if(!font)return;var oldMatrix=GUI.matrix;float scale=Math.Min(Screen.width/1280f,Screen.height/720f);GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*scale)/2,(Screen.height-720*scale)/2,0),Quaternion.identity,Vector3.one*scale);
             if(textStyle==null){textStyle=new GUIStyle(GUI.skin.label){font=font,wordWrap=true};buttonStyle=new GUIStyle(GUI.skin.button){font=font,fontSize=21,alignment=TextAnchor.MiddleCenter,wordWrap=true};}
             if(stage=="MENU")MenuGUI();
             else{
