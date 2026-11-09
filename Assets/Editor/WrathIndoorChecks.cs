@@ -81,7 +81,10 @@ public static class WrathIndoorChecks
     }
     static void CheckScenery(WrathChapter chapter){
         Need(chapter.exteriorScenery&&chapter.exteriorScenery.sprite&&chapter.exteriorScenery.enabled==!chapter.IsInside,"authored exterior visibility follows the entrance state");
-        Need(chapter.exteriorHouse&&chapter.exteriorHouse.sprite&&chapter.exteriorHouse.enabled==!chapter.IsInside,"independent house visibility follows the entrance state");
+        Need(chapter.exteriorPillars!=null&&chapter.exteriorPillars.Length==2&&
+            chapter.exteriorPillars.All(r=>r&&r.sprite&&r.enabled==!chapter.IsInside)&&
+            chapter.exteriorPillars[0].sprite==chapter.exteriorPillars[1].sprite,
+            "both shared-sprite pillars follow the entrance state");
         Need(chapter.scenery.All(r=>r&&r.enabled==chapter.IsInside),"interior visibility follows the room state");
         Need(chapter.entranceDoor.flipX,"door faces the arriving hero");
     }

@@ -29,10 +29,7 @@
     "entrance": 33.4,
     "entrance_walk_max": 34.2,
     "door_center": 34.31,
-    "door_render_size": 2.20,
-    "exterior_house_artifact": "../../Assets/Art/Wrath/House.png",
-    "exterior_house_size": [6, 4],
-    "exterior_house_position": [35.60, 0.66],
+    "door_render_size": 2.2,
     "exterior_artifact": "../../Assets/Art/Wrath/Exterior.png",
     "exterior_camera_center": 32.5,
     "exterior_camera_zoom": 1.5,
@@ -40,6 +37,17 @@
     "combat_bounds": [
       32.1,
       41.3
+    ],
+    "exterior_pillar_artifact": "../../Assets/Art/Wrath/Pillar.png",
+    "exterior_pillar_foot_positions": [
+      [
+        33.7,
+        -0.65
+      ],
+      [
+        34.9,
+        -0.95
+      ]
     ]
   },
   "native_scene": "../../Assets/Scenes/Chapter01_Wrath.unity"

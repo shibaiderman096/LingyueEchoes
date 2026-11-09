@@ -1,0 +1,32 @@
+{
+  "art_source": "host_image",
+  "route": "built-in image_gen",
+  "estimateUsd": null,
+  "asset": "Assets/Art/Wrath/Pillar.png",
+  "source": "exec-96ce928d-7624-4238-9847-2cc0a794fd2f.png",
+  "prompt": "Use case: stylized-concept. Asset type: ONE isolated architectural pillar sprite for a 2D side scrolling Chinese dark fantasy pixel art game. Create a single tall vertical vermilion lacquered cylindrical palace column, restrained antique gold collars at top and foot, compact carved dark charcoal stone plinth with subtle gold scrollwork. Match the red gold purple palette and detailed crisp pixel-art rendering of the provided palace reference. The column is a standalone structural pillar, not a stele, not a gate, not a house. Long straight red shaft occupies most of its height, gold top capital and stepped stone base, symmetrical vertical silhouette, subtle three-quarter volume showing a small right side. Horizontal flat contact edge at bottom. Full object visible with generous transparent margins on all sides; ratio pillar width to height around 1:6, pillar body fills about 85% canvas height, centered on a portrait canvas. True transparent alpha background, no scenery, no floor, no cast shadow, no white matte, no white halo, no text, no roof, no walls, no lantern, no other objects. Hard clean pixel clusters and controlled highlights, nearest-neighbor appearance; not a soft 3D render.",
+  "finish": "Native alpha threshold 128, transparent RGB zero; alpha-bbox crop plus 8px gutters; no resampling.",
+  "placement": "Two instances: far road edge and near road edge, separate sorting around the hero; actual opaque bottom anchored to each road edge.",
+  "canvas": [
+    288,
+    1942
+  ],
+  "visibleHeightWorld": 2.975283213182286,
+  "canvasHeightWorld": 3,
+  "canvasWidthWorld": 0.44490216271884653,
+  "bottomGutterPixels": 8,
+  "footPositions": [
+    [
+      33.7,
+      -0.65
+    ],
+    [
+      34.9,
+      -0.95
+    ]
+  ],
+  "sortOrders": [
+    -15,
+    14
+  ]
+}

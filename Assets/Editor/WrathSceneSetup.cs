@@ -11,8 +11,8 @@ public static class WrathSceneSetup
     const string PalettePath="Assets/Scenes/WrathPlaceholderSprites.asset";
     const string ArtPath="Assets/Art/Wrath/";
     const float ExteriorWidth=14.4f,ExteriorCenterX=31.08f,ExteriorFloorFromTop=.68f;
-    // Independent house plate: adjust its placement without rescaling the road backdrop.
-    const float ExteriorHouseX=35.60f,ExteriorHouseY=.66f,ExteriorHouseWidth=6f,ExteriorHouseHeight=4f;
+    // Reuse the same pillar sprite on the far and near edges of the road.
+    const float ExteriorPillarHeight=3f;
     const float InteriorWidth=20f,InteriorCenterX=37.1f,FloorY=-.95f;
     const float EntranceDoorX=34.31f,EntranceDoorY=.25f,EntranceDoorSize=2.20f;
     static Color C(int r,int g,int b,int a=255)=>new Color32((byte)r,(byte)g,(byte)b,(byte)a);
@@ -41,7 +41,7 @@ public static class WrathSceneSetup
     public static void RebuildIndoor(){
         var interior=LoadArt("Interior");
         var exterior=LoadArt("Exterior");
-        var house=LoadArt("House");
+        var pillar=LoadArt("Pillar");
         var doors=Enumerable.Range(1,16).Select(i=>LoadArt("DoorOpening/door-"+i.ToString("00"))).ToArray();
         var shapes=AssetDatabase.LoadAllAssetsAtPath(PalettePath).OfType<Sprite>().ToDictionary(x=>x.name);
         var block=shapes["Block"];var flame=shapes["Flame"];
@@ -59,7 +59,12 @@ public static class WrathSceneSetup
         chapter.scenery=new[]{Piece(room,"General hall interior",interior,InteriorCenterX,FloorY+.18f*height,InteriorWidth,height,-20,Color.white)};
         float exteriorHeight=ExteriorWidth*exterior.rect.height/exterior.rect.width;
         chapter.exteriorScenery=Piece(room,"General hall exterior",exterior,ExteriorCenterX,FloorY+(ExteriorFloorFromTop-.5f)*exteriorHeight,ExteriorWidth,exteriorHeight,-20,Color.white);
-        chapter.exteriorHouse=Piece(room,"General hall exterior house",house,ExteriorHouseX,ExteriorHouseY,ExteriorHouseWidth,ExteriorHouseHeight,-15,Color.white);
+        float pillarWidth=ExteriorPillarHeight*pillar.rect.width/pillar.rect.height;
+        float pillarBottomGutter=8f*ExteriorPillarHeight/pillar.rect.height;
+        chapter.exteriorPillars=new[]{
+            Piece(room,"General hall exterior far pillar",pillar,33.7f,-.65f+ExteriorPillarHeight*.5f-pillarBottomGutter,pillarWidth,ExteriorPillarHeight,-15,Color.white),
+            Piece(room,"General hall exterior near pillar",pillar,34.9f,FloorY+ExteriorPillarHeight*.5f-pillarBottomGutter,pillarWidth,ExteriorPillarHeight,14,Color.white)
+        };
         chapter.bridgeStones=Array.Empty<SpriteRenderer>();
         var props=Group(world,"Props");
         chapter.entranceDoorFrames=doors;

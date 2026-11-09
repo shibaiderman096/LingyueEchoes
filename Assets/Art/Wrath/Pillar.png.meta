@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e78efcf6a50c49cc8d44ed5e9644a2ae
+guid: 295fe263a5c242b5bc1ecf026104e196
 TextureImporter:
   internalIDToNameTable:
   - first:
       213: -3552702312740951106
-    second: House_0
+    second: Pillar_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,7 +128,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: House_0
+      name: Pillar_0
       rect:
         serializedVersion: 2
         x: 0
@@ -163,7 +163,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      House_0: -3552702312740951106
+      Pillar_0: -3552702312740951106
   mipmapLimitGroupName:
   pSDRemoveMatte: 0
   userData:
